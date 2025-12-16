@@ -16,12 +16,15 @@ MVP web per autotrasportatori e aziende costruito con **Next.js**, **React**, **
 │   │   │   └── health/route.ts          # API di esempio per stato
 │   │   ├── dashboard/page.tsx           # Pagina protetta (richiede sessione)
 │   │   ├── dashboard/transporter/page.tsx # Dashboard dedicata al ruolo TRANSPORTER
+│   │   ├── dashboard/company/page.tsx    # Dashboard dedicata al ruolo COMPANY
 │   │   ├── globals.css                  # Stili globali minimi
 │   │   ├── layout.tsx                   # Layout root con header e main
 │   │   ├── login/page.tsx               # Pagina di accesso
 │   │   ├── register/page.tsx            # Pagina di registrazione
 │   │   └── page.tsx                     # Homepage
 │   ├── components/logout-button.tsx     # Bottone client per logout via API
+│   ├── components/
+│   │   └── dashboard/section-card.tsx   # Card riutilizzabile per le sezioni dashboard
 │   └── lib/
 │       ├── auth.ts                      # Firma/verifica token e lettura sessione
 │       └── prisma.ts                    # Client Prisma condiviso
@@ -64,7 +67,7 @@ Prisma definisce un enum `UserRole` con due valori: `TRANSPORTER` e `COMPANY`. I
 - **Login**: la pagina `/login` invia le credenziali a `POST /api/auth/login`, verifica l'hash e aggiorna il cookie di sessione JWT.
 - **Logout**: `POST /api/auth/logout` invalida il cookie di sessione.
 - **Protezione pagine**: `middleware.ts` blocca l'accesso a `/dashboard` se il token non è presente o non è valido. `getSessionUser` usa Prisma per recuperare l'utente nel server component.
-- **Protezione pagine**: `middleware.ts` blocca l'accesso a `/dashboard` se il token non è presente o non è valido. `getSessionUser` usa Prisma per recuperare l'utente nel server component. La pagina `/dashboard/transporter` applica un controllo server-side aggiuntivo sul ruolo `TRANSPORTER` e mostra contatti aziendali solo se l'abbonamento è attivo.
+- **Protezione pagine**: `middleware.ts` blocca l'accesso a `/dashboard` se il token non è presente o non è valido. `getSessionUser` usa Prisma per recuperare l'utente nel server component. La pagina `/dashboard/transporter` applica un controllo server-side aggiuntivo sul ruolo `TRANSPORTER` e mostra contatti aziendali solo se l'abbonamento è attivo. La pagina `/dashboard/company` esegue un controllo simile per il ruolo `COMPANY` e offre panoramica profilo e gestione richieste inviate.
 - I messaggi di stato sono mostrati nelle pagine tramite fetch client-side con redirect alla dashboard dopo successo.
 
 ## Comandi utili

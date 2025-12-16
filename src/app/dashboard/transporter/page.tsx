@@ -1,3 +1,4 @@
+import { SectionCard } from "@/components/dashboard/section-card";
 import { getSessionUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -56,9 +57,8 @@ export default async function TransporterDashboardPage() {
       </header>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">Profilo</h2>
-          <dl className="mt-3 space-y-2 text-sm text-slate-700">
+        <SectionCard title="Profilo">
+          <dl className="space-y-2 text-sm text-slate-700">
             <div className="flex justify-between gap-4">
               <dt className="text-slate-500">Email</dt>
               <dd className="font-medium text-slate-900">{user.email}</dd>
@@ -74,16 +74,12 @@ export default async function TransporterDashboardPage() {
               </dd>
             </div>
           </dl>
-        </div>
+        </SectionCard>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm md:col-span-2">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900">Abbonamento</h2>
-              <p className="text-sm text-slate-600">
-                I dettagli di contatto delle aziende sono visibili solo con un abbonamento attivo.
-              </p>
-            </div>
+        <SectionCard
+          title="Abbonamento"
+          description="I dettagli di contatto delle aziende sono visibili solo con un abbonamento attivo."
+          actions={
             <span
               className={`rounded-full px-3 py-1 text-xs font-semibold ${
                 subscriptionActive ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
@@ -91,30 +87,25 @@ export default async function TransporterDashboardPage() {
             >
               {subscriptionActive ? "Attivo" : "Non attivo"}
             </span>
-          </div>
+          }
+        >
           {!subscriptionActive && (
-            <div className="mt-3 flex flex-wrap gap-2 text-sm">
-              <button className="rounded-md bg-slate-900 px-3 py-2 text-white">
-                Attiva ora
-              </button>
+            <div className="flex flex-wrap gap-2 text-sm">
+              <button className="rounded-md bg-slate-900 px-3 py-2 text-white">Attiva ora</button>
               <button className="rounded-md border border-slate-200 px-3 py-2 text-slate-800">
                 Contatta l&apos;assistenza
               </button>
             </div>
           )}
-        </div>
+        </SectionCard>
       </section>
 
-      <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">Richieste ricevute</h2>
-            <p className="text-sm text-slate-600">Elenco di richieste inviate dalle aziende (dati di esempio).</p>
-          </div>
-          <span className="text-sm text-slate-500">{jobRequests.length} richieste</span>
-        </div>
-
-        <div className="mt-4 overflow-x-auto">
+      <SectionCard
+        title="Richieste ricevute"
+        description="Elenco di richieste inviate dalle aziende (dati di esempio)."
+        actions={<span className="text-sm text-slate-500">{jobRequests.length} richieste</span>}
+      >
+        <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
             <thead className="bg-slate-50 text-slate-700">
               <tr>
@@ -129,9 +120,7 @@ export default async function TransporterDashboardPage() {
             <tbody className="divide-y divide-slate-200">
               {jobRequests.map((request) => (
                 <tr key={request.id} className="hover:bg-slate-50">
-                  <td className="whitespace-nowrap px-4 py-3 font-medium text-slate-900">
-                    {request.id}
-                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 font-medium text-slate-900">{request.id}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-slate-800">{request.company}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-slate-800">{request.cargo}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-slate-800">
@@ -156,7 +145,7 @@ export default async function TransporterDashboardPage() {
             </tbody>
           </table>
         </div>
-      </section>
+      </SectionCard>
     </div>
   );
 }
