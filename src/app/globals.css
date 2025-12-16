@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0c0e1a;
+  --foreground: #f8f9ff;
+}
+
+body {
+  background: radial-gradient(circle at 20% 20%, rgba(76, 93, 255, 0.1), transparent 25%),
+    radial-gradient(circle at 80% 0%, rgba(76, 93, 255, 0.08), transparent 20%),
+    var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-full bg-brand-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-500/30 transition hover:-translate-y-0.5 hover:bg-brand-600 hover:shadow-xl hover:shadow-brand-500/40;
+}
+
+.card {
+  @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-lg shadow-black/20;
+}
