@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
+
+import { buildSessionCookie, createSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
@@ -36,7 +38,23 @@ export async function POST(request: Request) {
     const passwordHash = await hash(password, 10);
     const user = await prisma.user.create({ data: { email, password: passwordHash, role } });
 
-    return NextResponse.json({ id: user.id, email: user.email, role: user.role, createdAt: user.createdAt });
+    // Crea subito una sessione autenticata per l'utente appena registrato.
+    const sessionToken = await createSessionToken({
+      sub: String(user.id),
+      email: user.email,
+      role: user.role,
+    });
+
+    const response = NextResponse.json({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt,
+    });
+
+    response.cookies.set(buildSessionCookie(sessionToken));
+
+    return response;
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Registrazione non riuscita." }, { status: 500 });

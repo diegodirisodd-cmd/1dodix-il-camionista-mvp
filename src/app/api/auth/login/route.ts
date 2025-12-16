@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
 import { compare } from "bcryptjs";
-import { prisma } from "@/lib/prisma";
 
-function createSessionToken(userId: number) {
-  const tokenBase = `${userId}:${Date.now()}`;
-  return Buffer.from(tokenBase).toString("base64");
-}
+import { buildSessionCookie, createSessionToken } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
@@ -29,15 +26,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Credenziali non valide." }, { status: 401 });
     }
 
-    const sessionToken = createSessionToken(user.id);
-    const response = NextResponse.json({ message: "Accesso eseguito.", email: user.email, role: user.role });
-    response.cookies.set({
-      name: "dodix_session",
-      value: sessionToken,
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
+    const sessionToken = await createSessionToken({
+      sub: String(user.id),
+      email: user.email,
+      role: user.role,
     });
+    const response = NextResponse.json({ message: "Accesso eseguito.", email: user.email, role: user.role });
+    response.cookies.set(buildSessionCookie(sessionToken));
 
     return response;
   } catch (error) {
