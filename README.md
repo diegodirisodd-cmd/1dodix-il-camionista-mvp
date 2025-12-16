@@ -1,25 +1,35 @@
 # DodiX – Il Camionista (MVP)
 
-MVP web per autotrasportatori costruito con **Next.js**, **React**, **Tailwind CSS** e **Prisma** su **SQLite**. Offre una homepage informativa, API route base e una struttura pronta per evolvere con funzionalità di logistica (viaggi, aggiornamenti, note).
+MVP web per autotrasportatori costruito con **Next.js**, **React**, **Tailwind CSS** e **Prisma** su **SQLite**. Include homepage,
+autenticazione email/password di base e pagine per accesso e registrazione.
 
 ## Struttura del progetto
 
 ```
 .
-├── prisma/              # Schema del database e file SQLite (non incluso)
-├── public/              # Asset statici (vuoto per ora)
+├── prisma/                 # Schema del database e file SQLite (non incluso)
+├── public/                 # Asset statici (vuoto per ora)
 ├── src/
-│   ├── app/             # App Router di Next.js
-│   │   ├── api/health/  # API route di esempio
-│   │   ├── globals.css  # Stili globali con Tailwind
-│   │   ├── layout.tsx   # Layout root
-│   │   └── page.tsx     # Homepage
-│   └── components/      # Componenti riutilizzabili (da aggiungere)
-├── .env.example         # Variabile d'ambiente per SQLite
-├── next.config.mjs      # Configurazione Next.js
-├── tailwind.config.ts   # Configurazione Tailwind CSS
-└── tsconfig.json        # Config TypeScript
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── auth/login/route.ts     # Endpoint login email/password
+│   │   │   ├── auth/register/route.ts  # Endpoint registrazione
+│   │   │   └── health/route.ts         # API di esempio per stato
+│   │   ├── globals.css                 # Stili globali minimi
+│   │   ├── layout.tsx                  # Layout root con header e main
+│   │   ├── login/page.tsx              # Pagina di accesso
+│   │   ├── register/page.tsx           # Pagina di registrazione
+│   │   └── page.tsx                    # Homepage
+│   └── lib/prisma.ts                   # Client Prisma condiviso
+├── .env.example                        # Variabile d'ambiente per SQLite
+├── next.config.mjs                     # Configurazione Next.js
+├── tailwind.config.ts                  # Configurazione Tailwind CSS
+└── tsconfig.json                       # Config TypeScript
 ```
+
+## Modello dati
+
+Prisma definisce un modello `User` con email univoca e hash password, e un modello `Trip` di esempio per estensioni future.
 
 ## Prerequisiti
 - Node.js 18+
@@ -44,6 +54,13 @@ MVP web per autotrasportatori costruito con **Next.js**, **React**, **Tailwind C
    ```
    L'app sarà disponibile su http://localhost:3000.
 
+## Flusso di autenticazione
+- **Registrazione**: la pagina `/register` invia email e password a `POST /api/auth/register`, che valida, genera l'hash (bcrypt)
+  e crea l'utente in SQLite.
+- **Login**: la pagina `/login` invia le credenziali a `POST /api/auth/login`, verifica l'hash e imposta un cookie di sessione
+  basilare (`dodix_session`) in risposta.
+- I messaggi di stato sono mostrati nelle pagine tramite fetch client-side.
+
 ## Comandi utili
 - `npm run dev` – Avvia il server Next.js in modalità sviluppo.
 - `npm run build` – Build di produzione.
@@ -54,6 +71,7 @@ MVP web per autotrasportatori costruito con **Next.js**, **React**, **Tailwind C
 - `npm run prisma:studio` – Apre Prisma Studio per ispezionare i dati.
 
 ## Note
-- Nessuna autenticazione è ancora presente.
 - Il database SQLite (`prisma/dev.db`) è ignorato nel controllo versione: sarà generato dopo la prima migrazione.
 - L'API `GET /api/health` restituisce uno stato base per verificare che il backend risponda.
+- I cookie di sessione creati da `/api/auth/login` sono dimostrativi: per un ambiente produttivo serviranno gestione sessioni e
+  scadenze reali.
