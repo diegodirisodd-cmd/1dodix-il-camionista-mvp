@@ -25,7 +25,8 @@ export default function LoginPage() {
       return;
     }
 
-    setResult(data.message ?? "Accesso eseguito.");
+    const roleInfo = data.role ? ` (ruolo: ${data.role.toLowerCase()})` : "";
+    setResult(`${data.message ?? "Accesso eseguito."}${roleInfo}`);
   };
 
   return (

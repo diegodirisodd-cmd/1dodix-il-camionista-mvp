@@ -31,7 +31,7 @@ export default function RegisterPage() {
   return (
     <section>
       <h1>Registrati</h1>
-      <p>Crea un account con email e password.</p>
+      <p>Crea un account con email, password e ruolo (trasportatore o azienda).</p>
 
       <form onSubmit={handleSubmit}>
         <div className="form-field">
@@ -42,6 +42,17 @@ export default function RegisterPage() {
         <div className="form-field">
           <label htmlFor="password">Password</label>
           <input id="password" name="password" type="password" minLength={6} required />
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="role">Ruolo</label>
+          <select id="role" name="role" required defaultValue="">
+            <option value="" disabled>
+              Seleziona un ruolo
+            </option>
+            <option value="trasportatore">Trasportatore</option>
+            <option value="azienda">Azienda</option>
+          </select>
         </div>
 
         <div className="form-actions">

@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     }
 
     const sessionToken = createSessionToken(user.id);
-    const response = NextResponse.json({ message: "Accesso eseguito.", email: user.email });
+    const response = NextResponse.json({ message: "Accesso eseguito.", email: user.email, role: user.role });
     response.cookies.set({
       name: "dodix_session",
       value: sessionToken,
