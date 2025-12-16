@@ -13,9 +13,31 @@ model User {
   password     String
   role         UserRole
   createdAt    DateTime  @default(now())
+  subscriptionActive Boolean @default(false)
+
+  requests     Request[]
 }
 
 enum UserRole {
   TRANSPORTER
   COMPANY
+}
+
+model Request {
+  id            Int       @id @default(autoincrement())
+  title         String
+  pickup        String
+  dropoff       String
+  cargo         String?
+  budget        String?
+  description   String?
+  contactName   String
+  contactPhone  String
+  contactEmail  String
+  company       User      @relation(fields: [companyId], references: [id])
+  companyId     Int
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([companyId])
 }

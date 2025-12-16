@@ -9,7 +9,7 @@ export default function HomePage() {
 
       <h2>Funzionalità incluse</h2>
       <ul>
-        <li>Home page con panoramica dell'app.</li>
+        <li>Home page con panoramica dell&apos;app.</li>
         <li>Pagina di registrazione con invio dati (email, password, ruolo) a un endpoint API.</li>
         <li>Pagina di accesso con verifica delle credenziali e creazione cookie di sessione.</li>
         <li>Area protetta (dashboard) accessibile solo se autenticati.</li>

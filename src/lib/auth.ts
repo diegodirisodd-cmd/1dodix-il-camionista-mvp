@@ -61,7 +61,7 @@ export async function getSessionUser() {
   const { prisma } = await import("./prisma");
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
-    select: { id: true, email: true, role: true, createdAt: true },
+    select: { id: true, email: true, role: true, createdAt: true, subscriptionActive: true },
   });
 
   if (!user) return null;

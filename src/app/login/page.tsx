@@ -35,7 +35,7 @@ export default function LoginPage() {
   return (
     <section>
       <h1>Accedi</h1>
-      <p>Inserisci email e password per eseguire l'accesso.</p>
+      <p>Inserisci email e password per eseguire l&apos;accesso.</p>
 
       <form onSubmit={handleSubmit}>
         <div className="form-field">

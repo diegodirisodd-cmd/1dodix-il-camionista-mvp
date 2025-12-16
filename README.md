@@ -13,10 +13,13 @@ MVP web per autotrasportatori e aziende costruito con **Next.js**, **React**, **
 │   │   │   ├── auth/login/route.ts      # Endpoint login email/password + cookie JWT
 │   │   │   ├── auth/logout/route.ts     # Pulizia cookie di sessione
 │   │   │   ├── auth/register/route.ts   # Endpoint registrazione con ruolo
+│   │   │   ├── requests/route.ts        # API creazione/lista richieste di trasporto
+│   │   │   ├── requests/[id]/route.ts   # API dettaglio/aggiornamento/cancellazione richiesta
 │   │   │   └── health/route.ts          # API di esempio per stato
 │   │   ├── dashboard/page.tsx           # Pagina protetta (richiede sessione)
 │   │   ├── dashboard/transporter/page.tsx # Dashboard dedicata al ruolo TRANSPORTER
-│   │   ├── dashboard/company/page.tsx    # Dashboard dedicata al ruolo COMPANY
+│   │   ├── dashboard/transporter/requests/page.tsx # Lista richieste visibile ai trasportatori
+│   │   ├── dashboard/company/page.tsx    # Dashboard dedicata al ruolo COMPANY con form pubblicazione richieste
 │   │   ├── globals.css                  # Stili globali minimi
 │   │   ├── layout.tsx                   # Layout root con header e main
 │   │   ├── login/page.tsx               # Pagina di accesso
@@ -24,6 +27,7 @@ MVP web per autotrasportatori e aziende costruito con **Next.js**, **React**, **
 │   │   └── page.tsx                     # Homepage
 │   ├── components/logout-button.tsx     # Bottone client per logout via API
 │   ├── components/
+│   │   ├── dashboard/request-form.tsx   # Form client per pubblicare richieste lato azienda
 │   │   └── dashboard/section-card.tsx   # Card riutilizzabile per le sezioni dashboard
 │   └── lib/
 │       ├── auth.ts                      # Firma/verifica token e lettura sessione
@@ -36,7 +40,10 @@ MVP web per autotrasportatori e aziende costruito con **Next.js**, **React**, **
 ```
 
 ## Modello dati
-Prisma definisce un enum `UserRole` con due valori: `TRANSPORTER` e `COMPANY`. Il modello `User` include email univoca, password (hash), ruolo e timestamp di creazione.
+Prisma definisce un enum `UserRole` con due valori: `TRANSPORTER` e `COMPANY`.
+
+- `User`: email univoca, password (hash), ruolo, flag `subscriptionActive` (sblocca contatti lato trasportatore) e timestamp di creazione.
+- `Request`: richiesta di trasporto pubblicata da un utente `COMPANY` con titolo, origine/destinazione, dati facoltativi su carico/budget/descrizione e riferimenti di contatto (visibili solo ai trasportatori abbonati).
 
 ## Prerequisiti
 - Node.js 18+
@@ -54,7 +61,7 @@ Prisma definisce un enum `UserRole` con due valori: `TRANSPORTER` e `COMPANY`. I
    Popola `AUTH_SECRET` con una stringa random e robusta (es. `openssl rand -base64 32`).
 3. **Migrazione database** (genera anche Prisma Client)
    ```bash
-   npx prisma migrate dev --name init
+   npx prisma migrate dev
    ```
 4. **Avvio in sviluppo**
    ```bash
@@ -66,9 +73,12 @@ Prisma definisce un enum `UserRole` con due valori: `TRANSPORTER` e `COMPANY`. I
 - **Registrazione**: la pagina `/register` invia email, password e ruolo a `POST /api/auth/register`, che valida i campi, genera l'hash (bcrypt), crea l'utente in SQLite e imposta un cookie di sessione JWT (`dodix_session`).
 - **Login**: la pagina `/login` invia le credenziali a `POST /api/auth/login`, verifica l'hash e aggiorna il cookie di sessione JWT.
 - **Logout**: `POST /api/auth/logout` invalida il cookie di sessione.
-- **Protezione pagine**: `middleware.ts` blocca l'accesso a `/dashboard` se il token non è presente o non è valido. `getSessionUser` usa Prisma per recuperare l'utente nel server component.
-- **Protezione pagine**: `middleware.ts` blocca l'accesso a `/dashboard` se il token non è presente o non è valido. `getSessionUser` usa Prisma per recuperare l'utente nel server component. La pagina `/dashboard/transporter` applica un controllo server-side aggiuntivo sul ruolo `TRANSPORTER` e mostra contatti aziendali solo se l'abbonamento è attivo. La pagina `/dashboard/company` esegue un controllo simile per il ruolo `COMPANY` e offre panoramica profilo e gestione richieste inviate.
+- **Protezione pagine**: `middleware.ts` blocca l'accesso a `/dashboard` se il token non è presente o non è valido. `getSessionUser` usa Prisma per recuperare l'utente nel server component. La pagina `/dashboard/transporter` e `/dashboard/transporter/requests` applicano un controllo server-side aggiuntivo sul ruolo `TRANSPORTER` e nascondono i contatti aziendali se `subscriptionActive` è falso. La pagina `/dashboard/company` richiede ruolo `COMPANY` e offre panoramica profilo + gestione/pubblicazione richieste.
 - I messaggi di stato sono mostrati nelle pagine tramite fetch client-side con redirect alla dashboard dopo successo.
+
+## Pubblicazione richieste
+- **Company**: compila il form nella pagina `/dashboard/company` oppure invia una `POST /api/requests` con `title`, `pickup`, `dropoff`, `contactName`, `contactPhone`, `contactEmail` (campi facoltativi: `cargo`, `budget`, `description`).
+- **Transporter**: consulta `/dashboard/transporter/requests` o chiama `GET /api/requests`. I contatti vengono restituiti solo se l'utente ha `subscriptionActive=true`, altrimenti vengono mascherati (`contactHidden`).
 
 ## Comandi utili
 - `npm run dev` – Avvia il server Next.js in modalità sviluppo.
