@@ -29,48 +29,100 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     { label: "Impostazioni", href: "/dashboard" },
   ];
 
+  const headerNav = sessionUser
+    ? [
+        { label: "Home", href: "/" },
+        { label: "Dashboard", href: "/dashboard" },
+        {
+          label: "Richieste",
+          href: sessionUser.role === "COMPANY" ? "/dashboard/company" : "/dashboard/transporter/requests",
+        },
+      ]
+    : [
+      { label: "Home", href: "/" },
+      { label: "Per aziende", href: "/#aziende" },
+      { label: "Per trasportatori", href: "/#trasportatori" },
+      ];
+
   return (
     <html lang="it">
       <body className={inter.className}>
         <div className="min-h-screen text-neutral-50">
-          <header className="sticky top-0 z-40 border-b border-white/10 bg-surface-muted/80 backdrop-blur-lg">
-            <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-              <Link href="/" className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-500 text-lg font-black tracking-tight text-brand-900 shadow-lg shadow-accent-500/30">
-                  DX
-                </div>
-                <div className="leading-tight">
-                  <div className="text-[11px] uppercase tracking-[0.3em] text-neutral-200">DodiX</div>
-                  <div className="text-xl font-semibold text-white">Il Camionista</div>
-                </div>
-              </Link>
-
-              <div className="flex items-center gap-2 text-sm font-semibold text-neutral-100">
-                <Link href="/" className="hidden sm:inline-flex rounded-lg px-3 py-2 transition hover:bg-white/10">
-                  Home
+          <header className="sticky top-0 z-40 border-b border-white/10 bg-surface-muted/85 backdrop-blur-xl">
+            <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex items-center justify-between gap-4">
+                <Link href="/" className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-500 text-lg font-black tracking-tight text-brand-900 shadow-lg shadow-accent-500/30">
+                    DX
+                  </div>
+                  <div className="leading-tight">
+                    <div className="text-[11px] uppercase tracking-[0.32em] text-neutral-200">DodiX</div>
+                    <div className="text-xl font-semibold text-white">Il Camionista</div>
+                  </div>
                 </Link>
-                {sessionUser ? (
-                  <>
-                    <Link href="/dashboard" className="inline-flex rounded-lg px-3 py-2 transition hover:bg-white/10">
-                      Dashboard
-                    </Link>
-                    <span className="hidden rounded-lg border border-white/10 bg-white/10 px-3 py-1 text-[11px] uppercase tracking-wide text-accent-100 sm:inline-flex">
-                      {sessionUser.role}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <Link href="/login" className="inline-flex rounded-lg px-3 py-2 transition hover:bg-white/10">
-                      Accedi
-                    </Link>
-                    <Link
-                      href="/register"
-                      className="inline-flex rounded-lg border border-accent-400/70 bg-accent-500/90 px-4 py-2 text-brand-900 shadow-lg shadow-accent-500/30 transition hover:-translate-y-0.5 hover:bg-accent-500"
-                    >
-                      Registrati
-                    </Link>
-                  </>
+
+                {sessionUser && (
+                  <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-neutral-100 shadow-card sm:hidden">
+                    <span className="h-2 w-2 rounded-full bg-success" aria-hidden />
+                    {sessionUser.role}
+                  </div>
                 )}
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 lg:flex-1 lg:justify-end">
+                <nav
+                  className="flex flex-1 items-center gap-1 rounded-2xl border border-white/10 bg-white/5 px-2 py-2 text-sm font-semibold text-neutral-100 shadow-card backdrop-blur lg:flex-none"
+                  aria-label="Navigazione principale"
+                >
+                  <div className="flex flex-1 items-center gap-1 overflow-x-auto px-1 sm:justify-center">
+                    {headerNav.map((item) => (
+                      <Link
+                        key={item.label}
+                        href={item.href}
+                        className="inline-flex items-center gap-2 rounded-xl px-3 py-2 transition hover:bg-white/10 hover:text-white"
+                      >
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full ${
+                            item.label === "Dashboard" && sessionUser ? "bg-accent-400" : "bg-white/40"
+                          }`}
+                          aria-hidden
+                        />
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                </nav>
+
+                <div className="flex items-center gap-2 text-sm font-semibold text-neutral-100">
+                  {sessionUser ? (
+                    <>
+                      <Link
+                        href="/dashboard"
+                        className="inline-flex items-center gap-2 rounded-xl border border-accent-400/60 bg-accent-500 px-4 py-2 text-brand-900 shadow-lg shadow-accent-500/30 transition hover:-translate-y-0.5 hover:bg-accent-400"
+                      >
+                        <span className="h-2 w-2 rounded-full bg-success" aria-hidden /> Dashboard
+                      </Link>
+                      <span className="hidden rounded-xl border border-white/10 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-wide text-neutral-100 sm:inline-flex">
+                        {sessionUser.role}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/login"
+                        className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 transition hover:bg-white/10"
+                      >
+                        Accedi
+                      </Link>
+                      <Link
+                        href="/register"
+                        className="inline-flex items-center gap-2 rounded-xl border border-accent-400/60 bg-accent-500 px-4 py-2 text-brand-900 shadow-lg shadow-accent-500/30 transition hover:-translate-y-0.5 hover:bg-accent-400"
+                      >
+                        Registrati
+                      </Link>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </header>
