@@ -38,7 +38,7 @@ export function PaywallActions() {
         type="button"
         onClick={handleCheckout}
         disabled={loading}
-        className="w-full rounded-md bg-indigo-600 px-4 py-3 text-center text-white shadow hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-400"
+        className="btn-primary w-full justify-center py-3 disabled:cursor-not-allowed disabled:bg-brand-400"
       >
         {loading ? "Reindirizzamento in corso..." : "Abbonati ora"}
       </button>

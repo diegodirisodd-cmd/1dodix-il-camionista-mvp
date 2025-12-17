@@ -9,15 +9,15 @@ type SectionCardProps = {
 
 export function SectionCard({ title, description, actions, children }: SectionCardProps) {
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+    <section className="card">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="space-y-1">
-          <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-          {description ? <p className="text-sm text-slate-600">{description}</p> : null}
+          <h2 className="text-xl font-semibold text-brand-900">{title}</h2>
+          {description ? <p className="text-sm text-neutral-700">{description}</p> : null}
         </div>
         {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
       </div>
-      <div className="mt-4 space-y-4 text-sm text-slate-700">{children}</div>
+      <div className="mt-5 space-y-4 text-sm text-neutral-800">{children}</div>
     </section>
   );
 }

@@ -83,6 +83,12 @@ Prisma definisce un enum `UserRole` con due valori: `TRANSPORTER` e `COMPANY`.
 - **Webhook**: `/api/billing/webhook` valida la firma Stripe e, sull'evento `checkout.session.completed`, attiva il flag `subscriptionActive` dell'utente trovando l'email del cliente. `subscriptionActive` è la singola fonte di verità per permettere l'accesso.
 - L'accesso a `/paywall` è bloccato per chi è già abbonato: gli utenti con `subscriptionActive=true` vengono reindirizzati alla dashboard.
 
+## Design system
+- Palette industriale B2B: blu profondo (`brand-800`) come primario, arancio (`accent-500`) come accento e neutri controllati (`neutral-*`).
+- Tipografia: Inter via `next/font` (fallback Roboto/system) con gerarchia forte su H1-H3 e label in `text-sm` semibold.
+- Spaziatura codificata in variabili CSS (`--space-*`) e classi component per bottoni, card, form, tabelle, alert e badge (vedi `src/app/globals.css`).
+- Documentazione completa in `docs/design-system.md` per palette, scala tipografica, componenti riutilizzabili e regole di layout.
+
 ## Pubblicazione richieste
 - **Company**: compila il form nella pagina `/dashboard/company` oppure invia una `POST /api/requests` con `title`, `pickup`, `dropoff`, `contactName`, `contactPhone`, `contactEmail` (campi facoltativi: `cargo`, `budget`, `description`).
 - **Transporter**: consulta `/dashboard/transporter/requests` o chiama `GET /api/requests`. I contatti vengono restituiti solo se l'utente ha `subscriptionActive=true`, altrimenti vengono mascherati (`contactHidden`).

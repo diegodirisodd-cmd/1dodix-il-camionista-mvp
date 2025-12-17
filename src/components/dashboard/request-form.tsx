@@ -54,20 +54,20 @@ export function RequestForm() {
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block space-y-1 text-sm">
-          <span className="font-medium text-slate-800">Titolo*</span>
+        <label className="form-field">
+          <span className="label">Titolo*</span>
           <input
             required
-            className="w-full rounded-md border border-slate-200 px-3 py-2"
+            className="input-field"
             value={form.title}
             onChange={(e) => updateField("title", e.target.value)}
             placeholder="Trasporto pallet nord Italia"
           />
         </label>
-        <label className="block space-y-1 text-sm">
-          <span className="font-medium text-slate-800">Budget (opzionale)</span>
+        <label className="form-field">
+          <span className="label">Budget (opzionale)</span>
           <input
-            className="w-full rounded-md border border-slate-200 px-3 py-2"
+            className="input-field"
             value={form.budget}
             onChange={(e) => updateField("budget", e.target.value)}
             placeholder="€800"
@@ -76,21 +76,21 @@ export function RequestForm() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block space-y-1 text-sm">
-          <span className="font-medium text-slate-800">Ritiro*</span>
+        <label className="form-field">
+          <span className="label">Ritiro*</span>
           <input
             required
-            className="w-full rounded-md border border-slate-200 px-3 py-2"
+            className="input-field"
             value={form.pickup}
             onChange={(e) => updateField("pickup", e.target.value)}
             placeholder="Bergamo (BG)"
           />
         </label>
-        <label className="block space-y-1 text-sm">
-          <span className="font-medium text-slate-800">Consegna*</span>
+        <label className="form-field">
+          <span className="label">Consegna*</span>
           <input
             required
-            className="w-full rounded-md border border-slate-200 px-3 py-2"
+            className="input-field"
             value={form.dropoff}
             onChange={(e) => updateField("dropoff", e.target.value)}
             placeholder="Verona (VR)"
@@ -99,19 +99,19 @@ export function RequestForm() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block space-y-1 text-sm">
-          <span className="font-medium text-slate-800">Carico (opzionale)</span>
+        <label className="form-field">
+          <span className="label">Carico (opzionale)</span>
           <input
-            className="w-full rounded-md border border-slate-200 px-3 py-2"
+            className="input-field"
             value={form.cargo}
             onChange={(e) => updateField("cargo", e.target.value)}
             placeholder="Pallet misti / 10q"
           />
         </label>
-        <label className="block space-y-1 text-sm">
-          <span className="font-medium text-slate-800">Descrizione (opzionale)</span>
+        <label className="form-field">
+          <span className="label">Descrizione (opzionale)</span>
           <textarea
-            className="w-full rounded-md border border-slate-200 px-3 py-2"
+            className="input-field"
             rows={3}
             value={form.description}
             onChange={(e) => updateField("description", e.target.value)}
@@ -121,32 +121,32 @@ export function RequestForm() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <label className="block space-y-1 text-sm">
-          <span className="font-medium text-slate-800">Referente*</span>
+        <label className="form-field">
+          <span className="label">Referente*</span>
           <input
             required
-            className="w-full rounded-md border border-slate-200 px-3 py-2"
+            className="input-field"
             value={form.contactName}
             onChange={(e) => updateField("contactName", e.target.value)}
             placeholder="Nome Cognome"
           />
         </label>
-        <label className="block space-y-1 text-sm">
-          <span className="font-medium text-slate-800">Telefono*</span>
+        <label className="form-field">
+          <span className="label">Telefono*</span>
           <input
             required
-            className="w-full rounded-md border border-slate-200 px-3 py-2"
+            className="input-field"
             value={form.contactPhone}
             onChange={(e) => updateField("contactPhone", e.target.value)}
             placeholder="+39 333 0000000"
           />
         </label>
-        <label className="block space-y-1 text-sm">
-          <span className="font-medium text-slate-800">Email*</span>
+        <label className="form-field">
+          <span className="label">Email*</span>
           <input
             required
             type="email"
-            className="w-full rounded-md border border-slate-200 px-3 py-2"
+            className="input-field"
             value={form.contactEmail}
             onChange={(e) => updateField("contactEmail", e.target.value)}
             placeholder="logistica@azienda.it"
@@ -154,14 +154,10 @@ export function RequestForm() {
         </label>
       </div>
 
-      {error && <p className="text-sm text-amber-700">{error}</p>}
-      {success && <p className="text-sm text-emerald-700">{success}</p>}
+      {error && <p className="alert-warning">{error}</p>}
+      {success && <p className="alert-success">{success}</p>}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
-      >
+      <button type="submit" disabled={loading} className="btn-primary">
         {loading ? "Pubblicazione..." : "Pubblica richiesta"}
       </button>
     </form>

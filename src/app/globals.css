@@ -3,14 +3,20 @@
 @tailwind utilities;
 
 :root {
-  color: #1f2933;
-  background-color: #ffffff;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  background: linear-gradient(135deg, #0c2344 0%, #081a32 25%, #f7f8fa 25%, #f7f8fa 100%);
+  color: #111927;
 }
 
 main {
@@ -28,20 +34,35 @@ a {
 }
 
 .app-header {
-  border-bottom: 1px solid #e5e7eb;
-  padding: 16px;
+  background: linear-gradient(135deg, #0c2344, #112b52);
+  color: #f7f8fa;
+  padding: var(--space-lg) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
 .app-nav {
   display: flex;
-  gap: 12px;
+  gap: var(--space-md);
   align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+.app-nav a {
+  color: #e9edf7;
+  font-weight: 600;
+}
+
+.app-nav a:hover {
+  color: #ffb975;
 }
 
 .app-content {
   flex: 1;
-  padding: 24px 16px;
-  max-width: 960px;
+  padding: var(--space-xl) var(--space-lg);
+  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
 }
@@ -49,12 +70,101 @@ a {
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-bottom: 16px;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-md);
 }
 
 .form-actions {
   display: flex;
-  gap: 12px;
+  gap: var(--space-md);
   align-items: center;
+}
+
+@layer base {
+  h1 {
+    @apply text-3xl md:text-4xl font-semibold text-brand-900;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl font-semibold text-brand-900;
+  }
+
+  h3 {
+    @apply text-xl font-semibold text-brand-800;
+  }
+
+  p {
+    @apply text-base text-neutral-700;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg bg-brand-700 px-4 py-2 text-white font-semibold shadow-card transition hover:bg-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white focus-visible:ring-accent-400;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-lg border border-brand-200 bg-white px-4 py-2 font-semibold text-brand-800 shadow-sm transition hover:border-brand-300 hover:bg-brand-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white focus-visible:ring-accent-400;
+  }
+
+  .card {
+    @apply bg-white shadow-card rounded-xl border border-neutral-100 p-6;
+  }
+
+  .card-muted {
+    @apply bg-neutral-50 border-neutral-100 shadow-sm rounded-xl p-6;
+  }
+
+  .input-field {
+    @apply w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-neutral-900 shadow-sm transition focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-accent-400/50;
+  }
+
+  .label {
+    @apply text-sm font-semibold text-neutral-800;
+  }
+
+  .table-shell {
+    @apply overflow-hidden rounded-xl border border-neutral-200 shadow-sm bg-white;
+  }
+
+  .table-shell table {
+    @apply min-w-full divide-y divide-neutral-200 text-sm text-neutral-800;
+  }
+
+  .table-shell thead {
+    @apply bg-neutral-50 text-neutral-700 uppercase tracking-wide text-xs font-semibold;
+  }
+
+  .table-shell th,
+  .table-shell td {
+    @apply px-4 py-3 text-left align-middle;
+  }
+
+  .table-shell tbody tr:hover {
+    @apply bg-neutral-50;
+  }
+
+  .alert {
+    @apply rounded-lg border px-4 py-3 text-sm flex items-start gap-3;
+  }
+
+  .alert-success {
+    @apply alert border-success/20 bg-success/10 text-success;
+  }
+
+  .alert-warning {
+    @apply alert border-warning/20 bg-warning/10 text-warning;
+  }
+
+  .alert-danger {
+    @apply alert border-danger/20 bg-danger/10 text-danger;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide bg-neutral-100 text-neutral-800 border border-neutral-200;
+  }
+
+  .badge-verified {
+    @apply badge bg-success/10 border-success/30 text-success;
+  }
 }

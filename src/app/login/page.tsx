@@ -33,35 +33,46 @@ export default function LoginPage() {
   };
 
   return (
-    <section>
-      <h1>Accedi</h1>
-      <p>Inserisci email e password per eseguire l&apos;accesso.</p>
+    <section className="max-w-xl space-y-6">
+      <header className="space-y-3">
+        <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">Accesso</p>
+        <h1>Accedi</h1>
+        <p>Inserisci email e password per accedere alla tua area operativa.</p>
+      </header>
 
-      <form onSubmit={handleSubmit}>
-        <div className="form-field">
-          <label htmlFor="email">Email</label>
-          <input id="email" name="email" type="email" required />
-        </div>
+      <div className="card space-y-6">
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="form-field">
+            <label className="label" htmlFor="email">
+              Email
+            </label>
+            <input className="input-field" id="email" name="email" type="email" required />
+          </div>
 
-        <div className="form-field">
-          <label htmlFor="password">Password</label>
-          <input id="password" name="password" type="password" required />
-        </div>
+          <div className="form-field">
+            <label className="label" htmlFor="password">
+              Password
+            </label>
+            <input className="input-field" id="password" name="password" type="password" required />
+          </div>
 
-        <div className="form-actions">
-          <button type="submit">Accedi</button>
-          <span>
-            Non hai un account? <Link href="/register">Registrati</Link>
-          </span>
-        </div>
-      </form>
+          <div className="form-actions justify-between">
+            <button type="submit" className="btn-primary">
+              Accedi
+            </button>
+            <span className="text-sm text-neutral-700">
+              Non hai un account? <Link className="text-brand-700" href="/register">Registrati</Link>
+            </span>
+          </div>
+        </form>
 
-      {result && <p aria-live="polite">{result}</p>}
-      {error && (
-        <p role="alert" style={{ color: "#b00020" }}>
-          {error}
-        </p>
-      )}
+        {result && <p className="alert-success" aria-live="polite">{result}</p>}
+        {error && (
+          <p className="alert-danger" role="alert">
+            {error}
+          </p>
+        )}
+      </div>
     </section>
   );
 }
