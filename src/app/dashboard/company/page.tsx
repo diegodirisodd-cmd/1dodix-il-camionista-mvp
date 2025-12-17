@@ -19,114 +19,184 @@ export default async function CompanyDashboardPage() {
     redirect("/paywall");
   }
 
-  const companyRequests = await prisma.request.findMany({
-    where: { companyId: user.id },
-    orderBy: { createdAt: "desc" },
-  });
+  const [companyRequests, verifiedTransporters] = await Promise.all([
+    prisma.request.findMany({
+      where: { companyId: user.id },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.user.count({
+      where: { role: "TRANSPORTER", subscriptionActive: true },
+    }),
+  ]);
+
+  const activeRequests = companyRequests.length;
+  const lastPublication = companyRequests[0]
+    ? new Date(companyRequests[0].createdAt).toLocaleDateString("it-IT")
+    : "Nessuna";
+  const recentContacts = companyRequests.slice(0, 5);
 
   return (
     <div className="space-y-8">
-      <header className="flex flex-col gap-2">
-        <p className="text-sm text-slate-500">Area riservata aziende</p>
-        <h1 className="text-3xl font-semibold text-slate-900">Dashboard Azienda</h1>
-        <p className="text-slate-700">
-          Pubblica nuove richieste di trasporto e consulta lo storico inviato ai trasportatori registrati.
-        </p>
+      <header className="flex flex-col gap-4 rounded-xl border border-slate-100 bg-white/60 p-6 shadow-sm shadow-slate-100">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm uppercase tracking-[0.12em] text-slate-500">Area aziende</p>
+            <h1 className="text-3xl font-semibold text-slate-900">Dashboard Company</h1>
+            <p className="text-slate-700">
+              Visione operativa su richieste pubblicate, trasportatori disponibili e stato abbonamento.
+            </p>
+          </div>
+          <a
+            href="#pubblica"
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
+          >
+            Pubblica nuova richiesta
+            <span aria-hidden>→</span>
+          </a>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <SectionCard title="Richieste attive" description="Annunci pubblicati e visibili ai trasportatori." subtle>
+            <p className="text-4xl font-semibold text-slate-900">{activeRequests}</p>
+            <p className="text-sm text-slate-600">Ultima pubblicazione: {lastPublication}</p>
+          </SectionCard>
+          <SectionCard title="Trasportatori verificati" description="Iscritti con abbonamento attivo." subtle>
+            <p className="text-4xl font-semibold text-slate-900">{verifiedTransporters}</p>
+            <p className="text-sm text-slate-600">Pronti a ricevere le tue richieste</p>
+          </SectionCard>
+          <SectionCard title="Abbonamento" description="Stato attuale dell’account." subtle>
+            <p className="text-lg font-semibold text-emerald-600">Attivo</p>
+            <p className="text-sm text-slate-600">L’accesso ai contatti è garantito</p>
+          </SectionCard>
+          <SectionCard title="Contatti recenti" description="Lead generati dalle ultime richieste." subtle>
+            <p className="text-4xl font-semibold text-slate-900">{recentContacts.length}</p>
+            <p className="text-sm text-slate-600">Ultimi 5 annunci pubblicati</p>
+          </SectionCard>
+        </div>
       </header>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <SectionCard title="Profilo azienda">
-          <dl className="space-y-2 text-sm text-slate-700">
-            <div className="flex justify-between gap-4">
+      <section className="grid gap-6 lg:grid-cols-3">
+        <SectionCard title="Profilo azienda" description="Dati account e onboarding." className="lg:col-span-1">
+          <dl className="space-y-3 text-sm text-slate-700">
+            <div className="flex items-start justify-between gap-4">
               <dt className="text-slate-500">Email</dt>
               <dd className="font-medium text-slate-900">{user.email}</dd>
             </div>
-            <div className="flex justify-between gap-4">
+            <div className="flex items-start justify-between gap-4">
               <dt className="text-slate-500">Ruolo</dt>
               <dd className="font-medium text-slate-900">{user.role}</dd>
             </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-slate-500">Iscritto</dt>
+            <div className="flex items-start justify-between gap-4">
+              <dt className="text-slate-500">Iscritto dal</dt>
               <dd className="font-medium text-slate-900">
                 {new Date(user.createdAt).toLocaleDateString("it-IT")}
+              </dd>
+            </div>
+            <div className="flex items-start justify-between gap-4">
+              <dt className="text-slate-500">Stato abbonamento</dt>
+              <dd className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                Attivo
               </dd>
             </div>
           </dl>
         </SectionCard>
 
         <SectionCard
-          title="Operatività"
-          description="Metriche live sulle richieste pubblicate."
-          actions={<span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Live</span>}
+          title="Richieste in corso"
+          description="Monitoraggio operativo delle spedizioni aperte."
+          actions={
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+              {activeRequests} attive
+            </span>
+          }
+          className="lg:col-span-2"
         >
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-md border border-slate-100 bg-slate-50 p-3">
-              <p className="text-xs uppercase tracking-wide text-slate-500">Richieste attive</p>
-              <p className="text-2xl font-semibold text-slate-900">{companyRequests.length}</p>
+          {companyRequests.length === 0 ? (
+            <p className="text-sm text-slate-600">Pubblica la prima richiesta per attivare i trasportatori disponibili.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+                <thead className="bg-slate-50 text-slate-700">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold">Titolo</th>
+                    <th className="px-4 py-3 font-semibold">Percorso</th>
+                    <th className="px-4 py-3 font-semibold">Budget</th>
+                    <th className="px-4 py-3 font-semibold">Contatto</th>
+                    <th className="px-4 py-3 font-semibold">Pubblicata</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {companyRequests.map((request) => (
+                    <tr key={request.id} className="hover:bg-slate-50">
+                      <td className="whitespace-nowrap px-4 py-3 font-medium text-slate-900">{request.title}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-slate-800">
+                        {request.pickup} → {request.dropoff}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-slate-800">{request.budget ?? "-"}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-slate-800">
+                        <div className="space-y-1">
+                          <div className="font-semibold text-slate-900">{request.contactName}</div>
+                          <div className="text-slate-700">{request.contactPhone}</div>
+                          <div className="text-slate-700">{request.contactEmail}</div>
+                        </div>
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-slate-800">
+                        {new Date(request.createdAt).toLocaleDateString("it-IT")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <div className="rounded-md border border-slate-100 bg-slate-50 p-3">
-              <p className="text-xs uppercase tracking-wide text-slate-500">Ultima pubblicazione</p>
-              <p className="text-lg font-semibold text-slate-900">
-                {companyRequests[0]
-                  ? new Date(companyRequests[0].createdAt).toLocaleDateString("it-IT")
-                  : "Nessuna"}
-              </p>
+          )}
+        </SectionCard>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-3" id="pubblica">
+        <SectionCard
+          title="Contatti recenti"
+          description="Dettagli di contatto condivisi con i trasportatori dagli ultimi annunci."
+          className="lg:col-span-2"
+        >
+          {recentContacts.length === 0 ? (
+            <p className="text-sm text-slate-600">Nessun contatto generato finora.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+                <thead className="bg-slate-50 text-slate-700">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold">Richiesta</th>
+                    <th className="px-4 py-3 font-semibold">Contatto</th>
+                    <th className="px-4 py-3 font-semibold">Email</th>
+                    <th className="px-4 py-3 font-semibold">Telefono</th>
+                    <th className="px-4 py-3 font-semibold">Data</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {recentContacts.map((request) => (
+                    <tr key={request.id} className="hover:bg-slate-50">
+                      <td className="whitespace-nowrap px-4 py-3 font-medium text-slate-900">{request.title}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-slate-800">{request.contactName}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-slate-800">{request.contactEmail}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-slate-800">{request.contactPhone}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-slate-800">
+                        {new Date(request.createdAt).toLocaleDateString("it-IT")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </div>
+          )}
         </SectionCard>
 
         <SectionCard
-          title="Pubblica una richiesta"
-          description="Crea una nuova spedizione e inviala ai trasportatori registrati."
+          title="Pubblica nuova richiesta"
+          description="Crea una spedizione con dati completi per attivare i trasportatori verificati."
         >
           <RequestForm />
         </SectionCard>
       </section>
-
-      <SectionCard
-        title="Richieste inviate"
-        description="Storico delle richieste di trasporto pubblicate."
-        actions={<span className="text-sm text-slate-500">{companyRequests.length} richieste</span>}
-      >
-        {companyRequests.length === 0 ? (
-          <p className="text-sm text-slate-600">Pubblica la prima richiesta per contattare i trasportatori disponibili.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
-              <thead className="bg-slate-50 text-slate-700">
-                <tr>
-                  <th className="px-4 py-3 font-semibold">Titolo</th>
-                  <th className="px-4 py-3 font-semibold">Percorso</th>
-                  <th className="px-4 py-3 font-semibold">Budget</th>
-                  <th className="px-4 py-3 font-semibold">Contatto</th>
-                  <th className="px-4 py-3 font-semibold">Pubblicata</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {companyRequests.map((request) => (
-                  <tr key={request.id} className="hover:bg-slate-50">
-                    <td className="whitespace-nowrap px-4 py-3 font-medium text-slate-900">{request.title}</td>
-                    <td className="whitespace-nowrap px-4 py-3 text-slate-800">
-                      {request.pickup} → {request.dropoff}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-slate-800">{request.budget ?? "-"}</td>
-                    <td className="whitespace-nowrap px-4 py-3 text-slate-800">
-                      <div className="space-y-1">
-                        <div className="font-semibold text-slate-900">{request.contactName}</div>
-                        <div className="text-slate-700">{request.contactPhone}</div>
-                        <div className="text-slate-700">{request.contactEmail}</div>
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-slate-800">
-                      {new Date(request.createdAt).toLocaleDateString("it-IT")}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </SectionCard>
     </div>
   );
 }
