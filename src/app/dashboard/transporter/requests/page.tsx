@@ -41,10 +41,7 @@ export default async function TransporterRequestsPage() {
       <header className="flex flex-col gap-2">
         <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">Richieste disponibili</p>
         <h1>Trasporti pubblicati</h1>
-        <p>
-          Visualizza le richieste inviate dalle aziende registrate. I dettagli di contatto sono visibili solo con un
-          abbonamento attivo.
-        </p>
+        <p>Richieste inviate da aziende registrate. I contatti sono visibili solo con un abbonamento attivo.</p>
       </header>
 
       <SectionCard

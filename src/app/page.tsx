@@ -4,30 +4,30 @@ export default function HomePage() {
   const steps = [
     {
       title: "Definisci la richiesta",
-      description: "Inserisci origine, destinazione, tempistiche e requisiti di sicurezza o temperatura.",
+      description: "Specifica origine, destinazione, vincoli di tempo e requisiti di sicurezza o temperatura.",
     },
     {
       title: "Seleziona il vettore",
-      description: "Valuta trasportatori verificati, disponibilità e tariffe prima di confermare.",
+      description: "Confronta trasportatori verificati, disponibilità e condizioni prima di confermare.",
     },
     {
       title: "Coordina e monitora",
-      description: "Allinea documenti, contatti e stati di viaggio in un’unica interfaccia.",
+      description: "Gestisci documenti, contatti e avanzamento in un’unica interfaccia tracciata.",
     },
   ];
 
   const companyBenefits = [
-    "Autotrasportatori verificati e specializzati in agroalimentare e industria.",
-    "Tempi di risposta rapidi grazie a richieste strutturate e notifiche mirate.",
-    "Contatti diretti e tracciati, senza intermediari opachi.",
-    "Abbonamento unico per tutta l’azienda con controlli di ruolo e sicurezza.",
+    "Trasportatori verificati e specializzati in agroalimentare e industria.",
+    "Tempi di risposta ridotti grazie a richieste standard e notifiche mirate.",
+    "Contatti diretti e registrati, senza passaggi opachi.",
+    "Un unico abbonamento aziendale con controlli di ruolo e sicurezza.",
   ];
 
   const transporterBenefits = [
     "Richieste qualificate da aziende export/food e industriali.",
-    "Dettagli tecnici chiari per ridurre i viaggi a vuoto e ottimizzare i carichi.",
-    "Pagamenti e condizioni trasparenti, con contatti disponibili ai clienti abbonati.",
-    "Profilo aziendale e verifiche per distinguersi dai concorrenti.",
+    "Briefing chiari per ridurre viaggi a vuoto e ottimizzare i carichi.",
+    "Condizioni trasparenti e contatti disponibili agli abbonati.",
+    "Profilo verificato per attestare affidabilità e priorità.",
   ];
 
   return (
@@ -38,8 +38,8 @@ export default function HomePage() {
             <p className="text-sm font-semibold uppercase tracking-wide text-accent-500">Logistica B2B senza frizioni</p>
             <h1>La piattaforma affidabile per spedire e trovare carichi critici</h1>
             <p className="text-lg text-neutral-800">
-              DodiX collega aziende export/food e operatori industriali con autotrasportatori verificati.
-              Un’unica esperienza per richieste strutturate, assegnazione rapida e contatti verificati.
+              DodiX collega aziende export/food e operatori industriali con trasportatori verificati.
+              Richieste strutturate, assegnazione rapida e contatti sicuri in un’unica piattaforma.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -57,26 +57,26 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Focus aziende</p>
-              <h3>Controllo totale su richieste e vettori</h3>
+              <h3>Controllo operativo su richieste e vettori</h3>
             </div>
             <div className="rounded-lg bg-brand-50 px-3 py-2 text-sm font-semibold text-brand-800">B2B</div>
           </div>
           <ul className="space-y-3 text-sm text-neutral-800">
             <li className="flex items-start gap-2">
               <span className="mt-1 h-2 w-2 rounded-full bg-accent-500" aria-hidden />
-              Richieste standardizzate con SLA e requisiti speciali.
+              Richieste standardizzate con SLA, requisiti e ruoli chiari.
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-1 h-2 w-2 rounded-full bg-accent-500" aria-hidden />
-              Accesso a trasportatori verificati con storico e coperture.
+              Accesso a trasportatori verificati con storico e coperture assicurative.
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-1 h-2 w-2 rounded-full bg-accent-500" aria-hidden />
-              Contatti e documenti disponibili solo per account abbonati.
+              Contatti e documenti visibili solo a profili abbonati e verificati.
             </li>
           </ul>
           <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800">
-            Stripe billing attivo per tutti gli utenti: controlli di accesso e contatti sono abilitati solo con abbonamento.
+            Accesso protetto da abbonamento per aziende e trasportatori. Contatti e documenti sono disponibili solo con pagamenti attivi.
           </div>
         </div>
       </div>
@@ -89,15 +89,15 @@ export default function HomePage() {
         <div className="grid gap-6 md:grid-cols-3">
           <div className="space-y-2">
             <h3>Verifiche e ruoli chiari</h3>
-            <p>Account aziendali e autotrasportatori con ruoli definiti, controlli di abbonamento e audit.</p>
+            <p>Account aziendali e trasportatori con ruoli definiti, abbonamenti verificati e tracciabilità continua.</p>
           </div>
           <div className="space-y-2">
             <h3>Velocità operativa</h3>
-            <p>Richieste standardizzate riducono back-and-forth e garantiscono risposte più rapide.</p>
+            <p>Richieste standard riducono rimbalzi e velocizzano l’assegnazione dei carichi.</p>
           </div>
           <div className="space-y-2">
             <h3>Contatti tracciati</h3>
-            <p>Dettagli di contatto disponibili solo a utenti attivi, con visibilità controllata e sicura.</p>
+            <p>Contatti condivisi solo con utenti attivi e verificati, per evitare sprechi e garantire responsabilità.</p>
           </div>
         </div>
       </div>
@@ -154,11 +154,11 @@ export default function HomePage() {
           </div>
           <h2>Affidabilità e prove di fiducia</h2>
           <p>
-            Iscrizioni approvate, ruoli convalidati e pagamenti ricorrenti via Stripe assicurano che ogni interlocutore sia
-            tracciato e operi secondo standard professionali.
+            Accessi approvati, ruoli convalidati e pagamenti ricorrenti via Stripe assicurano identità chiare e
+            responsabilità su ogni interlocutore.
           </p>
           <p className="text-sm text-neutral-700">
-            Contatti e documenti sono visibili solo con abbonamento attivo, proteggendo informazioni sensibili di aziende e vettori.
+            Contatti e documenti sono visibili solo con abbonamento attivo, proteggendo informazioni sensibili di aziende e trasportatori.
           </p>
         </div>
         <div className="card-muted space-y-3">

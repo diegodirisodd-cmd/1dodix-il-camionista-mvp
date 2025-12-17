@@ -18,8 +18,8 @@ export default async function DashboardPage() {
 
   return (
     <section>
-      <h1>Area protetta</h1>
-      <p>Benvenuto, {user.email}.</p>
+      <h1>Area account</h1>
+      <p>Accesso verificato per {user.email}. Le funzioni operative richiedono un abbonamento attivo.</p>
 
       <div className="form-field">
         <strong>Ruolo:</strong> {user.role}

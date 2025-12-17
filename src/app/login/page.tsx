@@ -23,7 +23,7 @@ export default function LoginPage() {
     const data = await response.json();
 
     if (!response.ok) {
-      setError(data.error ?? "Accesso non riuscito.");
+      setError(data.error ?? "Accesso non riuscito. Verifica le credenziali.");
       return;
     }
 
@@ -37,7 +37,7 @@ export default function LoginPage() {
       <header className="space-y-3">
         <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">Accesso</p>
         <h1>Accedi</h1>
-        <p>Inserisci email e password per accedere alla tua area operativa.</p>
+        <p>Accedi per gestire richieste, contatti e dati operativi.</p>
       </header>
 
       <div className="card space-y-6">

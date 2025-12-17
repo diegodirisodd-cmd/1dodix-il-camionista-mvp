@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "DodiX – Il Camionista",
-  description: "MVP logistico con home, autenticazione di base e percorsi principali.",
+  description: "SaaS logistico B2B per aziende e trasportatori con controlli di accesso, richieste strutturate e contatti verificati.",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

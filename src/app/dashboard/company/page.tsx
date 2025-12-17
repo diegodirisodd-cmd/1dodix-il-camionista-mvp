@@ -41,16 +41,14 @@ export default async function CompanyDashboardPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm uppercase tracking-[0.12em] text-slate-500">Area aziende</p>
-            <h1 className="text-3xl font-semibold text-slate-900">Dashboard Company</h1>
-            <p className="text-slate-700">
-              Visione operativa su richieste pubblicate, trasportatori disponibili e stato abbonamento.
-            </p>
+            <h1 className="text-3xl font-semibold text-slate-900">Centro operativo aziendale</h1>
+            <p className="text-slate-700">Stato richieste, trasportatori verificati e abbonamento in un unico cruscotto.</p>
           </div>
           <a
             href="#pubblica"
             className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
           >
-            Pubblica nuova richiesta
+            Pubblica una richiesta
             <span aria-hidden>→</span>
           </a>
         </div>
@@ -62,15 +60,15 @@ export default async function CompanyDashboardPage() {
           </SectionCard>
           <SectionCard title="Trasportatori verificati" description="Iscritti con abbonamento attivo." subtle>
             <p className="text-4xl font-semibold text-slate-900">{verifiedTransporters}</p>
-            <p className="text-sm text-slate-600">Pronti a ricevere le tue richieste</p>
+            <p className="text-sm text-slate-600">Disponibili per assegnazione immediata</p>
           </SectionCard>
           <SectionCard title="Abbonamento" description="Stato attuale dell’account." subtle>
             <p className="text-lg font-semibold text-emerald-600">Attivo</p>
-            <p className="text-sm text-slate-600">L’accesso ai contatti è garantito</p>
+            <p className="text-sm text-slate-600">Accesso completo a contatti e documenti</p>
           </SectionCard>
           <SectionCard title="Contatti recenti" description="Lead generati dalle ultime richieste." subtle>
             <p className="text-4xl font-semibold text-slate-900">{recentContacts.length}</p>
-            <p className="text-sm text-slate-600">Ultimi 5 annunci pubblicati</p>
+            <p className="text-sm text-slate-600">Ultime richieste in evidenza</p>
           </SectionCard>
         </div>
       </header>
@@ -112,7 +110,7 @@ export default async function CompanyDashboardPage() {
           className="lg:col-span-2"
         >
           {companyRequests.length === 0 ? (
-            <p className="text-sm text-slate-600">Pubblica la prima richiesta per attivare i trasportatori disponibili.</p>
+            <p className="text-sm text-slate-600">Pubblica la prima richiesta per ingaggiare trasportatori verificati.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
@@ -155,7 +153,7 @@ export default async function CompanyDashboardPage() {
       <section className="grid gap-6 lg:grid-cols-3" id="pubblica">
         <SectionCard
           title="Contatti recenti"
-          description="Dettagli di contatto condivisi con i trasportatori dagli ultimi annunci."
+          description="Contatti condivisi con trasportatori dagli ultimi incarichi pubblicati."
           className="lg:col-span-2"
         >
           {recentContacts.length === 0 ? (
@@ -191,8 +189,8 @@ export default async function CompanyDashboardPage() {
         </SectionCard>
 
         <SectionCard
-          title="Pubblica nuova richiesta"
-          description="Crea una spedizione con dati completi per attivare i trasportatori verificati."
+          title="Pubblica una nuova richiesta"
+          description="Inserisci dati completi per assegnare rapidamente ai trasportatori verificati."
         >
           <RequestForm />
         </SectionCard>

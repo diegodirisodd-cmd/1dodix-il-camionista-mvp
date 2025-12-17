@@ -23,7 +23,7 @@ export default function RegisterPage() {
     const data = await response.json();
 
     if (!response.ok) {
-      setError(data.error ?? "Registrazione non riuscita.");
+      setError(data.error ?? "Registrazione non riuscita. Controlla i dati inseriti.");
       return;
     }
 
@@ -36,7 +36,7 @@ export default function RegisterPage() {
       <header className="space-y-3">
         <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">Onboarding</p>
         <h1>Registrati</h1>
-        <p>Apri un account con email, password e ruolo operativo (Transporter o Company).</p>
+        <p>Crea un account con email, password e ruolo operativo per accedere a richieste e contatti.</p>
       </header>
 
       <div className="card space-y-6">

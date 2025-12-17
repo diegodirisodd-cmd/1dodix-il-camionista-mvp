@@ -75,10 +75,10 @@ export default async function TransporterDashboardPage() {
       <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="space-y-2">
           <p className="text-sm font-semibold uppercase tracking-wide text-brand-700">Trasportatori</p>
-          <h1 className="text-3xl font-semibold text-brand-900">Control room operativa</h1>
+          <h1 className="text-3xl font-semibold text-brand-900">Control room trasportatori</h1>
           <p className="max-w-3xl text-neutral-700">
-            Monitoraggio carichi disponibili, aziende interessate e stato di affidabilità. Contatti e dati sensibili
-            sono protetti e visibili solo a trasportatori verificati con abbonamento attivo.
+            Carichi disponibili, aziende ingaggiate e stato di affidabilità in un unico pannello. Contatti e dati
+            sensibili sono visibili solo ai profili verificati con abbonamento attivo.
           </p>
         </div>
         <a
@@ -93,7 +93,7 @@ export default async function TransporterDashboardPage() {
         <StatCard
           title="Carichi disponibili"
           value={availableLoads.toString()}
-          hint="Nuove richieste pubblicate dalle aziende verificate."
+          hint="Nuove richieste pubblicate da aziende verificate."
           accent="primary"
           action={
             <a className="text-sm font-semibold text-white underline" href="/dashboard/transporter/requests">
@@ -105,7 +105,7 @@ export default async function TransporterDashboardPage() {
         <StatCard
           title="Aziende contattate"
           value={contactedCompanies.toString()}
-          hint="Numero di aziende con richieste attive a cui puoi rispondere."
+          hint="Aziende con richieste attive a cui puoi rispondere."
           accent="primary"
         />
 
@@ -148,16 +148,16 @@ export default async function TransporterDashboardPage() {
           <div className="space-y-2 rounded-xl border border-dashed border-amber-200 bg-amber-50 px-4 py-3 text-neutral-800">
             <p className="text-sm font-semibold text-amber-800">Perché è importante</p>
             <p className="text-sm">
-              Le aziende possono confermare più velocemente i carichi ai trasportatori verificati. Completa la verifica
-              documentale per mostrare la tua affidabilità e ridurre i tempi di onboarding.
+              Le aziende confermano più velocemente i carichi ai trasportatori verificati. Completa la verifica
+              documentale per dimostrare affidabilità e ridurre tempi di onboarding.
             </p>
           </div>
           <div className="space-y-2">
             <p className="text-sm font-semibold text-brand-800">Cosa fare ora</p>
             <ul className="list-disc space-y-1 pl-5 text-sm text-neutral-800">
-              <li>Carica licenza e assicurazione per ottenere il badge.</li>
-              <li>Associa il numero di telefono operativo per contatti rapidi.</li>
-              <li>Mantieni l&apos;abbonamento attivo per vedere subito i dettagli.</li>
+              <li>Carica licenza e assicurazione per ottenere il badge di verifica.</li>
+              <li>Associa il numero operativo per garantire contatti rapidi.</li>
+              <li>Mantieni l&apos;abbonamento attivo per consultare subito i dettagli.</li>
             </ul>
             <div className="flex flex-wrap gap-2">
               <a className="button-secondary" href="mailto:ops@dodix.com">
@@ -173,7 +173,7 @@ export default async function TransporterDashboardPage() {
 
       <SectionCard
         title="Carichi pubblicati dalle aziende"
-        description="Visualizza gli incarichi più recenti. I contatti sono visibili solo ai trasportatori abbonati."
+        description="Incarichi recenti. Contatti disponibili solo ai trasportatori abbonati e verificati."
         actions={
           <a className="text-sm font-semibold text-brand-800" href="/dashboard/transporter/requests">
             Vedi tutte le richieste

@@ -18,10 +18,10 @@ export default async function PaywallPage() {
     <div className="mx-auto max-w-6xl space-y-8">
       <header className="space-y-3 text-center">
         <p className="text-sm font-semibold uppercase tracking-wide text-accent-500">Accesso solo su abbonamento</p>
-        <h1>Operatività garantita con il piano DodiX</h1>
+        <h1>Abbonamento obbligatorio per operare su DodiX</h1>
         <p className="text-neutral-700">
-          Ogni azienda e trasportatore deve avere un abbonamento attivo per pubblicare, rispondere e contattare. È una
-          scelta di business: qualità delle richieste, identità verificata e supporto continuo.
+          Aziende e trasportatori lavorano solo con un abbonamento attivo. Questo mantiene il network verificato, tutela i
+          contatti e riduce i tempi di risposta.
         </p>
       </header>
 
@@ -30,27 +30,27 @@ export default async function PaywallPage() {
           <div className="space-y-2">
             <h2 className="text-xl font-semibold text-brand-900">Perché l&apos;abbonamento è obbligatorio</h2>
             <p className="text-neutral-700">
-              Manteniamo il marketplace pulito e affidabile. L&apos;abbonamento filtra gli accessi opportunistici, tutela i
-              dati di contatto e garantisce risposte rapide tra aziende e trasportatori.
+              L&apos;abbonamento protegge la qualità del marketplace: accessi verificati, contatti visibili solo a profili
+              attivi e tempi di risposta misurabili tra aziende e trasportatori.
             </p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="card space-y-3 border-brand-100 bg-white/70">
-              <h3 className="text-lg font-semibold text-brand-900">Cosa ottieni</h3>
+              <h3 className="text-lg font-semibold text-brand-900">Cosa è incluso</h3>
               <ul className="space-y-2 text-neutral-800">
-                <li>✔️ Pubblica richieste senza limiti</li>
-                <li>✔️ Contatta direttamente partner verificati</li>
-                <li>✔️ Visibilità prioritaria nelle ricerche</li>
-                <li>✔️ Supporto dedicato e roadmap B2B</li>
+                <li>✔️ Pubblica e gestisci richieste senza limiti</li>
+                <li>✔️ Contatti diretti con partner verificati</li>
+                <li>✔️ Visibilità prioritaria per profili affidabili</li>
+                <li>✔️ Supporto B2B e tracciabilità delle attività</li>
               </ul>
             </div>
 
             <div className="card space-y-3 border-brand-100 bg-white/70">
-              <h3 className="text-lg font-semibold text-brand-900">Applicato a tutti</h3>
+              <h3 className="text-lg font-semibold text-brand-900">Vale per ogni ruolo</h3>
               <p className="text-neutral-700">
                 Nessuna eccezione: aziende e trasportatori devono essere abbonati. È il modo più semplice per garantire
-                serietà, tempi di risposta brevi e un flusso costante di richieste qualificate.
+                interlocutori affidabili, contatti protetti e SLA rispettati.
               </p>
             </div>
           </div>
@@ -58,23 +58,23 @@ export default async function PaywallPage() {
           <div className="card space-y-4 border-brand-100 bg-white/70">
             <div className="flex items-center gap-2">
               <span className="badge-verified">VERIFIED</span>
-              <h3 className="text-lg font-semibold text-brand-900">Value per ruoli</h3>
+              <h3 className="text-lg font-semibold text-brand-900">Valore per ruolo</h3>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <p className="text-sm font-semibold uppercase tracking-wide text-neutral-600">Aziende</p>
                 <ul className="space-y-2 text-neutral-800">
-                  <li>• Rete di trasportatori affidabili</li>
-                  <li>• Contatti visibili solo a profili verificati</li>
-                  <li>• SLA di risposta chiari grazie all&apos;accesso a pagamento</li>
+                  <li>• Rete di trasportatori verificati e pronti</li>
+                  <li>• Contatti visibili solo a profili abbonati</li>
+                  <li>• SLA di risposta tracciati e riduzione dei tempi</li>
                 </ul>
               </div>
               <div className="space-y-2">
                 <p className="text-sm font-semibold uppercase tracking-wide text-neutral-600">Trasportatori</p>
                 <ul className="space-y-2 text-neutral-800">
-                  <li>• Carichi disponibili con contatti completi</li>
-                  <li>• Badge di affidabilità incluso</li>
-                  <li>• Maggiore visibilità verso aziende premium</li>
+                  <li>• Carichi qualificati con briefing completi</li>
+                  <li>• Badge di affidabilità e verifica documentale</li>
+                  <li>• Priorità verso aziende con processi strutturati</li>
                 </ul>
               </div>
             </div>
@@ -105,7 +105,7 @@ export default async function PaywallPage() {
           <PaywallActions />
 
           <p className="text-xs text-neutral-500">
-            Pagamenti gestiti da Stripe. Nessuna eccezione: senza abbonamento non hai accesso operativo.
+            Pagamenti gestiti da Stripe. Senza abbonamento non è possibile accedere a richieste, contatti e dashboard.
           </p>
         </div>
       </div>
