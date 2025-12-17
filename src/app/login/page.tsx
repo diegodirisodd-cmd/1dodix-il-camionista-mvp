@@ -35,9 +35,9 @@ export default function LoginPage() {
   return (
     <section className="max-w-xl space-y-6">
       <header className="space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">Accesso</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Accesso</p>
         <h1>Accedi</h1>
-        <p>Accedi per gestire richieste, contatti e dati operativi.</p>
+        <p className="text-neutral-100/80">Accedi per gestire richieste, contatti e dati operativi.</p>
       </header>
 
       <div className="card space-y-6">
@@ -60,8 +60,8 @@ export default function LoginPage() {
             <button type="submit" className="btn-primary">
               Accedi
             </button>
-            <span className="text-sm text-neutral-700">
-              Non hai un account? <Link className="text-brand-700" href="/register">Registrati</Link>
+            <span className="text-sm text-neutral-100/80">
+              Non hai un account? <Link className="text-accent-200 underline" href="/register">Registrati</Link>
             </span>
           </div>
         </form>

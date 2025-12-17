@@ -5,26 +5,26 @@ Identità visiva industriale e premium pensata per clienti B2B nel settore trasp
 ## Color palette
 | Token | Hex | Uso |
 | --- | --- | --- |
-| `brand-800` | `#0c2344` | Colore primario (header, bottoni principali, sfondi scuri)
-| `brand-600` | `#1b3d85` | Hover primario, icone
-| `brand-200` | `#a6b7df` | Bordi leggeri, separatori su fondi chiari
-| `accent-500` | `#ff8a19` | CTA, indicatori di stato positivo/urgente
-| `accent-300` | `#ffb975` | Hover/soft accent
-| `neutral-50` | `#f7f8fa` | Sfondo pagina chiaro
-| `neutral-200` | `#d7dde7` | Bordi e divisori
-| `neutral-800` | `#1f2a38` | Testo principale su fondi chiari
-| `success` | `#16a34a` | Conferme, badge VERIFIED
-| `warning` | `#f59e0b` | Attenzione
-| `danger` | `#dc2626` | Errori
+| `brand-900` | `#0f1a2a` | Blu industriale profondo per header, sfondi scuri, card contrast |
+| `brand-700` | `#26395b` | Hover primario, icone, sidebar |
+| `brand-300` | `#7e9ac6` | Bordi e highlight su superfici scure |
+| `accent-500` | `#f46f00` | CTA principali, indicatori urgenti |
+| `accent-300` | `#ffa240` | Hover accent, badge informativi |
+| `neutral-50` | `#f6f7fa` | Neutro chiaro per overlay e contrasti |
+| `neutral-900` | `#121824` | Testo principale su fondi chiari, ombre profonde |
+| `success` | `#16a34a` | Conferme, badge VERIFIED |
+| `warning` | `#f59e0b` | Attenzione |
+| `danger` | `#dc2626` | Errori |
 
 ## Typography scale
 Font primario: **Inter** (fallback Roboto/system). Tagli netti e leggibili.
 
-- Display / H1: `text-3xl` (mobile) / `text-4xl` (desktop), `font-semibold`
-- H2: `text-2xl` / `text-3xl`, `font-semibold`
-- H3: `text-xl`, `font-semibold`
-- Body: `text-base`, `text-neutral-700`
-- Meta/Label: `text-sm`, `font-semibold`
+- Display / H1: `text-4xl` (mobile) / `text-5xl` (desktop), `font-semibold`, `leading-tight`
+- H2: `text-3xl` / `text-4xl`, `font-semibold`
+- H3: `text-2xl`, `font-semibold`
+- H4: `text-xl`, `font-semibold`
+- Body: `text-base`, `text-neutral-100/80` su fondi scuri
+- Meta/Label: `text-xs` o `text-sm`, uppercase con tracking ampia
 
 Inter è importato via `next/font` in `src/app/layout.tsx` e applicato al `<body>`.
 
@@ -37,29 +37,32 @@ Scala coerente espressa come CSS custom properties (vedi `:root` in `globals.css
 - `--space-lg`: 24px
 - `--space-xl`: 32px
 - `--space-2xl`: 48px
+- `--space-3xl`: 64px
 
 Usa `gap`/`padding` con questi step per sezioni, card e form.
 
 ## Buttons
 Classi riutilizzabili definite in `@layer components`:
-- **Primario**: `.btn-primary` — fondo `brand-700`, testo bianco, shadow card, focus ring arancione.
-- **Secondario**: `.btn-secondary` — bordo `brand-200`, fondo bianco, testo `brand-800`, hover con brand-50.
+- **Primario**: `.btn-primary` — arancione industriale, testo bianco, focus ring arancio chiaro, disabled attenuato.
+- **Secondario**: `.btn-secondary` — bordo blu chiaro su fondo scuro, testo chiaro, hover con leggero contrasto.
+- **Ghost**: `.btn-ghost` — testo chiaro e hover trasparente per link contestuali.
 
 ## Cards
-- `.card`: sfondo bianco, bordo neutro chiaro, `shadow-card`, raggio `rounded-xl`, padding 24px.
-- `.card-muted`: variante su `neutral-50` per contesti di onboarding/empty state.
+- `.card`: superficie traslucida su fondi scuri (`bg-white/5`), bordo `white/10`, `shadow-card`, `rounded-2xl`.
+- `.card-muted`: variante leggermente più chiara (`bg-white/10`) per messaggi informativi.
+- `.card-contrast`: versione più intensa (`bg-brand-900/60`) per hero o callout.
 
 ## Forms
 - Etichetta: `.label`
-- Campo: `.input-field` (bordo neutro, focus brand/accent, angoli arrotondati, shadow soft)
-- Wrapper campi: `.form-field` (gap + spaziatura verticale standard)
+- Campo: `.input-field` (bordo `white/20`, fondo semitrasparente, focus accent, testo chiaro)
+- Wrapper campi: `.form-field` (gap maggiore e spaziatura generosa)
 - Azioni: `.form-actions` per distribuire pulsanti e link di supporto.
 
 ## Tables
 Contenitore `div.table-shell` e `table` interno:
-- `table-shell`: bordo `neutral-200`, `shadow-sm`, `rounded-xl`.
-- `thead`: `bg-neutral-50`, testo uppercase XS, divisore neutro.
-- `tbody tr:hover`: highlight `neutral-50`.
+- `table-shell`: bordo `white/10`, `bg-white/5`, `rounded-2xl`, backdrop-blur.
+- `thead`: `bg-white/5`, testo uppercase XS chiaro.
+- `tbody tr:hover`: highlight `white/5`.
 
 ## Alerts
 - Base: `.alert`

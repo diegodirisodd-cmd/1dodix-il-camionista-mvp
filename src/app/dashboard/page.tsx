@@ -17,20 +17,33 @@ export default async function DashboardPage() {
   }
 
   return (
-    <section>
-      <h1>Area account</h1>
-      <p>Accesso verificato per {user.email}. Le funzioni operative richiedono un abbonamento attivo.</p>
-
-      <div className="form-field">
-        <strong>Ruolo:</strong> {user.role}
-      </div>
-      <div className="form-field">
-        <strong>Creato il:</strong> {new Date(user.createdAt).toLocaleString("it-IT")}
+    <section className="space-y-6">
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Profilo</p>
+        <h1>Area account</h1>
+        <p className="text-neutral-100/80">
+          Accesso verificato per {user.email}. Le funzioni operative richiedono un abbonamento attivo.
+        </p>
       </div>
 
-      <Suspense fallback={<p>Chiusura sessione...</p>}>
-        <LogoutButton />
-      </Suspense>
+      <div className="card space-y-4 text-sm text-neutral-100/80">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-200">Ruolo</p>
+            <p className="text-base font-semibold text-white">{user.role}</p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-200">Creato il</p>
+            <p className="text-base font-semibold text-white">{new Date(user.createdAt).toLocaleString("it-IT")}</p>
+          </div>
+        </div>
+
+        <div className="pt-2">
+          <Suspense fallback={<p>Chiusura sessione...</p>}>
+            <LogoutButton />
+          </Suspense>
+        </div>
+      </div>
     </section>
   );
 }

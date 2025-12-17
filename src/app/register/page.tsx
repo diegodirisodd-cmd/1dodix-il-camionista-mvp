@@ -34,9 +34,9 @@ export default function RegisterPage() {
   return (
     <section className="max-w-2xl space-y-6">
       <header className="space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">Onboarding</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Onboarding</p>
         <h1>Registrati</h1>
-        <p>Crea un account con email, password e ruolo operativo per accedere a richieste e contatti.</p>
+        <p className="text-neutral-100/80">Crea un account con email, password e ruolo operativo per accedere a richieste e contatti.</p>
       </header>
 
       <div className="card space-y-6">
@@ -72,8 +72,8 @@ export default function RegisterPage() {
             <button type="submit" className="btn-primary">
               Crea account
             </button>
-            <span className="text-sm text-neutral-700">
-              Hai già un account? <Link className="text-brand-700" href="/login">Accedi</Link>
+            <span className="text-sm text-neutral-100/80">
+              Hai già un account? <Link className="text-accent-200 underline" href="/login">Accedi</Link>
             </span>
           </div>
         </form>

@@ -39,9 +39,9 @@ export default async function TransporterRequestsPage() {
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-2">
-        <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">Richieste disponibili</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Richieste disponibili</p>
         <h1>Trasporti pubblicati</h1>
-        <p>Richieste inviate da aziende registrate. I contatti sono visibili solo con un abbonamento attivo.</p>
+        <p className="text-neutral-100/80">Richieste inviate da aziende registrate. I contatti sono visibili solo con un abbonamento attivo.</p>
       </header>
 
       <SectionCard
@@ -52,7 +52,7 @@ export default async function TransporterRequestsPage() {
         }
       >
         {displayRequests.length === 0 ? (
-          <p className="text-sm text-neutral-700">Nessuna richiesta presente. Torna a controllare più tardi.</p>
+          <p className="text-sm text-neutral-200/80">Nessuna richiesta presente. Torna a controllare più tardi.</p>
         ) : (
           <div className="table-shell overflow-x-auto">
             <table>
@@ -70,27 +70,27 @@ export default async function TransporterRequestsPage() {
               <tbody>
                 {displayRequests.map((request) => (
                   <tr key={request.id}>
-                    <td className="whitespace-nowrap font-semibold text-brand-900">{request.title}</td>
-                    <td className="whitespace-nowrap">{request.company.email}</td>
-                    <td className="whitespace-nowrap">
+                    <td className="whitespace-nowrap font-semibold text-white">{request.title}</td>
+                    <td className="whitespace-nowrap text-neutral-100/80">{request.company.email}</td>
+                    <td className="whitespace-nowrap text-neutral-100/80">
                       {request.pickup} → {request.dropoff}
                     </td>
-                    <td className="whitespace-nowrap">{request.cargo ?? "-"}</td>
-                    <td className="whitespace-nowrap">{request.budget ?? "-"}</td>
-                    <td>
+                    <td className="whitespace-nowrap text-neutral-100/80">{request.cargo ?? "-"}</td>
+                    <td className="whitespace-nowrap text-neutral-100/80">{request.budget ?? "-"}</td>
+                    <td className="text-neutral-100/80">
                       {request.contactName ? (
                         <div className="space-y-1">
-                          <div className="font-semibold text-brand-900">{request.contactName}</div>
-                          <div className="text-neutral-700">{request.contactPhone}</div>
-                          <div className="text-neutral-700">{request.contactEmail}</div>
+                          <div className="font-semibold text-white">{request.contactName}</div>
+                          <div className="text-neutral-200/80">{request.contactPhone}</div>
+                          <div className="text-neutral-200/80">{request.contactEmail}</div>
                         </div>
                       ) : (
-                        <div className="text-sm text-neutral-600">
+                        <div className="text-sm text-neutral-200/80">
                           Abbonamento necessario per vedere i contatti
                         </div>
                       )}
                     </td>
-                    <td className="whitespace-nowrap text-neutral-700">
+                    <td className="whitespace-nowrap text-neutral-200/80">
                       {new Date(request.createdAt).toLocaleDateString("it-IT")}
                     </td>
                   </tr>

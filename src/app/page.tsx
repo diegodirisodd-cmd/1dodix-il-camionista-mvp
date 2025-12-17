@@ -31,37 +31,47 @@ export default function HomePage() {
   ];
 
   return (
-    <section className="space-y-10 md:space-y-12">
+    <section className="space-y-12 md:space-y-16">
       <div className="grid gap-8 lg:grid-cols-[1.1fr,0.9fr] lg:items-center">
         <div className="space-y-6">
           <div className="space-y-3">
-            <p className="text-sm font-semibold uppercase tracking-wide text-accent-500">Logistica B2B senza frizioni</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Logistica B2B senza frizioni</p>
             <h1>La piattaforma affidabile per spedire e trovare carichi critici</h1>
-            <p className="text-lg text-neutral-800">
-              DodiX collega aziende export/food e operatori industriali con trasportatori verificati.
-              Richieste strutturate, assegnazione rapida e contatti sicuri in un’unica piattaforma.
+            <p className="text-lg text-neutral-100/80">
+              DodiX collega aziende export/food e operatori industriali con trasportatori verificati. Richieste strutturate,
+              assegnazione rapida e contatti sicuri in un’unica piattaforma.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link href="/register" className="btn-primary">
+            <Link href="/register" className="btn-primary px-6 py-3 text-base">
               Inizia ora
             </Link>
-            <Link href="/login" className="btn-secondary">
+            <Link href="/login" className="btn-secondary px-6 py-3 text-base">
               Accedi
             </Link>
             <span className="badge-verified">Utenti verificati</span>
           </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="card-contrast space-y-2">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-accent-200">Per aziende</p>
+              <p className="text-sm text-neutral-100/80">Richieste standard, SLA chiari, contatti verificati.</p>
+            </div>
+            <div className="card-contrast space-y-2">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-accent-200">Per trasportatori</p>
+              <p className="text-sm text-neutral-100/80">Carichi qualificati, briefing completi, contatti protetti.</p>
+            </div>
+          </div>
         </div>
 
-        <div className="card space-y-4">
+        <div className="card space-y-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Focus aziende</p>
-              <h3>Controllo operativo su richieste e vettori</h3>
+              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-200">Focus aziende</p>
+              <h3 className="text-2xl text-white">Controllo operativo su richieste e vettori</h3>
             </div>
-            <div className="rounded-lg bg-brand-50 px-3 py-2 text-sm font-semibold text-brand-800">B2B</div>
+            <div className="rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-sm font-semibold text-accent-100">B2B</div>
           </div>
-          <ul className="space-y-3 text-sm text-neutral-800">
+          <ul className="space-y-3 text-sm text-neutral-100/80">
             <li className="flex items-start gap-2">
               <span className="mt-1 h-2 w-2 rounded-full bg-accent-500" aria-hidden />
               Richieste standardizzate con SLA, requisiti e ruoli chiari.
@@ -75,29 +85,29 @@ export default function HomePage() {
               Contatti e documenti visibili solo a profili abbonati e verificati.
             </li>
           </ul>
-          <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800">
+          <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-neutral-100/80">
             Accesso protetto da abbonamento per aziende e trasportatori. Contatti e documenti sono disponibili solo con pagamenti attivi.
           </div>
         </div>
       </div>
 
-      <div className="card space-y-4">
-        <div className="flex items-center justify-between">
-          <h2>Perché scegliere DodiX</h2>
+      <div className="card space-y-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <h2 className="text-3xl text-white">Perché scegliere DodiX</h2>
           <span className="badge">Supply chain affidabile</span>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
           <div className="space-y-2">
-            <h3>Verifiche e ruoli chiari</h3>
-            <p>Account aziendali e trasportatori con ruoli definiti, abbonamenti verificati e tracciabilità continua.</p>
+            <h3 className="text-xl text-white">Verifiche e ruoli chiari</h3>
+            <p className="text-neutral-100/80">Account aziendali e trasportatori con ruoli definiti, abbonamenti verificati e tracciabilità continua.</p>
           </div>
           <div className="space-y-2">
-            <h3>Velocità operativa</h3>
-            <p>Richieste standard riducono rimbalzi e velocizzano l’assegnazione dei carichi.</p>
+            <h3 className="text-xl text-white">Velocità operativa</h3>
+            <p className="text-neutral-100/80">Richieste standard riducono rimbalzi e velocizzano l’assegnazione dei carichi.</p>
           </div>
           <div className="space-y-2">
-            <h3>Contatti tracciati</h3>
-            <p>Contatti condivisi solo con utenti attivi e verificati, per evitare sprechi e garantire responsabilità.</p>
+            <h3 className="text-xl text-white">Contatti tracciati</h3>
+            <p className="text-neutral-100/80">Contatti condivisi solo con utenti attivi e verificati, per evitare sprechi e garantire responsabilità.</p>
           </div>
         </div>
       </div>
@@ -106,39 +116,39 @@ export default function HomePage() {
         {steps.map((step, index) => (
           <div key={step.title} className="card space-y-3">
             <div className="flex items-center justify-between">
-              <h3>{step.title}</h3>
+              <h3 className="text-xl text-white">{step.title}</h3>
               <span className="rounded-full bg-accent-500 px-3 py-1 text-xs font-semibold text-brand-900">{index + 1}</span>
             </div>
-            <p>{step.description}</p>
+            <p className="text-neutral-100/80">{step.description}</p>
           </div>
         ))}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="card space-y-3">
+        <div className="card space-y-4">
           <div className="flex items-center justify-between">
-            <h2>Benefici per aziende</h2>
+            <h2 className="text-3xl text-white">Benefici per aziende</h2>
             <span className="badge">Company</span>
           </div>
-          <ul className="space-y-2 text-neutral-800">
+          <ul className="space-y-2 text-neutral-100/80">
             {companyBenefits.map((item) => (
               <li key={item} className="flex items-start gap-2">
-                <span className="mt-1 h-2 w-2 rounded-full bg-brand-600" aria-hidden />
+                <span className="mt-1 h-2 w-2 rounded-full bg-accent-400" aria-hidden />
                 {item}
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="card space-y-3">
+        <div className="card space-y-4">
           <div className="flex items-center justify-between">
-            <h2>Benefici per trasportatori</h2>
+            <h2 className="text-3xl text-white">Benefici per trasportatori</h2>
             <span className="badge">Transporter</span>
           </div>
-          <ul className="space-y-2 text-neutral-800">
+          <ul className="space-y-2 text-neutral-100/80">
             {transporterBenefits.map((item) => (
               <li key={item} className="flex items-start gap-2">
-                <span className="mt-1 h-2 w-2 rounded-full bg-brand-600" aria-hidden />
+                <span className="mt-1 h-2 w-2 rounded-full bg-accent-400" aria-hidden />
                 {item}
               </li>
             ))}
@@ -147,37 +157,36 @@ export default function HomePage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr,0.8fr] lg:items-center">
-        <div className="card space-y-3">
+        <div className="card space-y-4">
           <div className="flex items-center gap-3">
             <span className="badge-verified">Verified</span>
             <span className="badge">B2B network</span>
           </div>
-          <h2>Affidabilità e prove di fiducia</h2>
-          <p>
-            Accessi approvati, ruoli convalidati e pagamenti ricorrenti via Stripe assicurano identità chiare e
-            responsabilità su ogni interlocutore.
+          <h2 className="text-3xl text-white">Affidabilità e prove di fiducia</h2>
+          <p className="text-neutral-100/80">
+            Accessi approvati, ruoli convalidati e pagamenti ricorrenti via Stripe assicurano identità chiare e responsabilità su ogni interlocutore.
           </p>
-          <p className="text-sm text-neutral-700">
+          <p className="text-sm text-neutral-200/80">
             Contatti e documenti sono visibili solo con abbonamento attivo, proteggendo informazioni sensibili di aziende e trasportatori.
           </p>
         </div>
-        <div className="card-muted space-y-3">
-          <h3>Metriche chiave</h3>
-          <div className="grid grid-cols-2 gap-4 text-sm text-neutral-800">
+        <div className="card-muted space-y-4">
+          <h3 className="text-xl text-white">Metriche chiave</h3>
+          <div className="grid grid-cols-2 gap-4 text-sm text-neutral-100/80">
             <div className="space-y-1">
-              <div className="text-3xl font-semibold text-brand-900">24/7</div>
+              <div className="text-3xl font-semibold text-accent-200">24/7</div>
               <p>Disponibilità piattaforma per richieste e assegnazioni.</p>
             </div>
             <div className="space-y-1">
-              <div className="text-3xl font-semibold text-brand-900">100%</div>
+              <div className="text-3xl font-semibold text-accent-200">100%</div>
               <p>Accessi protetti da abbonamento e controlli di ruolo.</p>
             </div>
             <div className="space-y-1">
-              <div className="text-3xl font-semibold text-brand-900">3</div>
+              <div className="text-3xl font-semibold text-accent-200">3</div>
               <p>Passi per pubblicare, scegliere e coordinare una spedizione.</p>
             </div>
             <div className="space-y-1">
-              <div className="text-3xl font-semibold text-brand-900">Zero</div>
+              <div className="text-3xl font-semibold text-accent-200">Zero</div>
               <p>Intermediari opachi: contatti diretti e tracciati.</p>
             </div>
           </div>
@@ -186,14 +195,14 @@ export default function HomePage() {
 
       <div className="card flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="space-y-2">
-          <h2>Pronti a operare senza frizioni?</h2>
-          <p className="text-neutral-800">Attiva l’abbonamento e collega team aziendali e flotta in un’unica piattaforma.</p>
+          <h2 className="text-3xl text-white">Pronti a operare senza frizioni?</h2>
+          <p className="text-neutral-100/80">Attiva l’abbonamento e collega team aziendali e flotta in un’unica piattaforma.</p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link href="/paywall" className="btn-primary">
+          <Link href="/paywall" className="btn-primary px-6 py-3 text-base">
             Abbonati ora
           </Link>
-          <Link href="/dashboard" className="btn-secondary">
+          <Link href="/dashboard" className="btn-secondary px-6 py-3 text-base">
             Vai alla dashboard
           </Link>
         </div>
