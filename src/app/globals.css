@@ -15,7 +15,9 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: linear-gradient(135deg, #0c2344 0%, #081a32 25%, #f7f8fa 25%, #f7f8fa 100%);
+  background: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0)),
+    radial-gradient(circle at 90% 10%, rgba(255, 186, 117, 0.25), rgba(255, 186, 117, 0)),
+    #f3f4f6;
   color: #111927;
 }
 
@@ -25,46 +27,6 @@ main {
 
 a {
   color: inherit;
-}
-
-.app-shell {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-}
-
-.app-header {
-  background: linear-gradient(135deg, #0c2344, #112b52);
-  color: #f7f8fa;
-  padding: var(--space-lg) 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-}
-
-.app-nav {
-  display: flex;
-  gap: var(--space-md);
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 var(--space-lg);
-}
-
-.app-nav a {
-  color: #e9edf7;
-  font-weight: 600;
-}
-
-.app-nav a:hover {
-  color: #ffb975;
-}
-
-.app-content {
-  flex: 1;
-  padding: var(--space-xl) var(--space-lg);
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
 }
 
 .form-field {
