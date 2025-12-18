@@ -55,7 +55,7 @@ export default async function TransporterRequestsPage() {
           <p className="text-sm text-neutral-200/80">Nessuna richiesta presente. Torna a controllare più tardi.</p>
         ) : (
           <div className="table-shell overflow-x-auto">
-            <table>
+            <table className="min-w-[960px]">
               <thead>
                 <tr>
                   <th>Titolo</th>
@@ -64,7 +64,7 @@ export default async function TransporterRequestsPage() {
                   <th>Carico</th>
                   <th>Budget</th>
                   <th>Contatto</th>
-                  <th>Pubblicata</th>
+                  <th className="text-right">Pubblicata</th>
                 </tr>
               </thead>
               <tbody>
@@ -76,22 +76,26 @@ export default async function TransporterRequestsPage() {
                       {request.pickup} → {request.dropoff}
                     </td>
                     <td className="whitespace-nowrap text-neutral-100/80">{request.cargo ?? "-"}</td>
-                    <td className="whitespace-nowrap text-neutral-100/80">{request.budget ?? "-"}</td>
+                    <td className="whitespace-nowrap font-semibold text-white">{request.budget ?? "-"}</td>
                     <td className="text-neutral-100/80">
                       {request.contactName ? (
-                        <div className="space-y-1">
-                          <div className="font-semibold text-white">{request.contactName}</div>
-                          <div className="text-neutral-200/80">{request.contactPhone}</div>
-                          <div className="text-neutral-200/80">{request.contactEmail}</div>
+                        <div className="space-y-2">
+                          <span className="table-chip success">Contatti sbloccati</span>
+                          <div className="space-y-1 text-sm">
+                            <div className="font-semibold text-white">{request.contactName}</div>
+                            <div className="text-neutral-200/80">{request.contactPhone}</div>
+                            <div className="text-neutral-200/80">{request.contactEmail}</div>
+                          </div>
                         </div>
                       ) : (
-                        <div className="text-sm text-neutral-200/80">
-                          Abbonamento necessario per vedere i contatti
+                        <div className="space-y-2 text-sm text-neutral-200/80">
+                          <span className="table-chip warning">Contatti bloccati</span>
+                          <p className="leading-snug">Attiva l&apos;abbonamento per vedere i recapiti e chiamare subito.</p>
                         </div>
                       )}
                     </td>
-                    <td className="whitespace-nowrap text-neutral-200/80">
-                      {new Date(request.createdAt).toLocaleDateString("it-IT")}
+                    <td className="whitespace-nowrap text-right text-neutral-200/80">
+                      <div className="table-meta">{new Date(request.createdAt).toLocaleDateString("it-IT")}</div>
                     </td>
                   </tr>
                 ))}

@@ -223,8 +223,8 @@ export default async function TransporterDashboardPage() {
         {recentRequests.length === 0 ? (
           <p className="text-sm text-neutral-200/80">Ancora nessuna richiesta pubblicata.</p>
         ) : (
-          <div className="table-shell">
-            <table>
+          <div className="table-shell overflow-x-auto">
+            <table className="min-w-[820px]">
               <thead>
                 <tr>
                   <th>Titolo</th>
@@ -240,18 +240,21 @@ export default async function TransporterDashboardPage() {
                     <td className="whitespace-nowrap text-neutral-100/80">
                       {request.pickup} → {request.dropoff}
                     </td>
-                    <td className="whitespace-nowrap text-neutral-100/80">{request.budget ?? "-"}</td>
+                    <td className="whitespace-nowrap font-semibold text-white">{request.budget ?? "-"}</td>
                     <td className="text-neutral-100/80">
                       {subscriptionActive ? (
-                        <div className="space-y-1 text-sm">
-                          <div className="font-semibold text-white">{request.contactName}</div>
-                          <div className="text-neutral-200/80">{request.contactPhone}</div>
-                          <div className="text-neutral-200/80">{request.contactEmail}</div>
+                        <div className="space-y-2 text-sm">
+                          <span className="table-chip success">Contatti sbloccati</span>
+                          <div className="space-y-1">
+                            <div className="font-semibold text-white">{request.contactName}</div>
+                            <div className="text-neutral-200/80">{request.contactPhone}</div>
+                            <div className="text-neutral-200/80">{request.contactEmail}</div>
+                          </div>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-2 text-sm text-neutral-200/80">
-                          <span className="badge">Riservato</span>
-                          <span>Attiva l&apos;abbonamento per sbloccare i contatti</span>
+                        <div className="space-y-2 text-sm text-neutral-200/80">
+                          <span className="table-chip warning">Contatti bloccati</span>
+                          <p className="leading-snug">Abbonati per vedere email e telefono del referente.</p>
                         </div>
                       )}
                     </td>

@@ -146,8 +146,8 @@ export default async function CompanyDashboardPage() {
           {companyRequests.length === 0 ? (
             <p className="text-sm text-neutral-200/80">Pubblica la prima richiesta per ingaggiare trasportatori verificati.</p>
           ) : (
-            <div className="table-shell">
-              <table>
+            <div className="table-shell overflow-x-auto">
+              <table className="min-w-[860px]">
                 <thead>
                   <tr>
                     <th>Titolo</th>
@@ -164,19 +164,19 @@ export default async function CompanyDashboardPage() {
                       <td className="whitespace-nowrap text-neutral-100/80">
                         {request.pickup} → {request.dropoff}
                       </td>
-                      <td className="whitespace-nowrap text-neutral-100/80">{request.budget ?? "-"}</td>
-                      <td className="whitespace-nowrap text-neutral-100/80">
-                        <div className="space-y-1">
-                          <div className="font-semibold text-white">{request.contactName}</div>
-                          <div className="text-neutral-200/80">{request.contactPhone}</div>
-                          <div className="text-neutral-200/80">{request.contactEmail}</div>
-                        </div>
-                      </td>
-                      <td className="whitespace-nowrap text-neutral-100/80">
-                        {new Date(request.createdAt).toLocaleDateString("it-IT")}
-                      </td>
-                    </tr>
-                  ))}
+                    <td className="whitespace-nowrap font-semibold text-white">{request.budget ?? "-"}</td>
+                    <td className="whitespace-nowrap text-neutral-100/80">
+                      <div className="space-y-1 text-sm">
+                        <div className="font-semibold text-white">{request.contactName}</div>
+                        <div className="text-neutral-200/80">{request.contactPhone}</div>
+                        <div className="text-neutral-200/80">{request.contactEmail}</div>
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap text-neutral-100/80">
+                      {new Date(request.createdAt).toLocaleDateString("it-IT")}
+                    </td>
+                  </tr>
+                ))}
                 </tbody>
               </table>
             </div>
@@ -193,8 +193,8 @@ export default async function CompanyDashboardPage() {
           {recentContacts.length === 0 ? (
             <p className="text-sm text-neutral-200/80">Nessun contatto generato finora.</p>
           ) : (
-            <div className="table-shell">
-              <table>
+            <div className="table-shell overflow-x-auto">
+              <table className="min-w-[760px]">
                 <thead>
                   <tr>
                     <th>Richiesta</th>

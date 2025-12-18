@@ -108,7 +108,7 @@ a {
   }
 
   .table-shell thead {
-    @apply bg-white/5 text-neutral-200 uppercase tracking-wide text-xs font-semibold;
+    @apply bg-white/10 text-neutral-200 uppercase tracking-wide text-xs font-semibold;
   }
 
   .table-shell th,
@@ -118,6 +118,22 @@ a {
 
   .table-shell tbody tr:hover {
     @apply bg-white/5;
+  }
+
+  .table-chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-100;
+  }
+
+  .table-chip.success {
+    @apply border-success/40 bg-success/10 text-success;
+  }
+
+  .table-chip.warning {
+    @apply border-accent-400/50 bg-accent-500/10 text-accent-100;
+  }
+
+  .table-meta {
+    @apply text-xs font-semibold uppercase tracking-wide text-neutral-200/80;
   }
 
   .alert {
