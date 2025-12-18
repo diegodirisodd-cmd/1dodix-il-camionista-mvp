@@ -75,9 +75,9 @@ export default function LoginPage() {
         <div className="w-full max-w-[420px] space-y-6 rounded-2xl border border-neutral-200 bg-white/95 p-8 text-neutral-900 shadow-xl shadow-black/10">
           <div className="space-y-2 text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#0f2a44]">Accesso</p>
-            <h2 className="text-3xl font-semibold text-[#0f2a44]">Accedi al pannello</h2>
+            <h2 className="text-3xl font-semibold text-[#0f2a44]">Accedi a DodiX</h2>
             <p className="text-sm text-neutral-600">
-              Inserisci email aziendale e password per continuare. L&apos;abbonamento è obbligatorio per usare la piattaforma.
+              La piattaforma che collega aziende e trasportatori in modo semplice e veloce.
             </p>
           </div>
 
@@ -95,7 +95,7 @@ export default function LoginPage() {
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <label className="text-sm font-semibold text-neutral-800" htmlFor="email">
-                Email
+                Email aziendale
               </label>
               <input
                 className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-3 text-sm text-neutral-900 shadow-inner transition focus:border-[#0f2a44] focus:outline-none focus:ring-2 focus:ring-[#0f2a44]/30"
@@ -128,13 +128,13 @@ export default function LoginPage() {
                 type="submit"
                 className="h-12 w-full rounded-xl bg-[#0f2a44] text-sm font-semibold text-white shadow-md transition duration-150 hover:bg-[#13375a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f2a44] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
               >
-                Accedi
+                Accedi alla piattaforma
               </button>
               <Link
                 href="/register"
                 className="flex h-12 w-full items-center justify-center rounded-xl border border-[#0f2a44]/20 bg-emerald-50 text-sm font-semibold text-[#0f2a44] transition duration-150 hover:border-[#0f2a44]/40 hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f2a44] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
               >
-                Non hai un account? Registrati
+                Non hai un account? Crea il tuo profilo
               </Link>
             </div>
           </form>
