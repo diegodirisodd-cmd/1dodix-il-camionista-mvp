@@ -42,34 +42,38 @@ export default function LoginPage() {
         <div className="absolute inset-0 opacity-40" aria-hidden>
           <div className="h-full w-full bg-[radial-gradient(circle_at_25%_20%,rgba(255,255,255,0.12),transparent_35%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.1),transparent_30%)]" />
         </div>
-        <div className="relative mx-auto flex h-full max-w-2xl flex-col justify-between space-y-10">
-          <div className="space-y-5">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-100">
-              DodiX – Il Camionista
-            </span>
-            <div className="space-y-4">
-              <h1 className="text-4xl font-semibold leading-tight text-white">Accesso sicuro alla tua operatività</h1>
-              <p className="text-lg text-white/80">
-                Gestisci richieste, contatti e abbonamento con un&apos;esperienza pensata per team di trasporto e aziende che cercano affidabilità.
+        <div className="relative mx-auto flex h-full max-w-3xl items-center justify-center">
+          <div className="space-y-8 rounded-2xl border border-white/15 bg-black/20 p-8 shadow-2xl shadow-black/40 backdrop-blur">
+            <div className="space-y-3">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-100">
+                DodiX – Il Camionista
+              </span>
+              <h1 className="text-4xl font-semibold leading-tight text-white">Trasporti, senza perdite di tempo</h1>
+              <p className="text-base text-white/80">
+                Soluzione unica per aziende e trasportatori che vogliono pubblicare, ricevere e gestire richieste in modo diretto e affidabile.
               </p>
             </div>
-          </div>
-
-          <div className="space-y-4 rounded-2xl border border-white/15 bg-white/10 p-6 shadow-xl shadow-black/30 backdrop-blur">
-            <h3 className="text-lg font-semibold text-white">Perché accedere ora</h3>
-            <ul className="space-y-3 text-sm text-white/80">
-              <li className="flex items-start gap-3">
-                <span className="badge">Richieste</span>
-                <span>Pubblica o prendi in carico trasporti con contatti protetti per gli abbonati.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="badge">Dashboard</span>
-                <span>Stato operativo, verifiche e abbonamento sempre aggiornati.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="badge">Supporto</span>
-                <span>Indicazioni chiare su verifica profilo e gestione dati sensibili.</span>
-              </li>
+            <ul className="space-y-4 text-base text-white/80">
+              {["Pubblica richieste in pochi minuti", "Ricevi offerte da trasportatori verificati", "Gestisci tutto da un'unica dashboard"].map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-200">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-4 w-4"
+                      aria-hidden
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </span>
+                  <span className="leading-relaxed text-white">{item}</span>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
