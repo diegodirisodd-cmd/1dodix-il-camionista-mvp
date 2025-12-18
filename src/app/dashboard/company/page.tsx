@@ -36,23 +36,49 @@ export default async function CompanyDashboardPage() {
   const recentContacts = companyRequests.slice(0, 5);
 
   return (
-    <div className="space-y-8">
-      <header className="card space-y-4 lg:space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-accent-300">Area aziende</p>
-            <h1 className="text-3xl text-white">Centro operativo aziendale</h1>
-            <p className="text-neutral-100/80">Stato richieste, trasportatori verificati e abbonamento in un unico cruscotto.</p>
+    <div className="space-y-10">
+      <header className="card space-y-6 lg:space-y-8">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-3 rounded-full bg-white/5 px-4 py-2 text-xs font-semibold text-neutral-100 shadow-sm shadow-black/20 ring-1 ring-white/10">
+              <span className="rounded-full bg-accent-500/20 px-3 py-1 text-accent-200">Azienda</span>
+              <span className="text-white">Dashboard operativa</span>
+            </div>
+            <div className="space-y-2">
+              <h1 className="text-3xl font-semibold leading-tight text-white lg:text-4xl">
+                Controllo totale su richieste e trasportatori verificati
+              </h1>
+              <p className="max-w-3xl text-neutral-100/80">
+                Monitora richieste attive, contatta trasportatori verificati e mantieni abbonamento sempre
+                operativo. Tutto in una vista pronta per le demo commerciali.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 text-sm text-neutral-100/80">
+              <span className="inline-flex items-center gap-2 rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success">
+                Abbonamento attivo
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs font-semibold text-white/80">
+                Ultima pubblicazione: {lastPublication}
+              </span>
+            </div>
           </div>
-          <a href="#pubblica" className="btn-primary px-5 py-3 text-base">
-            Pubblica una richiesta
-            <span aria-hidden>→</span>
-          </a>
+          <div className="flex flex-col items-start gap-3 lg:items-end">
+            <a href="#pubblica" className="btn-primary px-6 py-3 text-base">
+              Pubblica una richiesta
+              <span aria-hidden>→</span>
+            </a>
+            <p className="text-sm text-neutral-100/70">Raggiungi trasportatori verificati in pochi minuti.</p>
+          </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <SectionCard title="Richieste attive" description="Annunci pubblicati e visibili ai trasportatori." subtle>
-            <p className="text-4xl font-semibold text-white">{activeRequests}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-4xl font-semibold text-white">{activeRequests}</p>
+              <span className="rounded-full bg-white/5 px-3 py-1 text-xs font-semibold text-neutral-100/80">
+                In evidenza
+              </span>
+            </div>
             <p className="text-sm text-neutral-200/80">Ultima pubblicazione: {lastPublication}</p>
           </SectionCard>
           <SectionCard title="Trasportatori verificati" description="Iscritti con abbonamento attivo." subtle>
@@ -60,18 +86,26 @@ export default async function CompanyDashboardPage() {
             <p className="text-sm text-neutral-200/80">Disponibili per assegnazione immediata</p>
           </SectionCard>
           <SectionCard title="Abbonamento" description="Stato attuale dell’account." subtle>
-            <p className="text-lg font-semibold text-success">Attivo</p>
-            <p className="text-sm text-neutral-200/80">Accesso completo a contatti e documenti</p>
+            <div className="space-y-2">
+              <p className="text-lg font-semibold text-success">Attivo</p>
+              <p className="text-sm text-neutral-200/80">Accesso completo a contatti e documenti.</p>
+            </div>
           </SectionCard>
           <SectionCard title="Contatti recenti" description="Lead generati dalle ultime richieste." subtle>
-            <p className="text-4xl font-semibold text-white">{recentContacts.length}</p>
-            <p className="text-sm text-neutral-200/80">Ultime richieste in evidenza</p>
+            <div className="space-y-2">
+              <p className="text-4xl font-semibold text-white">{recentContacts.length}</p>
+              <p className="text-sm text-neutral-200/80">Monitorati per follow-up commerciale.</p>
+            </div>
           </SectionCard>
         </div>
       </header>
 
-      <section className="grid gap-6 lg:grid-cols-3">
-        <SectionCard title="Profilo azienda" description="Dati account e onboarding." className="lg:col-span-1">
+      <section className="grid gap-6 xl:grid-cols-3">
+        <SectionCard
+          title="Profilo azienda"
+          description="Dettagli account sempre disponibili per le verifiche commerciali."
+          className="xl:col-span-1"
+        >
           <dl className="space-y-3 text-sm text-neutral-100/80">
             <div className="flex items-start justify-between gap-4">
               <dt className="text-neutral-300">Email</dt>
@@ -94,17 +128,20 @@ export default async function CompanyDashboardPage() {
               </dd>
             </div>
           </dl>
+          <div className="mt-4 rounded-lg border border-white/5 bg-white/5 px-4 py-3 text-xs text-neutral-100/70">
+            Mantieni i dati aggiornati per velocizzare la firma dei contratti e l’assegnazione dei carichi.
+          </div>
         </SectionCard>
 
         <SectionCard
           title="Richieste in corso"
-          description="Monitoraggio operativo delle spedizioni aperte."
+          description="Monitoraggio operativo delle spedizioni aperte e dei contatti condivisi."
           actions={
             <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-neutral-100">
               {activeRequests} attive
             </span>
           }
-          className="lg:col-span-2"
+          className="xl:col-span-2"
         >
           {companyRequests.length === 0 ? (
             <p className="text-sm text-neutral-200/80">Pubblica la prima richiesta per ingaggiare trasportatori verificati.</p>
@@ -147,11 +184,11 @@ export default async function CompanyDashboardPage() {
         </SectionCard>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-3" id="pubblica">
+      <section className="grid gap-6 xl:grid-cols-3" id="pubblica">
         <SectionCard
           title="Contatti recenti"
           description="Contatti condivisi con trasportatori dagli ultimi incarichi pubblicati."
-          className="lg:col-span-2"
+          className="xl:col-span-2"
         >
           {recentContacts.length === 0 ? (
             <p className="text-sm text-neutral-200/80">Nessun contatto generato finora.</p>
