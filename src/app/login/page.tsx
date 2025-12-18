@@ -7,10 +7,12 @@ import { FormEvent, useState } from "react";
 export default function LoginPage() {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true);
     setResult(null);
     setError(null);
 
@@ -24,11 +26,13 @@ export default function LoginPage() {
 
     if (!response.ok) {
       setError(data.error ?? "Accesso non riuscito. Verifica le credenziali.");
+      setLoading(false);
       return;
     }
 
     const roleInfo = data.role ? ` (ruolo: ${data.role.toLowerCase()})` : "";
     setResult(`${data.message ?? "Accesso eseguito."}${roleInfo}`);
+    setLoading(false);
     router.replace("/dashboard");
   };
 
@@ -87,9 +91,22 @@ export default function LoginPage() {
             </p>
           )}
           {error && (
-            <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700" role="alert" aria-live="assertive">
-              {error}
-            </p>
+            <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert" aria-live="assertive">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="h-5 w-5 flex-shrink-0"
+                aria-hidden
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-11.75a.75.75 0 011.5 0v4.5a.75.75 0 01-1.5 0v-4.5zm0 7a.75.75 0 111.5 0 .75.75 0 01-1.5 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <p className="font-semibold leading-relaxed">{error}</p>
+            </div>
           )}
 
           <form className="space-y-5" onSubmit={handleSubmit}>
@@ -97,14 +114,22 @@ export default function LoginPage() {
               <label className="text-sm font-semibold text-neutral-800" htmlFor="email">
                 Email aziendale
               </label>
-              <input
-                className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-3 text-sm text-neutral-900 shadow-inner transition focus:border-[#0f2a44] focus:outline-none focus:ring-2 focus:ring-[#0f2a44]/30"
-                id="email"
-                name="email"
-                type="email"
-                required
-                autoComplete="email"
-              />
+              <div className="relative">
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-neutral-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
+                    <path d="M1.5 8.67v6.66a2.67 2.67 0 002.67 2.67h15.66a2.67 2.67 0 002.67-2.67V8.67L12 13.5 1.5 8.67z" />
+                    <path d="M21.5 6.67A2.67 2.67 0 0018.83 4H5.17A2.67 2.67 0 002.5 6.67L12 11.5l9.5-4.83z" />
+                  </svg>
+                </span>
+                <input
+                  className="w-full rounded-xl border border-neutral-200 bg-white pl-11 pr-3 py-3 text-sm text-neutral-900 shadow-inner transition focus:border-[#0f2a44] focus:outline-none focus:ring-2 focus:ring-[#0f2a44]/40"
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                />
+              </div>
               <p className="text-xs text-neutral-500">Usa l&apos;indirizzo aziendale verificato.</p>
             </div>
 
@@ -112,23 +137,47 @@ export default function LoginPage() {
               <label className="text-sm font-semibold text-neutral-800" htmlFor="password">
                 Password
               </label>
-              <input
-                className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-3 text-sm text-neutral-900 shadow-inner transition focus:border-[#0f2a44] focus:outline-none focus:ring-2 focus:ring-[#0f2a44]/30"
-                id="password"
-                name="password"
-                type="password"
-                required
-                autoComplete="current-password"
-              />
+              <div className="relative">
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-neutral-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
+                    <path d="M12 2a5 5 0 00-5 5v2H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2h-2V7a5 5 0 00-5-5zm-3 7V7a3 3 0 116 0v2H9zm3 4a1.5 1.5 0 011.5 1.5 1.5 1.5 0 11-3 0A1.5 1.5 0 0112 13z" />
+                  </svg>
+                </span>
+                <input
+                  className="w-full rounded-xl border border-neutral-200 bg-white pl-11 pr-3 py-3 text-sm text-neutral-900 shadow-inner transition focus:border-[#0f2a44] focus:outline-none focus:ring-2 focus:ring-[#0f2a44]/40"
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
               <p className="text-xs text-neutral-500">Minimo 6 caratteri. Non condividere la password.</p>
             </div>
 
             <div className="space-y-3">
               <button
                 type="submit"
-                className="h-12 w-full rounded-xl bg-[#0f2a44] text-sm font-semibold text-white shadow-md transition duration-150 hover:bg-[#13375a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f2a44] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                disabled={loading}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#0f2a44] text-sm font-semibold text-white shadow-md transition duration-150 hover:bg-[#13375a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f2a44] focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:border disabled:border-[#0f2a44]/30 disabled:bg-[#0f2a44]/60"
               >
-                Accedi alla piattaforma
+                {loading && (
+                  <svg
+                    className="h-4 w-4 animate-spin text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    aria-hidden
+                  >
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    ></path>
+                  </svg>
+                )}
+                {loading ? "Accesso in corso..." : "Accedi alla piattaforma"}
               </button>
               <Link
                 href="/register"
