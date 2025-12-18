@@ -1,289 +1,197 @@
 import Link from "next/link";
 
+const valueProps = [
+  {
+    title: "Niente intermediari",
+    description: "Contatti diretti, senza commissioni e perdite di tempo.",
+  },
+  {
+    title: "Solo operatori verificati",
+    description: "Aziende e trasportatori selezionati, profili reali.",
+  },
+  {
+    title: "Abbonamento chiaro",
+    description: "Un solo piano annuale. Zero sorprese.",
+  },
+];
+
+const companyPoints = [
+  "Pubblica richieste di trasporto",
+  "Ricevi contatti diretti",
+  "Gestisci tutto da un’unica dashboard",
+];
+
+const transporterPoints = [
+  "Visualizza richieste reali",
+  "Accedi ai contatti solo con abbonamento attivo",
+  "Lavora con aziende verificate",
+];
+
 export default function HomePage() {
-  const companyBenefits = [
-    "Richieste strutturate con requisiti chiari e contatti verificati.",
-    "Selezione rapida di vettori affidabili con ruoli definiti.",
-    "Tracciabilità di ogni passaggio per ridurre i tempi di coordinamento.",
-  ];
-
-  const transporterBenefits = [
-    "Accesso a richieste qualificate senza passaggi opachi.",
-    "Briefing completi per preparare documenti e mezzi prima del contatto.",
-    "Pagamenti ricorrenti e controlli di identità per interazioni sicure.",
-  ];
-
-  const coreBenefits = [
-    {
-      title: "Affidabilità verificata",
-      description:
-        "Identità controllate, ruoli chiari e abbonamento obbligatorio tutelano entrambi gli interlocutori.",
-    },
-    {
-      title: "Operazioni snelle",
-      description:
-        "Richieste standard e contatti diretti riducono rimbalzi, tempi morti e errori di coordinamento.",
-    },
-    {
-      title: "Visibilità completa",
-      description:
-        "Ogni scambio è tracciato: requisiti, documenti e responsabilità restano sempre disponibili agli abbonati.",
-    },
-  ];
-
   return (
-    <section className="space-y-12 md:space-y-16">
-      <div className="card overflow-hidden bg-gradient-to-br from-surface-900/70 via-surface-900 to-surface-900/90 p-0 shadow-xl ring-1 ring-white/5">
-        <div className="relative isolate overflow-hidden px-6 py-12 sm:px-10 lg:flex lg:items-center lg:gap-12 lg:px-12 lg:py-16">
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(255,138,76,0.12),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(95,176,255,0.1),transparent_28%)]" />
-          <div className="space-y-6 text-center lg:max-w-2xl lg:text-left">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Logistica B2B</p>
+    <div className="space-y-16 md:space-y-20">
+      <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-surface-900 via-surface-900/90 to-black p-8 shadow-xl ring-1 ring-white/5 md:p-12">
+        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+          <div className="space-y-6 text-center lg:text-left">
             <div className="space-y-3">
-              <h1 className="text-balance text-4xl leading-tight text-white sm:text-5xl">
-                DodiX – Il punto di incontro tra aziende e trasportatori
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-200">Logistica B2B</p>
+              <h1 className="text-balance text-4xl font-semibold leading-tight text-white md:text-5xl">
+                Il punto di incontro diretto tra aziende e trasportatori
               </h1>
-              <p className="text-lg text-neutral-100/80 sm:text-xl">
-                La piattaforma B2B che permette alle aziende di trovare trasportatori verificati e ai trasportatori di ricevere
-                richieste di lavoro reali, senza intermediari.
+              <p className="text-lg text-neutral-100/85 md:text-xl">
+                DodiX è la piattaforma B2B che connette aziende di produzione e trasportatori verificati, senza intermediari.
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-              <Link href="/register" className="btn-primary px-6 py-3 text-base">
-                Iscriviti ora
+              <Link href="/register?role=company" className="btn-primary px-6 py-3 text-base">
+                Registrati come Azienda
               </Link>
-              <Link href="/login" className="btn-secondary px-6 py-3 text-base">
-                Accedi
+              <Link href="/register?role=transporter" className="btn-secondary px-6 py-3 text-base">
+                Registrati come Trasportatore
               </Link>
-              <span className="badge-verified">Accesso verificato</span>
             </div>
-            <div className="grid gap-3 text-sm text-neutral-100/80 sm:grid-cols-3 sm:text-left">
-              <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3">
-                <p className="font-semibold text-white">Aziende</p>
-                <p className="text-neutral-100/70">Briefing chiari, contatti tracciati, carichi assegnati in modo rapido.</p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-left text-neutral-100/85">
+                <p className="text-sm font-semibold text-white">Contatto diretto</p>
+                <p className="text-sm">Zero passaggi opachi: aziende e trasportatori dialogano subito.</p>
               </div>
-              <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3">
-                <p className="font-semibold text-white">Trasportatori</p>
-                <p className="text-neutral-100/70">Richieste reali, profili verificati, pagamenti e responsabilità definite.</p>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-left text-neutral-100/85">
+                <p className="text-sm font-semibold text-white">Profili verificati</p>
+                <p className="text-sm">Identità e ruoli controllati per tutelare ogni incarico.</p>
               </div>
-              <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3">
-                <p className="font-semibold text-white">Abbonamento</p>
-                <p className="text-neutral-100/70">Accesso solo a utenti attivi: tutela di contatti e documenti sensibili.</p>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-left text-neutral-100/85">
+                <p className="text-sm font-semibold text-white">Abbonamento unico</p>
+                <p className="text-sm">Accesso annuale obbligatorio per mantenere qualità e sicurezza.</p>
               </div>
             </div>
           </div>
 
-          <div className="mt-10 w-full lg:mt-0 lg:max-w-md">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-2xl ring-1 ring-white/10 backdrop-blur">
-              <div className="mb-6 flex items-center justify-between">
+          <div className="relative isolate overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl ring-1 ring-white/10 backdrop-blur">
+            <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(255,138,76,0.08),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(95,176,255,0.1),transparent_35%)]" />
+            <div className="space-y-4 text-neutral-100">
+              <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-neutral-200">Panoramica</p>
-                  <p className="text-lg font-semibold text-white">Richieste, contatti, verifiche</p>
+                  <p className="text-lg font-semibold text-white">Accesso premium DodiX</p>
                 </div>
-                <span className="rounded-lg bg-accent-500/10 px-3 py-1 text-sm font-semibold text-accent-100">B2B</span>
+                <span className="rounded-full bg-accent-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent-50">B2B</span>
               </div>
-              <div className="space-y-4 text-sm text-neutral-100/80">
-                <div className="flex items-start gap-3">
-                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-accent-400" aria-hidden />
-                  <div>
-                    <p className="font-semibold text-white">Richieste strutturate</p>
-                    <p className="text-neutral-100/70">Tempi, vincoli e documenti in un unico flusso tracciato.</p>
-                  </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-sm font-semibold text-white">Richieste attive</p>
+                  <p className="text-2xl font-semibold text-accent-100">Live</p>
+                  <p className="text-xs text-neutral-100/70">Strutturate e assegnabili in pochi minuti.</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-accent-400" aria-hidden />
-                  <div>
-                    <p className="font-semibold text-white">Contatti verificati</p>
-                    <p className="text-neutral-100/70">Identità e ruoli chiari per evitare passaggi opachi.</p>
-                  </div>
+                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-sm font-semibold text-white">Contatti verificati</p>
+                  <p className="text-2xl font-semibold text-accent-100">Protetti</p>
+                  <p className="text-xs text-neutral-100/70">Visibili solo con abbonamento attivo.</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-accent-400" aria-hidden />
-                  <div>
-                    <p className="font-semibold text-white">Abbonamento obbligatorio</p>
-                    <p className="text-neutral-100/70">Protezione di dati sensibili e responsabilità reciproche.</p>
-                  </div>
+                <div className="rounded-xl border border-white/10 bg-white/5 p-4 sm:col-span-2">
+                  <p className="text-sm font-semibold text-white">Abbonamento annuale</p>
+                  <p className="text-lg text-neutral-100/85">
+                    Un’unica quota per aziende e trasportatori: trasparenza e continuità operativa.
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="card space-y-6">
+      <section className="card space-y-8">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-          <h2 className="text-3xl text-white">Come funziona DodiX</h2>
-          <span className="badge">Flusso in 3 step</span>
+          <h2 className="text-3xl text-white">Perché DodiX</h2>
+          <span className="badge">Value proposition</span>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
-          {[
-            {
-              title: "Registrati",
-              text: "Crea un account come azienda o trasportatore in pochi minuti.",
-            },
-            {
-              title: "Pubblica o consulta richieste",
-              text: "Le aziende pubblicano richieste di trasporto.\nI trasportatori consultano incarichi reali.",
-            },
-            {
-              title: "Contatto diretto",
-              text: "I contatti sono visibili solo agli utenti abbonati.\nZero intermediari, zero perdite di tempo.",
-            },
-          ].map((step, idx) => (
-            <div key={step.title} className="flex gap-4 rounded-xl border border-white/5 bg-surface-800/70 p-5 shadow-inner">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-accent-500/15 text-base font-semibold text-accent-100 ring-1 ring-accent-500/20">
-                {idx + 1}
+          {valueProps.map((item) => (
+            <div key={item.title} className="rounded-2xl border border-white/10 bg-surface-800/80 p-6 shadow-inner">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-accent-500/15 text-sm font-semibold text-accent-100 ring-1 ring-accent-500/25">
+                •
               </div>
-              <div className="space-y-1 text-neutral-100/90">
-                <h3 className="text-xl font-semibold text-white">{step.title}</h3>
-                <p className="whitespace-pre-line text-sm text-neutral-100/80">{step.text}</p>
-              </div>
+              <h3 className="text-xl font-semibold text-white">{item.title}</h3>
+              <p className="mt-2 text-sm text-neutral-100/80">{item.description}</p>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
-      <div className="card space-y-6">
-        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-          <h2 className="text-3xl text-white">Soluzioni per ogni ruolo</h2>
-          <span className="badge">Aziende e Trasportatori</span>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          {[
-            {
-              title: "Per le Aziende",
-              bullets: [
-                "Trova trasportatori verificati",
-                "Pubblica richieste in pochi minuti",
-                "Ricevi contatti diretti",
-                "Nessun intermediario",
-              ],
-              cta: "Registrati come Azienda",
-              href: "/register?role=company",
-            },
-            {
-              title: "Per i Trasportatori",
-              bullets: [
-                "Visualizza richieste reali",
-                "Contatti sbloccati con abbonamento",
-                "Più lavoro, meno telefonate",
-                "Opportunità costanti",
-              ],
-              cta: "Registrati come Trasportatore",
-              href: "/register?role=transporter",
-            },
-          ].map((column) => (
-            <div
-              key={column.title}
-              className="rounded-2xl border border-white/10 bg-surface-800/70 p-6 shadow-inner transition duration-200 hover:-translate-y-0.5 hover:border-accent-400/40 hover:shadow-lg"
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-2xl font-semibold text-white">{column.title}</h3>
-                <span className="rounded-full bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-neutral-100/80">
-                  Focus
-                </span>
-              </div>
-              <ul className="space-y-2 text-neutral-100/85">
-                {column.bullets.map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-accent-400" aria-hidden />
-                    <span className="text-sm">{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-6 flex">
-                <Link href={column.href} className="btn-primary w-full justify-center px-5 py-3 text-base">
-                  {column.cta}
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="card space-y-6">
-        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-          <h2 className="text-3xl text-white">Benefici principali</h2>
-          <span className="badge">Per aziende e trasportatori</span>
-        </div>
-        <div className="grid gap-6 md:grid-cols-3">
-          {coreBenefits.map((item) => (
-            <div key={item.title} className="space-y-2">
-              <h3 className="text-xl text-white">{item.title}</h3>
-              <p className="text-neutral-100/80">{item.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
+      <section className="grid gap-6 lg:grid-cols-2">
         <div className="card space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-3xl text-white">Per aziende</h2>
-            <span className="badge">Company</span>
+          <div className="flex items-start justify-between gap-2">
+            <h2 className="text-3xl text-white">Per le aziende di produzione</h2>
+            <span className="badge">Aziende</span>
           </div>
-          <ul className="space-y-2 text-neutral-100/80">
-            {companyBenefits.map((item) => (
-              <li key={item} className="flex items-start gap-2">
-                <span className="mt-1 h-2 w-2 rounded-full bg-accent-400" aria-hidden />
-                {item}
+          <ul className="space-y-2 text-neutral-100/85">
+            {companyPoints.map((point) => (
+              <li key={point} className="flex items-start gap-3 text-sm">
+                <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-accent-400" aria-hidden />
+                {point}
               </li>
             ))}
           </ul>
-        </div>
-
-        <div className="card space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-3xl text-white">Per trasportatori</h2>
-            <span className="badge">Transporter</span>
-          </div>
-          <ul className="space-y-2 text-neutral-100/80">
-            {transporterBenefits.map((item) => (
-              <li key={item} className="flex items-start gap-2">
-                <span className="mt-1 h-2 w-2 rounded-full bg-accent-400" aria-hidden />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div className="card flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="space-y-2">
-          <h2 className="text-3xl text-white">Pronto ad accedere a contatti verificati?</h2>
-          <p className="text-neutral-100/80">
-            Attiva l’account, scegli il tuo ruolo e opera in un ambiente controllato con responsabilità definite.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/register" className="btn-primary px-6 py-3 text-base">
-            Registrati
-          </Link>
-          <Link href="/login" className="btn-secondary px-6 py-3 text-base">
-            Accedi
-          </Link>
-        </div>
-      </div>
-
-      <footer className="rounded-2xl bg-neutral-100/90 px-6 py-8 text-sm text-neutral-700 shadow-inner ring-1 ring-neutral-200/80">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="space-y-1">
-            <p className="text-base font-semibold text-neutral-900">DodiX – Il Camionista</p>
-            <p className="text-neutral-700">Piattaforma B2B per trasporti e logistica</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-neutral-800">
-            <Link href="/" className="transition hover:text-accent-700">
-              Home
+          <div className="pt-2">
+            <Link href="/register?role=company" className="btn-primary w-full justify-center px-5 py-3 text-base">
+              Iscriviti come Azienda
             </Link>
+          </div>
+        </div>
+
+        <div className="card space-y-4">
+          <div className="flex items-start justify-between gap-2">
+            <h2 className="text-3xl text-white">Per trasportatori e logistica</h2>
+            <span className="badge">Trasportatori</span>
+          </div>
+          <ul className="space-y-2 text-neutral-100/85">
+            {transporterPoints.map((point) => (
+              <li key={point} className="flex items-start gap-3 text-sm">
+                <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-accent-400" aria-hidden />
+                {point}
+              </li>
+            ))}
+          </ul>
+          <div className="pt-2">
+            <Link href="/register?role=transporter" className="btn-secondary w-full justify-center px-5 py-3 text-base">
+              Iscriviti come Trasportatore
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="card flex flex-col items-center gap-4 text-center md:flex-row md:items-center md:justify-between md:text-left">
+        <div className="space-y-2">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-200">Trasparenza</p>
+          <h2 className="text-3xl text-white">Un solo abbonamento</h2>
+          <p className="text-neutral-100/80">Valido per aziende e trasportatori</p>
+        </div>
+        <div className="rounded-2xl border border-accent-500/30 bg-accent-500/10 px-6 py-5 text-left shadow-inner">
+          <p className="text-4xl font-semibold text-white">360€ / anno</p>
+          <p className="mt-1 text-sm text-neutral-100/80">Accesso completo, contatti verificati, assistenza prioritaria.</p>
+          <div className="mt-4 flex flex-wrap gap-3 md:justify-start">
+            <Link href="/paywall" className="btn-primary px-6 py-3 text-base">
+              Attiva l’accesso
+            </Link>
+            <Link href="/login" className="btn-secondary px-6 py-3 text-base">
+              Già abbonato? Accedi
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <footer className="rounded-2xl bg-neutral-100/90 px-6 py-8 text-sm text-neutral-800 shadow-inner ring-1 ring-neutral-200/80">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <p className="font-semibold text-neutral-900">DodiX – Il Camionista | Ecosistema digitale per il trasporto</p>
+          <div className="flex flex-wrap items-center gap-4 font-medium">
             <Link href="/login" className="transition hover:text-accent-700">
-              Accedi
+              Login
             </Link>
             <Link href="/register" className="transition hover:text-accent-700">
-              Registrati
+              Registrazione
             </Link>
           </div>
         </div>
-        <div className="mt-4 text-xs text-neutral-600">© DodiX</div>
       </footer>
-    </section>
+    </div>
   );
 }
