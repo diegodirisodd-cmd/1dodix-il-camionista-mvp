@@ -33,61 +33,78 @@ export default function HomePage() {
 
   return (
     <section className="space-y-12 md:space-y-16">
-      <div className="grid gap-10 lg:grid-cols-[1.05fr,0.95fr] lg:items-center">
-        <div className="space-y-6">
-          <div className="space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Piattaforma B2B per logistica</p>
-            <h1>DodiX unisce aziende e trasportatori in un flusso controllato</h1>
-            <p className="text-lg text-neutral-100/80">
-              Una sola piattaforma per pubblicare richieste, contattare vettori verificati e mantenere ogni interazione tracciata. Senza
-              passaggi opachi, con responsabilità chiare e abbonamento obbligatorio per tutti.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/register" className="btn-primary px-6 py-3 text-base">
-              Registrati
-            </Link>
-            <Link href="/login" className="btn-secondary px-6 py-3 text-base">
-              Accedi
-            </Link>
-            <span className="badge-verified">Accesso verificato</span>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="card-contrast space-y-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-accent-200">Per aziende</p>
-              <p className="text-sm text-neutral-100/80">Richieste strutturate, selezione dei vettori e contatti tracciati.</p>
+      <div className="card overflow-hidden bg-gradient-to-br from-surface-900/70 via-surface-900 to-surface-900/90 p-0 shadow-xl ring-1 ring-white/5">
+        <div className="relative isolate overflow-hidden px-6 py-12 sm:px-10 lg:flex lg:items-center lg:gap-12 lg:px-12 lg:py-16">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(255,138,76,0.12),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(95,176,255,0.1),transparent_28%)]" />
+          <div className="space-y-6 text-center lg:max-w-2xl lg:text-left">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Logistica B2B</p>
+            <div className="space-y-3">
+              <h1 className="text-balance text-4xl leading-tight text-white sm:text-5xl">
+                DodiX – Il punto di incontro tra aziende e trasportatori
+              </h1>
+              <p className="text-lg text-neutral-100/80 sm:text-xl">
+                La piattaforma B2B che permette alle aziende di trovare trasportatori verificati e ai trasportatori di ricevere
+                richieste di lavoro reali, senza intermediari.
+              </p>
             </div>
-            <div className="card-contrast space-y-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-accent-200">Per trasportatori</p>
-              <p className="text-sm text-neutral-100/80">Carichi qualificati, briefing completi e contatti protetti dagli abbonamenti.</p>
+            <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+              <Link href="/register" className="btn-primary px-6 py-3 text-base">
+                Iscriviti ora
+              </Link>
+              <Link href="/login" className="btn-secondary px-6 py-3 text-base">
+                Accedi
+              </Link>
+              <span className="badge-verified">Accesso verificato</span>
+            </div>
+            <div className="grid gap-3 text-sm text-neutral-100/80 sm:grid-cols-3 sm:text-left">
+              <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+                <p className="font-semibold text-white">Aziende</p>
+                <p className="text-neutral-100/70">Briefing chiari, contatti tracciati, carichi assegnati in modo rapido.</p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+                <p className="font-semibold text-white">Trasportatori</p>
+                <p className="text-neutral-100/70">Richieste reali, profili verificati, pagamenti e responsabilità definite.</p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+                <p className="font-semibold text-white">Abbonamento</p>
+                <p className="text-neutral-100/70">Accesso solo a utenti attivi: tutela di contatti e documenti sensibili.</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="card space-y-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-200">Come funziona</p>
-              <h3 className="text-2xl text-white">Tre passaggi chiari per operare</h3>
+          <div className="mt-10 w-full lg:mt-0 lg:max-w-md">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-2xl ring-1 ring-white/10 backdrop-blur">
+              <div className="mb-6 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-200">Panoramica</p>
+                  <p className="text-lg font-semibold text-white">Richieste, contatti, verifiche</p>
+                </div>
+                <span className="rounded-lg bg-accent-500/10 px-3 py-1 text-sm font-semibold text-accent-100">B2B</span>
+              </div>
+              <div className="space-y-4 text-sm text-neutral-100/80">
+                <div className="flex items-start gap-3">
+                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-accent-400" aria-hidden />
+                  <div>
+                    <p className="font-semibold text-white">Richieste strutturate</p>
+                    <p className="text-neutral-100/70">Tempi, vincoli e documenti in un unico flusso tracciato.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-accent-400" aria-hidden />
+                  <div>
+                    <p className="font-semibold text-white">Contatti verificati</p>
+                    <p className="text-neutral-100/70">Identità e ruoli chiari per evitare passaggi opachi.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-accent-400" aria-hidden />
+                  <div>
+                    <p className="font-semibold text-white">Abbonamento obbligatorio</p>
+                    <p className="text-neutral-100/70">Protezione di dati sensibili e responsabilità reciproche.</p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <span className="rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-sm font-semibold text-accent-100">B2B</span>
-          </div>
-          <ul className="space-y-3 text-sm text-neutral-100/80">
-            <li className="flex items-start gap-2">
-              <span className="mt-1 h-2 w-2 rounded-full bg-accent-500" aria-hidden />
-              Pubblica o ricevi richieste con requisiti, tempi e vincoli definiti.
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-1 h-2 w-2 rounded-full bg-accent-500" aria-hidden />
-              Seleziona contatti verificati e condividi documenti solo con utenti attivi.
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-1 h-2 w-2 rounded-full bg-accent-500" aria-hidden />
-              Coordina l’assegnazione con uno storico unico e responsabilità chiare.
-            </li>
-          </ul>
-          <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-neutral-100/80">
-            Accesso consentito solo ad abbonati: tutela di contatti, documenti e processi per entrambe le parti.
           </div>
         </div>
       </div>
