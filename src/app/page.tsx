@@ -263,6 +263,27 @@ export default function HomePage() {
           </Link>
         </div>
       </div>
+
+      <footer className="rounded-2xl bg-neutral-100/90 px-6 py-8 text-sm text-neutral-700 shadow-inner ring-1 ring-neutral-200/80">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-1">
+            <p className="text-base font-semibold text-neutral-900">DodiX – Il Camionista</p>
+            <p className="text-neutral-700">Piattaforma B2B per trasporti e logistica</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-neutral-800">
+            <Link href="/" className="transition hover:text-accent-700">
+              Home
+            </Link>
+            <Link href="/login" className="transition hover:text-accent-700">
+              Accedi
+            </Link>
+            <Link href="/register" className="transition hover:text-accent-700">
+              Registrati
+            </Link>
+          </div>
+        </div>
+        <div className="mt-4 text-xs text-neutral-600">© DodiX</div>
+      </footer>
     </section>
   );
 }
