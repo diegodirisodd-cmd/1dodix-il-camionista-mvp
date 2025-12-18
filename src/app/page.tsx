@@ -144,6 +144,64 @@ export default function HomePage() {
 
       <div className="card space-y-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <h2 className="text-3xl text-white">Soluzioni per ogni ruolo</h2>
+          <span className="badge">Aziende e Trasportatori</span>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {[
+            {
+              title: "Per le Aziende",
+              bullets: [
+                "Trova trasportatori verificati",
+                "Pubblica richieste in pochi minuti",
+                "Ricevi contatti diretti",
+                "Nessun intermediario",
+              ],
+              cta: "Registrati come Azienda",
+              href: "/register?role=company",
+            },
+            {
+              title: "Per i Trasportatori",
+              bullets: [
+                "Visualizza richieste reali",
+                "Contatti sbloccati con abbonamento",
+                "Più lavoro, meno telefonate",
+                "Opportunità costanti",
+              ],
+              cta: "Registrati come Trasportatore",
+              href: "/register?role=transporter",
+            },
+          ].map((column) => (
+            <div
+              key={column.title}
+              className="rounded-2xl border border-white/10 bg-surface-800/70 p-6 shadow-inner transition duration-200 hover:-translate-y-0.5 hover:border-accent-400/40 hover:shadow-lg"
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-2xl font-semibold text-white">{column.title}</h3>
+                <span className="rounded-full bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-neutral-100/80">
+                  Focus
+                </span>
+              </div>
+              <ul className="space-y-2 text-neutral-100/85">
+                {column.bullets.map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-accent-400" aria-hidden />
+                    <span className="text-sm">{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6 flex">
+                <Link href={column.href} className="btn-primary w-full justify-center px-5 py-3 text-base">
+                  {column.cta}
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="card space-y-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <h2 className="text-3xl text-white">Benefici principali</h2>
           <span className="badge">Per aziende e trasportatori</span>
         </div>
