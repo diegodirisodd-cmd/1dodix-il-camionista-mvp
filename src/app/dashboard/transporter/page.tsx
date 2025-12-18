@@ -52,8 +52,6 @@ export default async function TransporterDashboardPage() {
     redirect("/paywall");
   }
 
-  const subscriptionActive = user.subscriptionActive;
-
   const [recentRequests, availableLoads, companiesWithLoads] = await Promise.all([
     prisma.request.findMany({
       orderBy: { createdAt: "desc" },
@@ -70,20 +68,65 @@ export default async function TransporterDashboardPage() {
     message: "Carica documenti e dati aziendali per ottenere il badge verificato e accelerare le conferme.",
   };
 
+  const subscriptionActive = user.subscriptionActive;
+
   return (
     <div className="space-y-8">
-      <header className="card flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <header className="card space-y-6">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Trasportatori</p>
           <h1 className="text-3xl text-white">Control room trasportatori</h1>
-          <p className="max-w-3xl text-neutral-100/80">
-            Carichi disponibili, aziende ingaggiate e stato di affidabilità in un unico pannello. Contatti e dati sensibili
-            sono visibili solo ai profili verificati con abbonamento attivo.
+          <p className="max-w-4xl text-neutral-100/80">
+            Tutto ciò che serve per lavorare con aziende verificate: carichi disponibili, contatti e briefing. Il valore
+            dell&apos;abbonamento è l&apos;accesso immediato alle informazioni riservate e priorità sulle risposte.
           </p>
         </div>
-        <a href="/dashboard/transporter/requests" className="btn-primary px-5 py-3 text-base">
-          Trova carichi
-        </a>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-brand-500/40 bg-brand-900/60 p-4 shadow-card">
+            <p className="text-xs font-semibold uppercase tracking-wide text-accent-200">Abbonamento</p>
+            <p className="mt-1 text-lg font-semibold text-white">
+              {subscriptionActive ? "Attivo" : "Non attivo"}
+            </p>
+            <p className="mt-2 text-sm text-neutral-100/80">
+              {subscriptionActive
+                ? "Contatti e dettagli carichi sono sbloccati."
+                : "Contatti, recapiti e briefing restano nascosti finché non attivi l’abbonamento."}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {subscriptionActive ? (
+                <span className="badge-verified">Accesso completo</span>
+              ) : (
+                <a className="btn-primary" href="/paywall">
+                  Attiva abbonamento
+                </a>
+              )}
+              <a className="btn-secondary" href="/dashboard/transporter/requests">
+                Vedi carichi
+              </a>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-accent-400/30 bg-white/5 p-4 shadow-card">
+            <p className="text-xs font-semibold uppercase tracking-wide text-accent-200">Cosa sblocchi</p>
+            <ul className="mt-2 space-y-2 text-sm text-neutral-100/80">
+              <li>Contatti completi delle aziende (telefono, email, referente).</li>
+              <li>Briefing operativi e budget pubblicati.</li>
+              <li>Priorità nelle conferme per profili verificati.</li>
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-card">
+            <p className="text-xs font-semibold uppercase tracking-wide text-white/80">Senza pagamento</p>
+            <p className="mt-1 text-lg font-semibold text-white">Accesso limitato</p>
+            <p className="mt-2 text-sm text-neutral-100/80">
+              Vedi solo titoli e percorsi: i contatti restano oscurati. Attiva l&apos;abbonamento per lavorare con le aziende.
+            </p>
+            <a className="mt-3 inline-flex btn-secondary" href="/paywall">
+              Attiva abbonamento
+            </a>
+          </div>
+        </div>
       </header>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
