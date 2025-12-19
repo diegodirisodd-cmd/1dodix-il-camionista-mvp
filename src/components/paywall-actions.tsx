@@ -13,7 +13,7 @@ export function PaywallActions() {
       onClick={handleRedirect}
       className="btn-primary w-full justify-center py-3"
     >
-      Abbonati ora
+      Attiva abbonamento
     </button>
   );
 }
