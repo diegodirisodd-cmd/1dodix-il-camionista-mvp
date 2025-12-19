@@ -9,9 +9,12 @@ datasource db {
 
 model User {
   id           Int       @id @default(autoincrement())
+  name         String    @default("")
   email        String    @unique
   password     String
   role         UserRole
+  phone        String?
+  operatingArea String   @default("")
   createdAt    DateTime  @default(now())
   subscriptionActive Boolean @default(false)
   stripeCustomerId   String?

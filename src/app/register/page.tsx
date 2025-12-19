@@ -29,7 +29,14 @@ export default function RegisterPage() {
     }
 
     setResult("Account creato con successo.");
-    router.replace("/dashboard");
+    const destination =
+      data.redirectTo ||
+      (data.role === "COMPANY"
+        ? "/dashboard/company"
+        : data.role === "TRANSPORTER"
+          ? "/dashboard/transporter"
+          : "/dashboard");
+    router.replace(destination);
   };
 
   return (
@@ -83,6 +90,14 @@ export default function RegisterPage() {
 
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="form-field">
+              <label className="label" htmlFor="name">
+                Nome o ragione sociale
+              </label>
+              <input className="input-field" id="name" name="name" type="text" required autoComplete="organization" />
+              <p className="text-xs text-neutral-100/70">Inserisci il nominativo con cui operi sulla piattaforma.</p>
+            </div>
+
+            <div className="form-field">
               <label className="label" htmlFor="email">
                 Email
               </label>
@@ -107,6 +122,29 @@ export default function RegisterPage() {
             </div>
 
             <div className="form-field">
+              <label className="label" htmlFor="phone">
+                Telefono (opzionale)
+              </label>
+              <input className="input-field" id="phone" name="phone" type="tel" autoComplete="tel" />
+              <p className="text-xs text-neutral-100/70">Verrà usato per i contatti diretti. Puoi aggiornarlo in seguito.</p>
+            </div>
+
+            <div className="form-field">
+              <label className="label" htmlFor="operatingArea">
+                Area operativa
+              </label>
+              <input
+                className="input-field"
+                id="operatingArea"
+                name="operatingArea"
+                type="text"
+                required
+                placeholder="Es. Nord Italia, Lombardia"
+              />
+              <p className="text-xs text-neutral-100/70">Indica l&apos;area geografica in cui operi abitualmente.</p>
+            </div>
+
+            <div className="form-field">
               <label className="label" htmlFor="role">
                 Ruolo
               </label>
@@ -114,12 +152,11 @@ export default function RegisterPage() {
                 <option value="" disabled>
                   Seleziona un ruolo
                 </option>
-                <option value="transporter">Transporter</option>
-                <option value="company">Company</option>
+                <option value="company">Azienda</option>
+                <option value="transporter">Trasportatore</option>
               </select>
               <p className="text-xs text-neutral-100/70">
-                Il ruolo guida la navigazione (dashboard trasportatore o azienda). Gli account ADMIN vengono creati solo su
-                richiesta per accessi di supervisione.
+                Il ruolo guida la navigazione (dashboard azienda o trasportatore) e i permessi disponibili.
               </p>
             </div>
 

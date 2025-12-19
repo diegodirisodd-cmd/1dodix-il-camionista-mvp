@@ -34,7 +34,14 @@ export default function LoginPage() {
     const roleInfo = data.role ? ` (ruolo: ${data.role.toLowerCase()})` : "";
     setResult(`${data.message ?? "Accesso eseguito."}${roleInfo}`);
     setLoading(false);
-    router.replace("/dashboard");
+    const destination =
+      data.redirectTo ||
+      (data.role === "COMPANY"
+        ? "/dashboard/company"
+        : data.role === "TRANSPORTER"
+          ? "/dashboard/transporter"
+          : "/dashboard");
+    router.replace(destination);
   };
 
   return (

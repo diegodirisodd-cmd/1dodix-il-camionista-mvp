@@ -63,9 +63,12 @@ export async function getSessionUser() {
     where: { id: session.userId },
     select: {
       id: true,
+      name: true,
       email: true,
       role: true,
       createdAt: true,
+      phone: true,
+      operatingArea: true,
       subscriptionActive: true,
       stripeCustomerId: true,
       stripeSubscriptionId: true,
