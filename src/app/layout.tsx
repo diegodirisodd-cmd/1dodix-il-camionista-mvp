@@ -18,26 +18,36 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const sessionUser = await getSessionUser();
   const role = sessionUser?.role;
   const dashboardHome =
-    role === "COMPANY" ? "/dashboard/company" : role === "TRANSPORTER" ? "/dashboard/transporter" : "/dashboard";
+    role === "ADMIN"
+      ? "/dashboard/admin"
+      : role === "COMPANY"
+        ? "/dashboard/company"
+        : role === "TRANSPORTER"
+          ? "/dashboard/transporter"
+          : "/dashboard";
   const requestsLink =
-    role === "COMPANY"
-      ? "/dashboard/company"
-      : role === "TRANSPORTER" || role === "ADMIN"
-        ? "/dashboard/transporter/requests"
-        : "/dashboard";
+    role === "ADMIN"
+      ? "/dashboard/admin#richieste"
+      : role === "COMPANY"
+        ? "/dashboard/company"
+        : role === "TRANSPORTER"
+          ? "/dashboard/transporter/requests"
+          : "/dashboard";
   const peerLink =
-    role === "COMPANY"
-      ? "/dashboard/company"
-      : role === "TRANSPORTER"
-        ? "/dashboard/transporter"
-        : "/dashboard";
+    role === "ADMIN"
+      ? "/dashboard/admin#utenti"
+      : role === "COMPANY"
+        ? "/dashboard/company"
+        : role === "TRANSPORTER"
+          ? "/dashboard/transporter"
+          : "/dashboard";
 
   const sidebarLinks = sessionUser
     ? [
         { label: "Dashboard", href: dashboardHome },
         { label: "Richieste", href: requestsLink },
         role === "ADMIN"
-          ? { label: "Monitoraggio (solo lettura)", href: "/dashboard" }
+          ? { label: "Panoramica admin", href: "/dashboard/admin" }
           : {
               label: "Trasportatori / Aziende",
               href: role === "COMPANY" ? peerLink : role === "TRANSPORTER" ? peerLink : "/dashboard",

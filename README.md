@@ -82,6 +82,7 @@ Prisma definisce un enum `UserRole` con tre valori: `TRANSPORTER`, `COMPANY` e `
 - **Checkout**: la pagina `/paywall` avvia `POST /api/billing/checkout`, che crea una sessione Stripe Checkout (subscription) con `STRIPE_PRICE_ID`; al termine Stripe riporta l'utente su `/dashboard` o, in caso di annullo, su `/paywall`.
 - **Webhook**: `/api/billing/webhook` valida la firma Stripe e, sull'evento `checkout.session.completed`, attiva il flag `subscriptionActive` dell'utente trovando l'email del cliente. `subscriptionActive` è la singola fonte di verità per permettere l'accesso.
 - L'accesso a `/paywall` è bloccato per chi è già abbonato: gli utenti con `subscriptionActive=true` vengono reindirizzati alla dashboard.
+- **Admin (solo lettura)**: il ruolo `ADMIN` accede a `/dashboard/admin` per visualizzare elenco utenti e richieste in modalità di sola consultazione; non sono previste azioni di modifica o moderazione nell'MVP.
 
 ## Design system
 - Palette industriale B2B: blu profondo (`brand-800`) come primario, arancio (`accent-500`) come accento e neutri controllati (`neutral-*`).
