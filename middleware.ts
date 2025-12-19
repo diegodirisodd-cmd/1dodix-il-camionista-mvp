@@ -4,14 +4,6 @@ import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
 
 const DASHBOARD_PREFIX = "/dashboard";
 
-function isBillingApi(pathname: string) {
-  return pathname.startsWith("/api/billing");
-}
-
-function isBillingWebhook(pathname: string) {
-  return pathname === "/api/billing/webhook";
-}
-
 function isAuthApi(pathname: string) {
   return pathname.startsWith("/api/auth");
 }
@@ -21,7 +13,7 @@ export async function middleware(request: NextRequest) {
   const isApiRequest = pathname.startsWith("/api");
   const isDashboard = pathname.startsWith(DASHBOARD_PREFIX);
 
-  if (isBillingWebhook(pathname) || isAuthApi(pathname)) {
+  if (isAuthApi(pathname)) {
     return NextResponse.next();
   }
 
@@ -64,15 +56,11 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!user.subscriptionActive) {
-    const skipSubscriptionCheck = isBillingApi(pathname);
-
-    if (!skipSubscriptionCheck) {
-      if (isApiRequest) {
-        return NextResponse.json({ error: "Abbonamento richiesto" }, { status: 402 });
-      }
-
-      return NextResponse.redirect(new URL("/paywall", request.url));
+    if (isApiRequest) {
+      return NextResponse.json({ error: "Abbonamento richiesto" }, { status: 402 });
     }
+
+    return NextResponse.redirect(new URL("/paywall", request.url));
   }
 
   return NextResponse.next();

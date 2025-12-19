@@ -16,8 +16,7 @@ L'accesso completo richiede un abbonamento Stripe attivo: gli utenti autenticati
 │   │   │   ├── auth/register/route.ts   # Endpoint registrazione con ruolo
 │   │   │   ├── requests/route.ts        # API creazione/lista richieste di trasporto
 │   │   │   ├── requests/[id]/route.ts   # API dettaglio/aggiornamento/cancellazione richiesta
-│   │   │   ├── billing/checkout/route.ts # Crea sessione Stripe Checkout (subscription)
-│   │   │   ├── billing/webhook/route.ts  # Webhook Stripe per aggiornare lo stato abbonamento
+│   │   │   ├── (api billing)             # Non usato in questa versione MVP (checkout via link esterno)
 │   │   │   └── health/route.ts          # API di esempio per stato
 │   │   ├── dashboard/page.tsx           # Pagina protetta (richiede sessione)
 │   │   ├── dashboard/transporter/page.tsx # Dashboard dedicata al ruolo TRANSPORTER
@@ -63,7 +62,7 @@ Prisma definisce un enum `UserRole` con tre valori: `TRANSPORTER`, `COMPANY` e `
    ```bash
    cp .env.example .env
    ```
-   Popola `AUTH_SECRET` con una stringa random e robusta (es. `openssl rand -base64 32`) e aggiungi le chiavi Stripe (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`).
+   Popola `AUTH_SECRET` con una stringa random e robusta (es. `openssl rand -base64 32`). Il checkout usa un link Stripe esterno e non richiede chiavi aggiuntive in questa versione.
 3. **Migrazione database** (genera anche Prisma Client)
    ```bash
    npx prisma migrate dev
@@ -78,9 +77,8 @@ Prisma definisce un enum `UserRole` con tre valori: `TRANSPORTER`, `COMPANY` e `
 - **Registrazione**: la pagina `/register` invia email, password e ruolo a `POST /api/auth/register`, che valida i campi, genera l'hash (bcrypt), crea l'utente in SQLite e imposta un cookie di sessione JWT (`dodix_session`).
 - **Login**: la pagina `/login` invia le credenziali a `POST /api/auth/login`, verifica l'hash e aggiorna il cookie di sessione JWT.
 - **Logout**: `POST /api/auth/logout` invalida il cookie di sessione.
-- **Protezione pagine/API**: `middleware.ts` richiede un token valido e una sottoscrizione attiva per tutte le rotte `/dashboard` e `/api` (eccezioni: `/api/auth/*` e `/api/billing/webhook`). Utenti autenticati ma senza abbonamento vengono reindirizzati a `/paywall` o ricevono risposta `402` sulle API (checkout escluso). `getSessionUser` recupera l'utente nei server component per applicare redirect server-side coerenti.
-- **Checkout**: la pagina `/paywall` avvia `POST /api/billing/checkout`, che crea una sessione Stripe Checkout (subscription) con `STRIPE_PRICE_ID`; al termine Stripe riporta l'utente su `/dashboard` o, in caso di annullo, su `/paywall`.
-- **Webhook**: `/api/billing/webhook` valida la firma Stripe e, sull'evento `checkout.session.completed`, attiva il flag `subscriptionActive` dell'utente trovando l'email del cliente. `subscriptionActive` è la singola fonte di verità per permettere l'accesso.
+- **Protezione pagine/API**: `middleware.ts` richiede un token valido e una sottoscrizione attiva per tutte le rotte `/dashboard` e `/api` (eccezione: `/api/auth/*`). Utenti autenticati ma senza abbonamento vengono reindirizzati a `/paywall` o ricevono risposta `402` sulle API. `getSessionUser` recupera l'utente nei server component per applicare redirect server-side coerenti.
+- **Checkout MVP**: la pagina `/paywall` reindirizza direttamente al link di Stripe Checkout esterno (`https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01`). Non sono utilizzati webhook o API Stripe lato server in questa versione MVP.
 - L'accesso a `/paywall` è bloccato per chi è già abbonato: gli utenti con `subscriptionActive=true` vengono reindirizzati alla dashboard.
 - **Admin (solo lettura)**: il ruolo `ADMIN` accede a `/dashboard/admin` per visualizzare elenco utenti e richieste in modalità di sola consultazione; non sono previste azioni di modifica o moderazione nell'MVP.
 
