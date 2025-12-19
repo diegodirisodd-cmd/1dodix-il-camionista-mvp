@@ -164,7 +164,7 @@ export default async function TransporterDashboardPage() {
               <p className="text-xs font-semibold uppercase tracking-wide text-accent-200">Cosa sblocchi</p>
               <ul className="mt-2 space-y-2 text-sm text-neutral-100/80">
                 <li>Contatti completi delle aziende (telefono, email, referente).</li>
-                <li>Briefing operativi e budget pubblicati.</li>
+                <li>Briefing operativi con percorso, finestra e carico chiariti.</li>
                 <li>Priorità nelle conferme per profili verificati.</li>
               </ul>
             </div>
@@ -234,12 +234,12 @@ export default async function TransporterDashboardPage() {
           <div className="table-shell overflow-x-auto">
             <table className="min-w-[820px]">
               <thead>
-                <tr>
-                  <th>Titolo</th>
-                  <th>Percorso</th>
-                  <th>Budget</th>
-                  <th>Contatti</th>
-                </tr>
+                  <tr>
+                    <th>Titolo</th>
+                    <th>Percorso</th>
+                    <th>Finestra</th>
+                    <th>Contatti</th>
+                  </tr>
               </thead>
               <tbody>
                 {recentRequests.map((request) => (
@@ -248,7 +248,7 @@ export default async function TransporterDashboardPage() {
                     <td className="whitespace-nowrap text-neutral-100/80">
                       {request.pickup} → {request.dropoff}
                     </td>
-                    <td className="whitespace-nowrap font-semibold text-white">{request.budget ?? "-"}</td>
+                    <td className="whitespace-nowrap text-neutral-100/80">{request.timeWindow}</td>
                     <td className="text-neutral-100/80">
                       {subscriptionActive ? (
                         <div className="space-y-2 text-sm">

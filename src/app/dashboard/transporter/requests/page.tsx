@@ -66,8 +66,8 @@ export default async function TransporterRequestsPage() {
                     <th>Titolo</th>
                     <th>Azienda</th>
                     <th>Percorso</th>
+                    <th>Finestra</th>
                     <th>Carico</th>
-                    <th>Budget</th>
                     <th>Contatto</th>
                     <th className="text-right">Pubblicata</th>
                   </tr>
@@ -86,8 +86,13 @@ export default async function TransporterRequestsPage() {
                           <span className="font-semibold text-white">{request.dropoff}</span>
                         </div>
                       </td>
-                      <td className="whitespace-nowrap text-neutral-100/80">{request.cargo ?? "-"}</td>
-                      <td className="whitespace-nowrap font-semibold text-white">{request.budget ?? "-"}</td>
+                      <td className="whitespace-nowrap text-neutral-100/80">{request.timeWindow}</td>
+                      <td className="whitespace-nowrap text-neutral-100/80">
+                        <div className="space-y-1">
+                          <div className="text-white">{request.cargoType}</div>
+                          <div className="text-xs text-neutral-200/80">{request.estimatedWeight}</div>
+                        </div>
+                      </td>
                       <td className="text-neutral-100/80">
                         {request.contactName ? (
                           <div className="space-y-2">
@@ -123,26 +128,28 @@ export default async function TransporterRequestsPage() {
                   key={request.id}
                   className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-sm backdrop-blur"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-accent-200">{request.company.email}</p>
-                      <h3 className="text-lg font-semibold text-white">{request.title}</h3>
-                      <p className="text-sm text-neutral-200/80">{new Date(request.createdAt).toLocaleDateString("it-IT")}</p>
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-accent-200">{request.company.email}</p>
+                        <h3 className="text-lg font-semibold text-white">{request.title}</h3>
+                        <p className="text-sm text-neutral-200/80">{new Date(request.createdAt).toLocaleDateString("it-IT")}</p>
+                      </div>
+                      <span className="rounded-full bg-accent-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent-100">
+                        {request.timeWindow}
+                      </span>
                     </div>
-                    <span className="rounded-full bg-accent-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent-100">
-                      {request.budget ?? "-"}
-                    </span>
-                  </div>
 
                   <div className="mt-3 space-y-2">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                    <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-white">
                       <span className="rounded-full bg-brand-900/60 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-200">Pick-up</span>
                       <span>{request.pickup}</span>
                       <span className="text-neutral-300">→</span>
                       <span className="rounded-full bg-accent-500/10 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-100">Drop-off</span>
                       <span>{request.dropoff}</span>
                     </div>
-                    <p className="text-sm text-neutral-200/80">Carico: {request.cargo ?? "-"}</p>
+                    <p className="text-sm text-neutral-200/80">Carico: {request.cargoType}</p>
+                    <p className="text-sm text-neutral-200/80">Peso/volume: {request.estimatedWeight}</p>
+                    <p className="text-sm text-neutral-200/80">Finestra: {request.timeWindow}</p>
                   </div>
 
                   <div className="mt-3 border-t border-white/10 pt-3">

@@ -4,7 +4,11 @@ import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
-export default async function CompanyDashboardPage() {
+export default async function CompanyDashboardPage({
+  searchParams,
+}: {
+  searchParams?: { created?: string };
+}) {
   const user = await getSessionUser();
 
   if (!user) {
@@ -34,9 +38,15 @@ export default async function CompanyDashboardPage() {
     ? new Date(companyRequests[0].createdAt).toLocaleDateString("it-IT")
     : "Nessuna";
   const recentContacts = companyRequests.slice(0, 5);
+  const showCreatedBanner = searchParams?.created === "1";
 
   return (
     <div className="space-y-10">
+      {showCreatedBanner && (
+        <div className="rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-success shadow-sm">
+          Richiesta creata correttamente. Puoi gestirla qui nella dashboard.
+        </div>
+      )}
       <header className="space-y-5 lg:space-y-6">
         <div className="space-y-3">
           <div className="inline-flex items-center gap-2 rounded-full bg-brand-900/20 px-4 py-2 text-xs font-semibold text-brand-50 ring-1 ring-brand-900/30">
@@ -99,7 +109,7 @@ export default async function CompanyDashboardPage() {
           >
             <div className="flex flex-col gap-3">
               <p className="text-sm text-neutral-100/80">
-                Definisci percorso, budget e contatti per attivare subito i trasportatori verificati.
+                Definisci percorso, finestra, carico e contatti per attivare subito i trasportatori verificati.
               </p>
               <a
                 href="#pubblica"
@@ -160,12 +170,13 @@ export default async function CompanyDashboardPage() {
             <p className="text-sm text-neutral-200/80">Pubblica la prima richiesta per ingaggiare trasportatori verificati.</p>
           ) : (
             <div className="table-shell overflow-x-auto">
-              <table className="min-w-[860px]">
+              <table className="min-w-[980px]">
                 <thead>
                   <tr>
                     <th>Titolo</th>
                     <th>Percorso</th>
-                    <th>Budget</th>
+                    <th>Finestra</th>
+                    <th>Carico</th>
                     <th>Contatto</th>
                     <th>Pubblicata</th>
                   </tr>
@@ -177,7 +188,13 @@ export default async function CompanyDashboardPage() {
                       <td className="whitespace-nowrap text-neutral-100/80">
                         {request.pickup} → {request.dropoff}
                       </td>
-                      <td className="whitespace-nowrap font-semibold text-white">{request.budget ?? "-"}</td>
+                      <td className="whitespace-nowrap text-neutral-100/80">{request.timeWindow}</td>
+                      <td className="whitespace-nowrap text-neutral-100/80">
+                        <div className="space-y-1">
+                          <div className="font-semibold text-white">{request.cargoType}</div>
+                          <div className="text-xs text-neutral-200/80">{request.estimatedWeight}</div>
+                        </div>
+                      </td>
                       <td className="whitespace-nowrap text-neutral-100/80">
                         <div className="space-y-1 text-sm">
                           <div className="font-semibold text-white">{request.contactName}</div>

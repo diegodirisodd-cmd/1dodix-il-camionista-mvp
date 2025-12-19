@@ -35,6 +35,9 @@ model Request {
   title         String
   pickup        String
   dropoff       String
+  timeWindow    String   @default("")
+  cargoType     String   @default("")
+  estimatedWeight String @default("")
   cargo         String?
   budget        String?
   description   String?

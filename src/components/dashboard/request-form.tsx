@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const INITIAL_STATE = {
-  title: "",
   pickup: "",
   dropoff: "",
+  timeWindow: "",
+  cargoType: "",
+  estimatedWeight: "",
   cargo: "",
   budget: "",
   description: "",
@@ -44,7 +46,7 @@ export function RequestForm() {
 
     setSuccess("Richiesta pubblicata correttamente");
     setForm(INITIAL_STATE);
-    router.refresh();
+    router.push("/dashboard/company?created=1");
   }
 
   function updateField(field: string, value: string) {
@@ -53,28 +55,6 @@ export function RequestForm() {
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <label className="form-field">
-          <span className="label">Titolo*</span>
-          <input
-            required
-            className="input-field"
-            value={form.title}
-            onChange={(e) => updateField("title", e.target.value)}
-            placeholder="Trasporto pallet nord Italia"
-          />
-        </label>
-        <label className="form-field">
-          <span className="label">Budget (opzionale)</span>
-          <input
-            className="input-field"
-            value={form.budget}
-            onChange={(e) => updateField("budget", e.target.value)}
-            placeholder="€800"
-          />
-        </label>
-      </div>
-
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="form-field">
           <span className="label">Ritiro*</span>
@@ -100,12 +80,36 @@ export function RequestForm() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="form-field">
-          <span className="label">Carico (opzionale)</span>
+          <span className="label">Data o finestra oraria*</span>
           <input
+            required
             className="input-field"
-            value={form.cargo}
-            onChange={(e) => updateField("cargo", e.target.value)}
-            placeholder="Pallet misti / 10q"
+            value={form.timeWindow}
+            onChange={(e) => updateField("timeWindow", e.target.value)}
+            placeholder="12 marzo, fascia mattina"
+          />
+        </label>
+        <label className="form-field">
+          <span className="label">Tipo di carico*</span>
+          <input
+            required
+            className="input-field"
+            value={form.cargoType}
+            onChange={(e) => updateField("cargoType", e.target.value)}
+            placeholder="Alimentari, pallet, ADR, ecc."
+          />
+        </label>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="form-field">
+          <span className="label">Peso/volume stimato*</span>
+          <input
+            required
+            className="input-field"
+            value={form.estimatedWeight}
+            onChange={(e) => updateField("estimatedWeight", e.target.value)}
+            placeholder="Es. 8 pallet / 12 ql"
           />
         </label>
         <label className="form-field">
