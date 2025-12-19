@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { SectionCard } from "@/components/dashboard/section-card";
+import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -59,7 +60,7 @@ export default async function TransporterDashboardPage() {
   return (
     <div className="space-y-8">
       <header className="card space-y-6">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold text-white/80 ring-1 ring-white/15">
               <span className="rounded-full bg-accent-500/25 px-3 py-0.5 text-accent-50">Ruolo</span>
@@ -73,11 +74,18 @@ export default async function TransporterDashboardPage() {
               </p>
             </div>
           </div>
-          <div className="flex flex-col items-start gap-2 lg:items-end">
-            <a className="btn-primary px-6 py-3 text-base shadow-lg shadow-brand-900/30" href="/dashboard/transporter/requests">
-              Apri elenco carichi
-            </a>
-            <p className="text-xs text-neutral-100/70 sm:text-sm">Vai direttamente alle richieste disponibili e valuta le tratte.</p>
+          <div className="flex flex-col items-start gap-3 lg:items-end">
+            <SubscriptionBadge
+              active={subscriptionActive}
+              className="self-start lg:self-end"
+              icon={subscriptionActive ? "lightning" : "check"}
+            />
+            <div className="flex flex-col items-start gap-2 lg:items-end">
+              <a className="btn-primary px-6 py-3 text-base shadow-lg shadow-brand-900/30" href="/dashboard/transporter/requests">
+                Apri elenco carichi
+              </a>
+              <p className="text-xs text-neutral-100/70 sm:text-sm">Vai direttamente alle richieste disponibili e valuta le tratte.</p>
+            </div>
           </div>
         </div>
 

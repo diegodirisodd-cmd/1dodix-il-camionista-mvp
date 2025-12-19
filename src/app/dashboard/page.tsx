@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import { getSessionUser } from "@/lib/auth";
 import { LogoutButton } from "@/components/logout-button";
+import { SubscriptionBadge } from "@/components/subscription-badge";
 import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
@@ -20,12 +21,19 @@ export default async function DashboardPage() {
 
   return (
     <section className="space-y-6">
-      <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Profilo</p>
-        <h1>Area account</h1>
-        <p className="text-neutral-100/80">
-          Accesso verificato per {user.email}. Le funzioni operative richiedono un abbonamento attivo.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Profilo</p>
+          <h1>Area account</h1>
+          <p className="text-neutral-100/80">
+            Accesso verificato per {user.email}. Le funzioni operative richiedono un abbonamento attivo.
+          </p>
+        </div>
+        <SubscriptionBadge
+          active={user.subscriptionActive}
+          className="self-start"
+          icon={user.subscriptionActive ? "lightning" : "check"}
+        />
       </div>
 
       <div className="card space-y-6 text-sm text-neutral-100/80">

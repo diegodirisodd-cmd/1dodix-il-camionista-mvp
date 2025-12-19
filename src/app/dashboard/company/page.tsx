@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { RequestForm } from "@/components/dashboard/request-form";
 import { SectionCard } from "@/components/dashboard/section-card";
+import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -70,19 +71,26 @@ export default async function CompanyDashboardPage({
         </div>
       )}
       <header className="space-y-5 lg:space-y-6">
-        <div className="space-y-3">
-          <div className="inline-flex items-center gap-2 rounded-full bg-brand-900/20 px-4 py-2 text-xs font-semibold text-brand-50 ring-1 ring-brand-900/30">
-            <span className="rounded-full bg-accent-500/20 px-3 py-1 text-accent-100">Azienda</span>
-            <span className="text-brand-50">{user.email}</span>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full bg-brand-900/20 px-4 py-2 text-xs font-semibold text-brand-50 ring-1 ring-brand-900/30">
+              <span className="rounded-full bg-accent-500/20 px-3 py-1 text-accent-100">Azienda</span>
+              <span className="text-brand-50">{user.email}</span>
+            </div>
+            <div className="space-y-2">
+              <h1 className="text-3xl font-semibold leading-tight text-white lg:text-4xl">
+                Dashboard Azienda
+              </h1>
+              <p className="max-w-3xl text-base text-neutral-100/80 lg:text-lg">
+                Pianifica incarichi di trasporto, ricevi risposte da trasportatori verificati e governa i contatti in modo diretto e documentato.
+              </p>
+            </div>
           </div>
-          <div className="space-y-2">
-            <h1 className="text-3xl font-semibold leading-tight text-white lg:text-4xl">
-              Dashboard Azienda
-            </h1>
-            <p className="max-w-3xl text-base text-neutral-100/80 lg:text-lg">
-              Pianifica incarichi di trasporto, ricevi risposte da trasportatori verificati e governa i contatti in modo diretto e documentato.
-            </p>
-          </div>
+          <SubscriptionBadge
+            active={isSubscribed}
+            icon={isSubscribed ? "lightning" : "check"}
+            className="self-start lg:self-center"
+          />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

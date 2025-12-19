@@ -2,6 +2,7 @@ import { SectionCard } from "@/components/dashboard/section-card";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { SubscriptionBadge } from "@/components/subscription-badge";
 
 function formatRole(role: string) {
   if (role === "COMPANY") return "Azienda";
@@ -50,15 +51,18 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2">
-        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-accent-400/50 bg-accent-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-100">
-          Ruolo
-          <span className="rounded-full bg-accent-500 px-2 py-0.5 text-[11px] font-bold uppercase text-brand-900">Admin</span>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-2">
+          <div className="inline-flex w-fit items-center gap-2 rounded-full border border-accent-400/50 bg-accent-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-100">
+            Ruolo
+            <span className="rounded-full bg-accent-500 px-2 py-0.5 text-[11px] font-bold uppercase text-brand-900">Admin</span>
+          </div>
+          <h1>Dashboard Admin</h1>
+          <p className="text-neutral-100/80">
+            Supervisione in sola lettura di utenti e richieste. Nessuna azione di modifica o moderazione è abilitata in questo MVP.
+          </p>
         </div>
-        <h1>Dashboard Admin</h1>
-        <p className="text-neutral-100/80">
-          Supervisione in sola lettura di utenti e richieste. Nessuna azione di modifica o moderazione è abilitata in questo MVP.
-        </p>
+        <SubscriptionBadge active={user.subscriptionActive} className="self-start" />
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
