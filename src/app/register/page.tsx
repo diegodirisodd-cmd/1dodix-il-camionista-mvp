@@ -117,7 +117,10 @@ export default function RegisterPage() {
                 <option value="transporter">Transporter</option>
                 <option value="company">Company</option>
               </select>
-              <p className="text-xs text-neutral-100/70">Il ruolo guida la navigazione (dashboard trasportatore o azienda).</p>
+              <p className="text-xs text-neutral-100/70">
+                Il ruolo guida la navigazione (dashboard trasportatore o azienda). Gli account ADMIN vengono creati solo su
+                richiesta per accessi di supervisione.
+              </p>
             </div>
 
             <div className="form-actions justify-between">

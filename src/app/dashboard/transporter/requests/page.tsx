@@ -16,12 +16,13 @@ function maskContact(subscriptionActive: boolean, request: RequestWithCompany) {
 
 export default async function TransporterRequestsPage() {
   const user = await getSessionUser();
+  const isAdmin = user?.role === "ADMIN";
 
   if (!user) {
     redirect("/login");
   }
 
-  if (user.role !== "TRANSPORTER") {
+  if (user.role !== "TRANSPORTER" && !isAdmin) {
     redirect("/dashboard");
   }
 
@@ -34,14 +35,17 @@ export default async function TransporterRequestsPage() {
     include: { company: { select: { email: true } } },
   });
 
-  const displayRequests = requests.map((request) => maskContact(user.subscriptionActive, request));
+  const displayRequests = requests.map((request) => maskContact(isAdmin ? true : user.subscriptionActive, request));
 
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-2">
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Richieste disponibili</p>
         <h1>Trasporti pubblicati</h1>
-        <p className="text-neutral-100/80">Richieste inviate da aziende registrate. I contatti sono visibili solo con un abbonamento attivo.</p>
+        <p className="text-neutral-100/80">
+          Richieste inviate da aziende registrate. I contatti sono visibili solo con un abbonamento attivo
+          {isAdmin ? " (gli admin possono consultarli in sola lettura)." : "."}
+        </p>
       </header>
 
       <SectionCard

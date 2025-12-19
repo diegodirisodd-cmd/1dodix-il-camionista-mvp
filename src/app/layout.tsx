@@ -16,33 +16,50 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const sessionUser = await getSessionUser();
-  const sidebarLinks = [
-    { label: "Dashboard", href: "/dashboard" },
-    {
-      label: "Richieste",
-      href: sessionUser?.role === "COMPANY" ? "/dashboard/company" : "/dashboard/transporter/requests",
-    },
-    {
-      label: "Trasportatori / Aziende",
-      href: sessionUser?.role === "COMPANY" ? "/dashboard/transporter" : "/dashboard/company",
-    },
-    { label: "Abbonamento", href: "/paywall" },
-    { label: "Impostazioni", href: "/dashboard" },
-  ];
+  const role = sessionUser?.role;
+  const dashboardHome =
+    role === "COMPANY" ? "/dashboard/company" : role === "TRANSPORTER" ? "/dashboard/transporter" : "/dashboard";
+  const requestsLink =
+    role === "COMPANY"
+      ? "/dashboard/company"
+      : role === "TRANSPORTER" || role === "ADMIN"
+        ? "/dashboard/transporter/requests"
+        : "/dashboard";
+  const peerLink =
+    role === "COMPANY"
+      ? "/dashboard/company"
+      : role === "TRANSPORTER"
+        ? "/dashboard/transporter"
+        : "/dashboard";
+
+  const sidebarLinks = sessionUser
+    ? [
+        { label: "Dashboard", href: dashboardHome },
+        { label: "Richieste", href: requestsLink },
+        role === "ADMIN"
+          ? { label: "Monitoraggio (solo lettura)", href: "/dashboard" }
+          : {
+              label: "Trasportatori / Aziende",
+              href: role === "COMPANY" ? peerLink : role === "TRANSPORTER" ? peerLink : "/dashboard",
+            },
+        { label: "Abbonamento", href: "/paywall" },
+        { label: "Impostazioni", href: "/dashboard" },
+      ]
+    : [];
 
   const headerNav = sessionUser
     ? [
         { label: "Home", href: "/" },
-        { label: "Dashboard", href: "/dashboard" },
+        { label: "Dashboard", href: dashboardHome },
         {
           label: "Richieste",
-          href: sessionUser.role === "COMPANY" ? "/dashboard/company" : "/dashboard/transporter/requests",
+          href: requestsLink,
         },
       ]
     : [
-      { label: "Home", href: "/" },
-      { label: "Per aziende", href: "/#aziende" },
-      { label: "Per trasportatori", href: "/#trasportatori" },
+        { label: "Home", href: "/" },
+        { label: "Per aziende", href: "/#aziende" },
+        { label: "Per trasportatori", href: "/#trasportatori" },
       ];
 
   return (

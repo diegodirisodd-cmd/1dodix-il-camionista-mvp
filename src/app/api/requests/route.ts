@@ -44,10 +44,11 @@ export async function GET() {
   }
 
   const isCompany = user.role === "COMPANY";
-  const includeContact = user.role === "COMPANY" || user.subscriptionActive;
+  const isAdmin = user.role === "ADMIN";
+  const includeContact = isCompany || isAdmin || user.subscriptionActive;
 
   const requests = await prisma.request.findMany({
-    where: isCompany ? { companyId: user.id } : undefined,
+    where: isCompany && !isAdmin ? { companyId: user.id } : undefined,
     orderBy: { createdAt: "desc" },
   });
 
@@ -59,6 +60,10 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
+  }
+
+  if (user.role === "ADMIN") {
+    return NextResponse.json({ error: "Gli admin possono solo consultare le richieste" }, { status: 403 });
   }
 
   if (user.role !== "COMPANY") {

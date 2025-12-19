@@ -43,15 +43,15 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     return NextResponse.json({ error: "Abbonamento richiesto" }, { status: 402 });
   }
 
+  const isAdmin = user.role === "ADMIN";
   const requestRecord = await prisma.request.findUnique({ where: { id: Number(params.id) } });
 
   if (!requestRecord) {
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
   }
 
-  const includeContact = user.role === "COMPANY" && requestRecord.companyId === user.id
-    ? true
-    : user.subscriptionActive;
+  const includeContact =
+    isAdmin || (user.role === "COMPANY" && requestRecord.companyId === user.id) || user.subscriptionActive;
 
   return NextResponse.json(sanitizeRequestOutput(requestRecord, includeContact));
 }
@@ -71,6 +71,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
   if (!existing) {
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
+  }
+
+  if (user.role === "ADMIN") {
+    return NextResponse.json({ error: "Gli admin possono solo consultare le richieste" }, { status: 403 });
   }
 
   if (user.role !== "COMPANY" || existing.companyId !== user.id) {
@@ -120,6 +124,10 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
 
   if (!existing) {
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
+  }
+
+  if (user.role === "ADMIN") {
+    return NextResponse.json({ error: "Gli admin possono solo consultare le richieste" }, { status: 403 });
   }
 
   if (user.role !== "COMPANY" || existing.companyId !== user.id) {

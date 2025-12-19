@@ -19,12 +19,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "La password deve contenere almeno 6 caratteri." }, { status: 400 });
     }
 
-    const allowedRoles = ["TRANSPORTER", "COMPANY"] as const;
+    const allowedRoles = ["TRANSPORTER", "COMPANY", "ADMIN"] as const;
     const isRoleValid = allowedRoles.includes(role as (typeof allowedRoles)[number]);
 
     if (!isRoleValid) {
       return NextResponse.json(
-        { error: "Ruolo non valido. Seleziona 'trasportatore' o 'azienda'." },
+        { error: "Ruolo non valido. Seleziona 'trasportatore', 'azienda' o un profilo admin autorizzato." },
         { status: 400 },
       );
     }
