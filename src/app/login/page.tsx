@@ -3,47 +3,31 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useState, useTransition } from "react";
+
+import { actionLogin } from "@/app/actions/auth";
 
 export default function LoginPage() {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, startTransition] = useTransition();
   const router = useRouter();
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setLoading(true);
+  const handleSubmit = (formData: FormData) => {
     setResult(null);
     setError(null);
 
-    const formData = new FormData(event.currentTarget);
+    startTransition(async () => {
+      const response = await actionLogin(formData);
 
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error ?? "Accesso non riuscito. Verifica le credenziali.");
-        setLoading(false);
+      if (response.error) {
+        setError(response.error);
         return;
       }
 
-      const roleInfo = data.role ? ` (ruolo: ${data.role.toLowerCase()})` : "";
-      setResult(`${data.message ?? "Accesso eseguito."}${roleInfo}`);
-      setLoading(false);
-      const destination = data.redirectTo || "/dashboard";
-      router.replace(destination);
-    } catch (err) {
-      console.error(err);
-      setError("Accesso non riuscito. Riprova.");
-      setLoading(false);
-    }
+      setResult("Accesso eseguito.");
+      router.replace(response.redirectTo ?? "/dashboard");
+    });
   };
 
   return (
@@ -141,7 +125,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form className="space-y-5" onSubmit={handleSubmit}>
+          <form className="space-y-5" action={handleSubmit}>
             <div className="space-y-2">
               <label className="text-sm font-semibold text-neutral-800" htmlFor="email">
                 Email aziendale

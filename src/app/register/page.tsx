@@ -3,39 +3,31 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useTransition, useState } from "react";
+
+import { actionRegister } from "@/app/actions/auth";
 
 export default function RegisterPage() {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = (formData: FormData) => {
     setResult(null);
     setError(null);
 
-    try {
-      const formData = new FormData(event.currentTarget);
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
+    startTransition(async () => {
+      const response = await actionRegister(formData);
 
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        setError(data.error ?? "Registrazione non riuscita. Controlla i dati inseriti.");
+      if (response.error) {
+        setError(response.error);
         return;
       }
 
-      setResult("Account creato con successo.");
-      router.replace("/dashboard");
-    } catch (err) {
-      console.error("Errore durante la registrazione", err);
-      setError("Registrazione non riuscita. Riprova più tardi.");
-    }
+      setResult("Account creato con successo. Accedi per continuare.");
+      router.replace("/login");
+    });
   };
 
   return (
@@ -87,7 +79,7 @@ export default function RegisterPage() {
             </p>
           )}
 
-          <form className="space-y-5" onSubmit={handleSubmit}>
+          <form className="space-y-5" action={handleSubmit}>
             <div className="form-field">
               <label className="label" htmlFor="name">
                 Nome o ragione sociale
@@ -160,8 +152,8 @@ export default function RegisterPage() {
             </div>
 
             <div className="form-actions justify-between">
-              <button type="submit" className="btn-primary w-full sm:w-auto">
-                Crea account
+              <button type="submit" disabled={isPending} className="btn-primary w-full sm:w-auto">
+                {isPending ? "Creazione in corso..." : "Crea account"}
               </button>
               <span className="text-sm text-neutral-100/80">
                 Hai già un account? <Link className="text-accent-200 underline" href="/login">Accedi</Link>

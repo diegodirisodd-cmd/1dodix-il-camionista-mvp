@@ -2,42 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
 
-const DASHBOARD_PREFIX = "/dashboard";
-
-function isAuthApi(pathname: string) {
-  return pathname.startsWith("/api/auth");
-}
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isApiRequest = pathname.startsWith("/api");
-  const isDashboard = pathname.startsWith(DASHBOARD_PREFIX);
+  const isDashboard = pathname.startsWith("/dashboard");
 
-  if (isAuthApi(pathname)) {
-    return NextResponse.next();
-  }
-
-  if (!isApiRequest && !isDashboard) {
+  if (!isDashboard) {
     return NextResponse.next();
   }
 
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
 
   if (!token) {
-    if (isApiRequest) {
-      return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-    }
-
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
   const session = await verifySessionToken(token);
 
   if (!session) {
-    if (isApiRequest) {
-      return NextResponse.json({ error: "Token non valido" }, { status: 401 });
-    }
-
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -45,5 +26,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/api/:path*"],
+  matcher: ["/dashboard/:path*"],
 };
