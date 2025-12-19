@@ -69,15 +69,15 @@ export default async function TransporterDashboardPage() {
             <div className="space-y-2">
               <h1 className="text-3xl font-semibold text-white lg:text-4xl">Dashboard Trasportatore</h1>
               <p className="max-w-3xl text-sm text-neutral-100/80 md:text-base">
-                Accedi alle richieste pubblicate da aziende verificate, controlla il tuo abbonamento e muoviti velocemente verso i carichi disponibili.
+                Consulta incarichi pubblicati da aziende verificate, mantieni attivo l’abbonamento e seleziona subito i carichi pertinenti.
               </p>
             </div>
           </div>
           <div className="flex flex-col items-start gap-2 lg:items-end">
             <a className="btn-primary px-6 py-3 text-base shadow-lg shadow-brand-900/30" href="/dashboard/transporter/requests">
-              Vedi richieste
+              Apri elenco carichi
             </a>
-            <p className="text-xs text-neutral-100/70 sm:text-sm">Accesso rapido ai carichi in piattaforma.</p>
+            <p className="text-xs text-neutral-100/70 sm:text-sm">Vai direttamente alle richieste disponibili e valuta le tratte.</p>
           </div>
         </div>
 
@@ -88,7 +88,7 @@ export default async function TransporterDashboardPage() {
             hint={
               subscriptionActive
                 ? "Contatti e briefing sono sbloccati."
-                : "Contenuti bloccati fino all’attivazione."
+                : "Contatti oscurati finché non attivi l’abbonamento."
             }
             accent={subscriptionActive ? "success" : "warning"}
             action={
@@ -96,7 +96,7 @@ export default async function TransporterDashboardPage() {
                 <span className="badge-verified">Attivo</span>
               ) : (
                 <a className="btn-primary px-4 py-2 text-sm" href="/paywall">
-                  Attiva ora
+                  Attiva abbonamento
                 </a>
               )
             }
@@ -105,23 +105,23 @@ export default async function TransporterDashboardPage() {
           <StatCard
             title="Richieste disponibili"
             value={availableLoads.toString()}
-            hint="Carichi pubblicati dalle aziende con profilo verificato."
+            hint="Carichi pubblicati da aziende con profilo verificato."
             accent="primary"
             action={
               <a className="text-sm font-semibold text-white underline" href="/dashboard/transporter/requests">
-                Vedi elenco
+                Consulta richieste
               </a>
             }
           />
 
           <StatCard
-            title="Azione rapida"
-            value="Vedi richieste"
-            hint="Vai subito all’elenco completo per prenotare i carichi."
+            title="Priorità operativa"
+            value="Apri richieste"
+            hint="Accedi all’elenco completo e blocca i carichi pertinenti."
             accent="primary"
             action={
               <a className="btn-secondary px-4 py-2 text-sm" href="/dashboard/transporter/requests">
-                Apri lista
+                Vai alle richieste
               </a>
             }
           />
@@ -156,7 +156,7 @@ export default async function TransporterDashboardPage() {
       <section className="grid gap-6 lg:grid-cols-2">
         <SectionCard
           title="Accesso e abbonamento"
-          description="Vedi cosa è incluso e quando i dati restano oscurati."
+          description="Cosa sblocchi con il pagamento e cosa rimane oscurato."
           className="flex flex-col justify-between"
         >
           <div className="grid gap-4 lg:grid-cols-2">
@@ -179,7 +179,7 @@ export default async function TransporterDashboardPage() {
                   Attiva abbonamento
                 </a>
                 <a className="btn-secondary" href="/dashboard/transporter/requests">
-                  Vedi carichi
+                  Consulta i carichi
                 </a>
               </div>
             </div>
@@ -196,7 +196,7 @@ export default async function TransporterDashboardPage() {
             <div className="space-y-2 rounded-xl border border-accent-300/30 bg-white/5 px-4 py-3 text-neutral-100/80">
               <p className="text-sm font-semibold text-white">Perché è importante</p>
               <p className="text-sm">
-                Le aziende confermano più velocemente i carichi ai trasportatori verificati. Completa la verifica documentale per dimostrare affidabilità e ridurre tempi di onboarding.
+                Le aziende assegnano più velocemente i carichi ai trasportatori verificati. Completa la verifica documentale per dimostrare affidabilità e ridurre i tempi di onboarding.
               </p>
             </div>
             <div className="space-y-3">
@@ -211,7 +211,7 @@ export default async function TransporterDashboardPage() {
                   Invia documenti
                 </a>
                 <a className="btn-primary" href="/dashboard/transporter/requests">
-                  Vedi carichi prioritari
+                  Apri carichi prioritari
                 </a>
               </div>
             </div>
@@ -219,15 +219,15 @@ export default async function TransporterDashboardPage() {
         </SectionCard>
       </section>
 
-      <SectionCard
-        title="Carichi pubblicati dalle aziende"
-        description="Incarichi recenti. I contatti completi sono visibili solo con abbonamento attivo."
-        actions={
-          <a className="text-sm font-semibold text-accent-200 underline" href="/dashboard/transporter/requests">
-            Vedi tutte le richieste
-          </a>
-        }
-      >
+        <SectionCard
+          title="Carichi pubblicati dalle aziende"
+          description="Incarichi recenti; i contatti completi si sbloccano solo con abbonamento attivo."
+          actions={
+            <a className="text-sm font-semibold text-accent-200 underline" href="/dashboard/transporter/requests">
+              Vai alla lista completa
+            </a>
+          }
+        >
         {recentRequests.length === 0 ? (
           <p className="text-sm text-neutral-200/80">Ancora nessuna richiesta pubblicata.</p>
         ) : (

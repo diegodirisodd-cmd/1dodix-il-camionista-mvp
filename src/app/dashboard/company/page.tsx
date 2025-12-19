@@ -48,7 +48,7 @@ export default async function CompanyDashboardPage() {
               Dashboard Azienda
             </h1>
             <p className="max-w-3xl text-base text-neutral-100/80 lg:text-lg">
-              Pubblica richieste di trasporto, ricevi trasportatori verificati e mantieni sotto controllo le tue operazioni in un ambiente B2B pulito e strutturato.
+              Pianifica incarichi di trasporto, ricevi risposte da trasportatori verificati e governa i contatti in modo diretto e documentato.
             </p>
           </div>
         </div>
@@ -56,7 +56,7 @@ export default async function CompanyDashboardPage() {
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <SectionCard
             title="Profilo azienda"
-            description="Dati chiave per le verifiche e la collaborazione."
+            description="Dati essenziali per verifiche e onboarding con i partner."
             subtle
           >
             <dl className="space-y-3 text-sm text-neutral-100/80">
@@ -82,7 +82,7 @@ export default async function CompanyDashboardPage() {
 
           <SectionCard
             title="Richieste attive"
-            description="Annunci visibili ai trasportatori verificati."
+            description="Incarichi pubblicati e visibili ai trasportatori verificati."
             subtle
           >
             <div className="flex items-end justify-between gap-3">
@@ -94,19 +94,20 @@ export default async function CompanyDashboardPage() {
 
           <SectionCard
             title="Pubblica nuova richiesta"
-            description="Ingaggia trasportatori verificati con un brief chiaro."
+            description="Invia un brief completo per ricevere proposte rapide."
             subtle
           >
             <div className="flex flex-col gap-3">
               <p className="text-sm text-neutral-100/80">
-                Definisci percorso, budget e contatti per ricevere risposte rapide dai partner verificati.
+                Definisci percorso, budget e contatti per attivare subito i trasportatori verificati.
               </p>
               <a
                 href="#pubblica"
                 className="btn-primary w-full justify-center px-4 py-3 text-base shadow-lg shadow-brand-900/30"
               >
-                Pubblica nuova richiesta
+                Apri il form di pubblicazione
               </a>
+              <p className="text-xs text-neutral-200/80">Il pulsante ti porta direttamente al modulo da completare.</p>
             </div>
           </SectionCard>
         </div>
@@ -147,7 +148,7 @@ export default async function CompanyDashboardPage() {
 
         <SectionCard
           title="Richieste in corso"
-          description="Monitoraggio operativo delle spedizioni aperte e dei contatti condivisi."
+          description="Monitoraggio delle spedizioni aperte e dei contatti condivisi."
           actions={
             <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-neutral-100">
               {activeRequests} attive
@@ -199,7 +200,7 @@ export default async function CompanyDashboardPage() {
       <section className="grid gap-6 xl:grid-cols-3" id="pubblica">
         <SectionCard
           title="Contatti recenti"
-          description="Contatti condivisi con trasportatori dagli ultimi incarichi pubblicati."
+          description="Recapiti condivisi con i trasportatori dagli ultimi incarichi pubblicati."
           className="xl:col-span-2"
         >
           {recentContacts.length === 0 ? (
@@ -236,7 +237,7 @@ export default async function CompanyDashboardPage() {
 
         <SectionCard
           title="Pubblica una nuova richiesta"
-          description="Inserisci dati completi per assegnare rapidamente ai trasportatori verificati."
+          description="Compila il brief operativo per attivare i trasportatori verificati."
         >
           <RequestForm />
         </SectionCard>
