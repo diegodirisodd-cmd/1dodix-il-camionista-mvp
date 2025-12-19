@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { hash } from "bcryptjs";
 
 import { buildSessionCookie, createSessionToken } from "@/lib/auth";
@@ -32,12 +33,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Ruolo non valido. Seleziona trasportatore o azienda." }, { status: 400 });
     }
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-
-    if (existingUser) {
-      return NextResponse.json({ error: "Esiste già un utente con questa email." }, { status: 409 });
-    }
-
     const passwordHash = await hash(password, 10);
     const user = await prisma.user.create({
       data: { email, password: passwordHash, role, name, phone: phone || null, operatingArea },
@@ -50,12 +45,7 @@ export async function POST(request: Request) {
       role: user.role,
     });
 
-    const redirectTo =
-      user.role === "COMPANY"
-        ? "/dashboard/company"
-        : user.role === "TRANSPORTER"
-          ? "/dashboard/transporter"
-          : "/dashboard";
+    const redirectTo = "/dashboard";
 
     const response = NextResponse.json({
       id: user.id,
@@ -69,7 +59,11 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error) {
-    console.error(error);
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      return NextResponse.json({ error: "Esiste già un utente con questa email." }, { status: 409 });
+    }
+
+    console.error("Errore nella registrazione", error);
     return NextResponse.json({ error: "Registrazione non riuscita." }, { status: 500 });
   }
 }

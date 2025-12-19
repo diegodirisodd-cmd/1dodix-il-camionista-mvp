@@ -15,28 +15,27 @@ export default function RegisterPage() {
     setResult(null);
     setError(null);
 
-    const formData = new FormData(event.currentTarget);
-    const response = await fetch("/api/auth/register", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const formData = new FormData(event.currentTarget);
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
 
-    const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
-    if (!response.ok) {
-      setError(data.error ?? "Registrazione non riuscita. Controlla i dati inseriti.");
-      return;
+      if (!response.ok) {
+        setError(data.error ?? "Registrazione non riuscita. Controlla i dati inseriti.");
+        return;
+      }
+
+      setResult("Account creato con successo.");
+      router.replace("/dashboard");
+    } catch (err) {
+      console.error("Errore durante la registrazione", err);
+      setError("Registrazione non riuscita. Riprova più tardi.");
     }
-
-    setResult("Account creato con successo.");
-    const destination =
-      data.redirectTo ||
-      (data.role === "COMPANY"
-        ? "/dashboard/company"
-        : data.role === "TRANSPORTER"
-          ? "/dashboard/transporter"
-          : "/dashboard");
-    router.replace(destination);
   };
 
   return (
