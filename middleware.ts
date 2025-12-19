@@ -41,20 +41,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  const { prisma } = await import("@/lib/prisma");
-  const user = await prisma.user.findUnique({
-    where: { id: session.userId },
-    select: { id: true },
-  });
-
-  if (!user) {
-    if (isApiRequest) {
-      return NextResponse.json({ error: "Utente non trovato" }, { status: 404 });
-    }
-
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
   return NextResponse.next();
 }
 
