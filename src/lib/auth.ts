@@ -13,10 +13,10 @@ type SessionPayload = {
 };
 
 function getAuthSecretKey() {
-  const secret = process.env.AUTH_SECRET;
+  const secret = process.env.AUTH_SECRET || "development-secret-change-me";
 
-  if (!secret) {
-    throw new Error("AUTH_SECRET non configurato. Imposta la variabile d'ambiente.");
+  if (!process.env.AUTH_SECRET) {
+    console.warn("AUTH_SECRET non configurato, uso una chiave di sviluppo predefinita.");
   }
 
   return new TextEncoder().encode(secret);
