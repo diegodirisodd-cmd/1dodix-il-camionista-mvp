@@ -45,58 +45,67 @@ export default async function TransporterDashboardPage() {
     redirect("/dashboard");
   }
 
-  if (!user.subscriptionActive) {
-    redirect("/paywall");
-  }
-
-  const [recentRequests, availableLoads, companiesWithLoads] = await Promise.all([
+  const [recentRequests, availableLoads] = await Promise.all([
     prisma.request.findMany({
       orderBy: { createdAt: "desc" },
       include: { company: { select: { email: true } } },
       take: 5,
     }),
     prisma.request.count(),
-    prisma.request.findMany({ distinct: ["companyId"], select: { companyId: true } }),
   ]);
-
-  const contactedCompanies = companiesWithLoads.length;
-  const verificationStatus = {
-    label: "In verifica",
-    message: "Carica documenti e dati aziendali per ottenere il badge verificato e accelerare le conferme.",
-  };
 
   const subscriptionActive = user.subscriptionActive;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <header className="card space-y-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white/80 ring-1 ring-white/15">
-              <span className="rounded-full bg-accent-500/20 px-3 py-1 text-accent-100">Ruolo</span>
-              <span className="text-white/90">Transporter</span>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold text-white/80 ring-1 ring-white/15">
+              <span className="rounded-full bg-accent-500/25 px-3 py-0.5 text-accent-50">Ruolo</span>
+              <span className="text-white/90">Trasportatore</span>
               <span className="text-neutral-200/80">{user.email}</span>
             </div>
             <div className="space-y-2">
-              <h1 className="text-3xl font-semibold text-white lg:text-4xl">Benvenuto nella control room trasportatori</h1>
-              <p className="max-w-4xl text-neutral-100/80">
-                Visualizza carichi disponibili, mantieni l’abbonamento attivo e lavora solo con aziende verificate in un layout premium e ordinato.
+              <h1 className="text-3xl font-semibold text-white lg:text-4xl">Dashboard Trasportatore</h1>
+              <p className="max-w-3xl text-sm text-neutral-100/80 md:text-base">
+                Accedi alle richieste pubblicate da aziende verificate, controlla il tuo abbonamento e muoviti velocemente verso i carichi disponibili.
               </p>
             </div>
           </div>
-          <div className="flex flex-col items-start gap-3 lg:items-end">
+          <div className="flex flex-col items-start gap-2 lg:items-end">
             <a className="btn-primary px-6 py-3 text-base shadow-lg shadow-brand-900/30" href="/dashboard/transporter/requests">
-              Trova carichi
+              Vedi richieste
             </a>
-            <p className="text-sm text-neutral-100/70">Accesso diretto ai carichi pubblicati dalle aziende.</p>
+            <p className="text-xs text-neutral-100/70 sm:text-sm">Accesso rapido ai carichi in piattaforma.</p>
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <StatCard
-            title="Carichi disponibili"
+            title="Stato abbonamento"
+            value={subscriptionActive ? "Attivo" : "Non attivo"}
+            hint={
+              subscriptionActive
+                ? "Contatti e briefing sono sbloccati."
+                : "Contenuti bloccati fino all’attivazione."
+            }
+            accent={subscriptionActive ? "success" : "warning"}
+            action={
+              subscriptionActive ? (
+                <span className="badge-verified">Attivo</span>
+              ) : (
+                <a className="btn-primary px-4 py-2 text-sm" href="/paywall">
+                  Attiva ora
+                </a>
+              )
+            }
+          />
+
+          <StatCard
+            title="Richieste disponibili"
             value={availableLoads.toString()}
-            hint="Richieste pubblicate dalle aziende verificate."
+            hint="Carichi pubblicati dalle aziende con profilo verificato."
             accent="primary"
             action={
               <a className="text-sm font-semibold text-white underline" href="/dashboard/transporter/requests">
@@ -106,38 +115,48 @@ export default async function TransporterDashboardPage() {
           />
 
           <StatCard
-            title="Aziende contattate"
-            value={contactedCompanies.toString()}
-            hint="Account con richieste attive a cui puoi rispondere."
+            title="Azione rapida"
+            value="Vedi richieste"
+            hint="Vai subito all’elenco completo per prenotare i carichi."
             accent="primary"
-          />
-
-          <StatCard
-            title="Stato abbonamento"
-            value={subscriptionActive ? "Attivo" : "Non attivo"}
-            hint={
-              subscriptionActive
-                ? "Contatti e briefing sono sbloccati."
-                : "Completa il pagamento per vedere recapiti e dettagli."
-            }
-            accent={subscriptionActive ? "success" : "warning"}
             action={
-              !subscriptionActive ? (
-                <a className="text-sm font-semibold text-white underline" href="/paywall">
-                  Attiva ora
-                </a>
-              ) : (
-                <span className="badge-verified">Verificato</span>
-              )
+              <a className="btn-secondary px-4 py-2 text-sm" href="/dashboard/transporter/requests">
+                Apri lista
+              </a>
             }
           />
         </div>
       </header>
 
+      {!subscriptionActive ? (
+        <SectionCard
+          title="Contenuto bloccato"
+          description="Serve un abbonamento attivo per sbloccare contatti, briefing e richieste complete."
+          className="border-accent-500/40 bg-gradient-to-r from-brand-900/70 via-brand-800/60 to-brand-700/60"
+        >
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-2 text-neutral-100/90">
+              <p className="text-lg font-semibold text-white">Attiva l’accesso premium</p>
+              <p className="text-sm text-neutral-100/80">
+                Sblocca i dettagli di contatto delle aziende, ricevi briefing completi e prenota i carichi direttamente.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <a className="btn-primary px-6 py-3 text-base shadow-lg shadow-brand-900/40" href="/paywall">
+                Attiva abbonamento
+              </a>
+              <a className="btn-secondary" href="/dashboard/transporter/requests">
+                Visualizza richieste (anteprima)
+              </a>
+            </div>
+          </div>
+        </SectionCard>
+      ) : null}
+
       <section className="grid gap-6 lg:grid-cols-2">
         <SectionCard
           title="Accesso e abbonamento"
-          description="Cosa è incluso e cosa resta bloccato senza pagamento."
+          description="Vedi cosa è incluso e quando i dati restano oscurati."
           className="flex flex-col justify-between"
         >
           <div className="grid gap-4 lg:grid-cols-2">
@@ -153,7 +172,7 @@ export default async function TransporterDashboardPage() {
               <p className="text-xs font-semibold uppercase tracking-wide text-white/80">Senza pagamento</p>
               <p className="mt-1 text-lg font-semibold text-white">Accesso limitato</p>
               <p className="mt-2 text-sm text-neutral-100/80">
-                Vedi solo titoli e percorsi: i contatti restano oscurati. Attiva l’abbonamento per lavorare con le aziende.
+                Titoli e percorsi restano consultabili, ma i contatti sono oscurati. Abbonati per parlare direttamente con le aziende.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <a className="btn-primary" href="/paywall">
@@ -170,7 +189,7 @@ export default async function TransporterDashboardPage() {
         <SectionCard
           title="Affidabilità e verifica"
           description="Metti in evidenza il tuo profilo per creare fiducia con le aziende del network."
-          actions={<span className="badge">{verificationStatus.label}</span>}
+          actions={<span className="badge">In verifica</span>}
           subtle
         >
           <div className="grid gap-4 md:grid-cols-2">
@@ -202,7 +221,7 @@ export default async function TransporterDashboardPage() {
 
       <SectionCard
         title="Carichi pubblicati dalle aziende"
-        description="Incarichi recenti. Contatti disponibili solo ai trasportatori abbonati e verificati."
+        description="Incarichi recenti. I contatti completi sono visibili solo con abbonamento attivo."
         actions={
           <a className="text-sm font-semibold text-accent-200 underline" href="/dashboard/transporter/requests">
             Vedi tutte le richieste
@@ -243,7 +262,7 @@ export default async function TransporterDashboardPage() {
                       ) : (
                         <div className="space-y-2 text-sm text-neutral-200/80">
                           <span className="table-chip warning">Contatti bloccati</span>
-                          <p className="leading-snug">Abbonati per vedere email e telefono del referente.</p>
+                          <p className="leading-snug">Attiva l’abbonamento per sbloccare contatti e briefing.</p>
                         </div>
                       )}
                     </td>
