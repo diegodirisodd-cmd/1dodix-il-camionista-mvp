@@ -26,13 +26,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Credenziali non valide." }, { status: 401 });
     }
 
-    const dashboardPath =
-      user.role === "COMPANY"
-        ? "/dashboard/company"
-        : user.role === "TRANSPORTER"
-          ? "/dashboard/transporter"
-          : "/dashboard";
-
     const sessionToken = await createSessionToken({
       sub: String(user.id),
       email: user.email,
@@ -42,7 +35,7 @@ export async function POST(request: Request) {
       message: "Accesso eseguito.",
       email: user.email,
       role: user.role,
-      redirectTo: dashboardPath,
+      redirectTo: "/dashboard",
     });
     response.cookies.set(buildSessionCookie(sessionToken));
 

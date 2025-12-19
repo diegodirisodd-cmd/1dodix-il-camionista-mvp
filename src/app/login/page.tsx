@@ -18,30 +18,32 @@ export default function LoginPage() {
     setError(null);
 
     const formData = new FormData(event.currentTarget);
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      body: formData,
-    });
 
-    const data = await response.json();
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
 
-    if (!response.ok) {
-      setError(data.error ?? "Accesso non riuscito. Verifica le credenziali.");
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error ?? "Accesso non riuscito. Verifica le credenziali.");
+        setLoading(false);
+        return;
+      }
+
+      const roleInfo = data.role ? ` (ruolo: ${data.role.toLowerCase()})` : "";
+      setResult(`${data.message ?? "Accesso eseguito."}${roleInfo}`);
       setLoading(false);
-      return;
+      const destination = data.redirectTo || "/dashboard";
+      router.replace(destination);
+    } catch (err) {
+      console.error(err);
+      setError("Accesso non riuscito. Riprova.");
+      setLoading(false);
     }
-
-    const roleInfo = data.role ? ` (ruolo: ${data.role.toLowerCase()})` : "";
-    setResult(`${data.message ?? "Accesso eseguito."}${roleInfo}`);
-    setLoading(false);
-    const destination =
-      data.redirectTo ||
-      (data.role === "COMPANY"
-        ? "/dashboard/company"
-        : data.role === "TRANSPORTER"
-          ? "/dashboard/transporter"
-          : "/dashboard");
-    router.replace(destination);
   };
 
   return (
