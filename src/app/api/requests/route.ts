@@ -46,20 +46,12 @@ function sanitizeRequestOutput(request: RequestModel, includeContact: boolean) {
 export async function GET() {
   const user = await getSessionUser();
 
-  if (!user) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
-
-  if (!user.subscriptionActive) {
-    return NextResponse.json({ error: "Abbonamento richiesto" }, { status: 402 });
-  }
-
-  const isCompany = user.role === "COMPANY";
-  const isAdmin = user.role === "ADMIN";
-  const includeContact = isCompany || isAdmin || user.subscriptionActive;
+  const isCompany = user?.role === "COMPANY";
+  const isAdmin = user?.role === "ADMIN";
+  const includeContact = Boolean(isCompany || isAdmin || user?.subscriptionActive);
 
   const requests = await prisma.request.findMany({
-    where: isCompany && !isAdmin ? { companyId: user.id } : undefined,
+    where: isCompany && !isAdmin && user ? { companyId: user.id } : undefined,
     orderBy: { createdAt: "desc" },
   });
 
@@ -79,6 +71,10 @@ export async function POST(request: Request) {
 
   if (user.role !== "COMPANY") {
     return NextResponse.json({ error: "Solo le aziende possono pubblicare richieste" }, { status: 403 });
+  }
+
+  if (!user.subscriptionActive) {
+    return NextResponse.json({ error: "Abbonamento richiesto per creare una richiesta" }, { status: 402 });
   }
 
   const data: RequestPayload = await request.json();

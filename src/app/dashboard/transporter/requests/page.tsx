@@ -26,10 +26,6 @@ export default async function TransporterRequestsPage() {
     redirect("/dashboard");
   }
 
-  if (!user.subscriptionActive) {
-    redirect("/paywall");
-  }
-
   const requests: RequestWithCompany[] = await prisma.request.findMany({
     orderBy: { createdAt: "desc" },
     include: { company: { select: { email: true } } },

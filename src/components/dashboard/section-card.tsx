@@ -7,6 +7,7 @@ type SectionCardProps = {
   children: ReactNode;
   className?: string;
   subtle?: boolean;
+  id?: string;
 };
 
 export function SectionCard({
@@ -16,9 +17,11 @@ export function SectionCard({
   children,
   className,
   subtle,
+  id,
 }: SectionCardProps) {
   return (
     <section
+      id={id}
       className={`${subtle ? "card-muted" : "card"} ${className ?? ""}`.trim()}
     >
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">

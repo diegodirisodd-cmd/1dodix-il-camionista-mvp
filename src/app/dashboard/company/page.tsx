@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { RequestForm } from "@/components/dashboard/request-form";
 import { SectionCard } from "@/components/dashboard/section-card";
 import { getSessionUser } from "@/lib/auth";
@@ -19,9 +20,7 @@ export default async function CompanyDashboardPage({
     redirect("/dashboard");
   }
 
-  if (!user.subscriptionActive) {
-    redirect("/paywall");
-  }
+  const isSubscribed = user.subscriptionActive;
 
   const [companyRequests, verifiedTransporters] = await Promise.all([
     prisma.request.findMany({
@@ -39,12 +38,35 @@ export default async function CompanyDashboardPage({
     : "Nessuna";
   const recentContacts = companyRequests.slice(0, 5);
   const showCreatedBanner = searchParams?.created === "1";
+  const subscriptionLabel = isSubscribed ? "Attivo" : "Non attivo";
+  const subscriptionBadgeClass = isSubscribed
+    ? "bg-success/10 text-success"
+    : "bg-accent-500/15 text-accent-50";
+  const publishHref = isSubscribed ? "#pubblica" : "/paywall";
+  const publishCtaLabel = isSubscribed
+    ? "Apri il form di pubblicazione"
+    : "Attiva l’abbonamento per pubblicare";
 
   return (
     <div className="space-y-10">
       {showCreatedBanner && (
         <div className="rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-success shadow-sm">
           Richiesta creata correttamente. Puoi gestirla qui nella dashboard.
+        </div>
+      )}
+      {!isSubscribed && (
+        <div className="rounded-xl border border-accent-500/30 bg-accent-500/10 px-4 py-3 text-sm text-accent-50 shadow-sm">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-accent-100">
+              Per pubblicare nuove richieste e condividere contatti è necessario attivare l’abbonamento.
+            </p>
+            <Link
+              href="/paywall"
+              className="btn-primary inline-flex w-full justify-center px-4 py-2 text-sm font-semibold sm:w-auto"
+            >
+              Attiva abbonamento
+            </Link>
+          </div>
         </div>
       )}
       <header className="space-y-5 lg:space-y-6">
@@ -112,12 +134,16 @@ export default async function CompanyDashboardPage({
                 Definisci percorso, finestra, carico e contatti per attivare subito i trasportatori verificati.
               </p>
               <a
-                href="#pubblica"
+                href={publishHref}
                 className="btn-primary w-full justify-center px-4 py-3 text-base shadow-lg shadow-brand-900/30"
               >
-                Apri il form di pubblicazione
+                {publishCtaLabel}
               </a>
-              <p className="text-xs text-neutral-200/80">Il pulsante ti porta direttamente al modulo da completare.</p>
+              <p className="text-xs text-neutral-200/80">
+                {isSubscribed
+                  ? "Il pulsante ti porta direttamente al modulo da completare."
+                  : "Servono pochi secondi per attivare l’abbonamento e pubblicare."}
+              </p>
             </div>
           </SectionCard>
         </div>
@@ -146,8 +172,10 @@ export default async function CompanyDashboardPage({
             </div>
             <div className="flex items-start justify-between gap-4">
               <dt className="text-neutral-300">Stato abbonamento</dt>
-              <dd className="inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1 text-xs font-semibold text-success">
-                Attivo
+              <dd
+                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${subscriptionBadgeClass}`}
+              >
+                {subscriptionLabel}
               </dd>
             </div>
           </dl>
@@ -255,8 +283,20 @@ export default async function CompanyDashboardPage({
         <SectionCard
           title="Pubblica una nuova richiesta"
           description="Compila il brief operativo per attivare i trasportatori verificati."
+          id="pubblica"
         >
-          <RequestForm />
+          {isSubscribed ? (
+            <RequestForm />
+          ) : (
+            <div className="space-y-3 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-neutral-100/80">
+              <p>
+                Attiva l’abbonamento per compilare il modulo e inviare nuove richieste ai trasportatori verificati.
+              </p>
+              <Link href="/paywall" className="btn-primary inline-flex w-full justify-center px-4 py-2 text-sm font-semibold">
+                Vai al paywall
+              </Link>
+            </div>
+          )}
         </SectionCard>
       </section>
     </div>

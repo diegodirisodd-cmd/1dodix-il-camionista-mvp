@@ -44,7 +44,7 @@ export async function middleware(request: NextRequest) {
   const { prisma } = await import("@/lib/prisma");
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
-    select: { subscriptionActive: true },
+    select: { id: true },
   });
 
   if (!user) {
@@ -53,14 +53,6 @@ export async function middleware(request: NextRequest) {
     }
 
     return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  if (!user.subscriptionActive) {
-    if (isApiRequest) {
-      return NextResponse.json({ error: "Abbonamento richiesto" }, { status: 402 });
-    }
-
-    return NextResponse.redirect(new URL("/paywall", request.url));
   }
 
   return NextResponse.next();

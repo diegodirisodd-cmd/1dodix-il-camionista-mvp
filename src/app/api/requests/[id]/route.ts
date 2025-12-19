@@ -50,10 +50,6 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
 
-  if (!user.subscriptionActive) {
-    return NextResponse.json({ error: "Abbonamento richiesto" }, { status: 402 });
-  }
-
   const isAdmin = user.role === "ADMIN";
   const requestRecord = await prisma.request.findUnique({ where: { id: Number(params.id) } });
 
@@ -75,7 +71,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 
   if (!user.subscriptionActive) {
-    return NextResponse.json({ error: "Abbonamento richiesto" }, { status: 402 });
+    return NextResponse.json({ error: "Abbonamento richiesto per aggiornare la richiesta" }, { status: 402 });
   }
 
   const existing = await prisma.request.findUnique({ where: { id: Number(params.id) } });
@@ -131,7 +127,7 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
   }
 
   if (!user.subscriptionActive) {
-    return NextResponse.json({ error: "Abbonamento richiesto" }, { status: 402 });
+    return NextResponse.json({ error: "Abbonamento richiesto per eliminare la richiesta" }, { status: 402 });
   }
 
   const existing = await prisma.request.findUnique({ where: { id: Number(params.id) } });

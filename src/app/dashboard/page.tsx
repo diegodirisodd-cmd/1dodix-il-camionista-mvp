@@ -12,10 +12,6 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  if (!user.subscriptionActive) {
-    redirect("/paywall");
-  }
-
   const isAdmin = user.role === "ADMIN";
 
   if (isAdmin) {
