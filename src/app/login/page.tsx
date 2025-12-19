@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
@@ -84,8 +85,15 @@ export default function LoginPage() {
           <div className="space-y-3 text-center">
               <div className="flex justify-center">
                 <div className="inline-flex items-center gap-3 rounded-2xl border border-neutral-200/70 bg-white px-4 py-2 shadow-sm">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 via-brand-500 to-accent-500 shadow-inner">
-                    <span className="text-xl font-black uppercase tracking-tight text-brand-950">DX</span>
+                  <div className="relative h-14 w-14 overflow-hidden rounded-xl bg-neutral-100">
+                    <Image
+                      src="/dodix-logo.svg"
+                      alt="Logo DodiX"
+                      fill
+                      sizes="56px"
+                      className="object-contain"
+                      priority
+                    />
                   </div>
                   <div className="text-left leading-tight">
                     <p className="text-[11px] uppercase tracking-[0.3em] text-neutral-500">DodiX</p>

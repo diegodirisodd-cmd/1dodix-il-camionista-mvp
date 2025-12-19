@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Image from "next/image";
 import Link from "next/link";
 
 import { getSessionUser } from "@/lib/auth";
@@ -53,8 +54,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <div className="flex items-center justify-between gap-4">
                 <Link href="/" className="flex items-center gap-3">
                   <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 shadow-card transition hover:border-white/20 hover:bg-white/10">
-                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-brand-400 via-brand-500 to-accent-500 shadow-inner">
-                      <span className="text-lg font-black uppercase tracking-tight text-brand-950">DX</span>
+                    <div className="relative h-11 w-11 overflow-hidden rounded-xl bg-white/10 shadow-inner">
+                      <Image
+                        src="/dodix-logo.svg"
+                        alt="Logo DodiX"
+                        fill
+                        sizes="44px"
+                        className="object-cover"
+                        priority
+                      />
                     </div>
                     <div className="leading-tight text-left">
                       <div className="text-[11px] uppercase tracking-[0.32em] text-neutral-200">DodiX</div>
