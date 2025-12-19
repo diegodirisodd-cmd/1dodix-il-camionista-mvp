@@ -37,53 +37,77 @@ export default async function CompanyDashboardPage() {
 
   return (
     <div className="space-y-10">
-      <header className="card space-y-5 lg:space-y-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white/80 ring-1 ring-white/15">
-              <span className="rounded-full bg-accent-500/20 px-3 py-1 text-accent-100">Ruolo</span>
-              <span className="text-white/90">Company</span>
-              <span className="text-neutral-200/80">{user.email}</span>
-            </div>
-            <div className="space-y-2">
-              <h1 className="text-3xl font-semibold leading-tight text-white lg:text-4xl">
-                Benvenuto nella tua area aziendale
-              </h1>
-              <p className="max-w-3xl text-neutral-100/80">
-                Gestisci richieste, contatti verificati e il tuo abbonamento da un layout pulito, pronto per i team commerciali.
-              </p>
-            </div>
+      <header className="space-y-5 lg:space-y-6">
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-2 rounded-full bg-brand-900/20 px-4 py-2 text-xs font-semibold text-brand-50 ring-1 ring-brand-900/30">
+            <span className="rounded-full bg-accent-500/20 px-3 py-1 text-accent-100">Azienda</span>
+            <span className="text-brand-50">{user.email}</span>
           </div>
-          <div className="flex flex-col items-start gap-3 lg:items-end">
-            <a href="#pubblica" className="btn-primary px-6 py-3 text-base shadow-lg shadow-brand-900/30">
-              Pubblica una richiesta
-              <span aria-hidden>→</span>
-            </a>
-            <p className="text-sm text-neutral-100/70">Raggiungi trasportatori verificati in pochi minuti.</p>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-semibold leading-tight text-white lg:text-4xl">
+              Dashboard Azienda
+            </h1>
+            <p className="max-w-3xl text-base text-neutral-100/80 lg:text-lg">
+              Pubblica richieste di trasporto, ricevi trasportatori verificati e mantieni sotto controllo le tue operazioni in un ambiente B2B pulito e strutturato.
+            </p>
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          <SectionCard title="Richieste attive" description="Annunci pubblicati e visibili ai trasportatori." subtle>
-            <div className="flex items-center justify-between">
-              <p className="text-4xl font-semibold text-white">{activeRequests}</p>
-              <span className="rounded-full bg-white/5 px-3 py-1 text-xs font-semibold text-neutral-100/80">Aggiornato</span>
+          <SectionCard
+            title="Profilo azienda"
+            description="Dati chiave per le verifiche e la collaborazione."
+            subtle
+          >
+            <dl className="space-y-3 text-sm text-neutral-100/80">
+              <div className="flex items-start justify-between gap-4">
+                <dt className="text-neutral-300">Email</dt>
+                <dd className="font-semibold text-white">{user.email}</dd>
+              </div>
+              <div className="flex items-start justify-between gap-4">
+                <dt className="text-neutral-300">Ruolo</dt>
+                <dd className="rounded-full bg-white/5 px-3 py-1 text-xs font-semibold uppercase text-white">{user.role}</dd>
+              </div>
+              <div className="flex items-start justify-between gap-4">
+                <dt className="text-neutral-300">Iscritto dal</dt>
+                <dd className="font-semibold text-white">
+                  {new Date(user.createdAt).toLocaleDateString("it-IT")}
+                </dd>
+              </div>
+            </dl>
+            <div className="mt-4 rounded-lg bg-white/5 px-4 py-3 text-xs text-neutral-100/70">
+              Mantieni le informazioni aziendali aggiornate per velocizzare gli accordi con i trasportatori.
+            </div>
+          </SectionCard>
+
+          <SectionCard
+            title="Richieste attive"
+            description="Annunci visibili ai trasportatori verificati."
+            subtle
+          >
+            <div className="flex items-end justify-between gap-3">
+              <p className="text-5xl font-semibold text-white">{activeRequests}</p>
+              <span className="rounded-full bg-success/10 px-3 py-1 text-xs font-semibold text-success">Aggiornato</span>
             </div>
             <p className="text-sm text-neutral-200/80">Ultima pubblicazione: {lastPublication}</p>
           </SectionCard>
-          <SectionCard title="Trasportatori verificati" description="Iscritti con abbonamento attivo." subtle>
-            <div className="flex items-center justify-between">
-              <p className="text-4xl font-semibold text-white">{verifiedTransporters}</p>
-              <span className="rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success">Pronti</span>
+
+          <SectionCard
+            title="Pubblica nuova richiesta"
+            description="Ingaggia trasportatori verificati con un brief chiaro."
+            subtle
+          >
+            <div className="flex flex-col gap-3">
+              <p className="text-sm text-neutral-100/80">
+                Definisci percorso, budget e contatti per ricevere risposte rapide dai partner verificati.
+              </p>
+              <a
+                href="#pubblica"
+                className="btn-primary w-full justify-center px-4 py-3 text-base shadow-lg shadow-brand-900/30"
+              >
+                Pubblica nuova richiesta
+              </a>
             </div>
-            <p className="text-sm text-neutral-200/80">Disponibili per assegnazione immediata</p>
-          </SectionCard>
-          <SectionCard title="Abbonamento" description="Stato attuale dell’account." subtle>
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-lg font-semibold text-success">Attivo</p>
-              <span className="rounded-full bg-white/5 px-3 py-1 text-xs font-semibold text-white/80">Accesso premium</span>
-            </div>
-            <p className="text-sm text-neutral-200/80">Contatti e documenti sbloccati.</p>
           </SectionCard>
         </div>
       </header>
