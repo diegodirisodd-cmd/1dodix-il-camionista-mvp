@@ -5,8 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition, useState } from "react";
 
-import { actionRegister } from "@/app/actions/auth";
-
 export default function RegisterPage() {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -18,15 +16,27 @@ export default function RegisterPage() {
     setError(null);
 
     startTransition(async () => {
-      const response = await actionRegister(formData);
+      try {
+        const payload = Object.fromEntries(formData.entries());
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-      if (response.error) {
-        setError(response.error);
-        return;
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data?.error ?? "Registrazione non riuscita. Riprova.");
+          return;
+        }
+
+        setResult("Account creato con successo. Accedi per continuare.");
+        router.replace("/login");
+      } catch (err) {
+        console.error("Errore durante la registrazione", err);
+        setError("Registrazione non riuscita. Controlla i dati e riprova.");
       }
-
-      setResult("Account creato con successo. Accedi per continuare.");
-      router.replace("/login");
     });
   };
 

@@ -5,8 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import { actionLogin } from "@/app/actions/auth";
-
 export default function LoginPage() {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -18,15 +16,28 @@ export default function LoginPage() {
     setError(null);
 
     startTransition(async () => {
-      const response = await actionLogin(formData);
+      try {
+        const payload = Object.fromEntries(formData.entries());
 
-      if (response.error) {
-        setError(response.error);
-        return;
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data?.error ?? "Email o password non valide");
+          return;
+        }
+
+        setResult("Accesso eseguito.");
+        router.replace(data?.redirectTo ?? "/dashboard");
+      } catch (err) {
+        console.error("Errore durante il login", err);
+        setError("Accesso non riuscito. Riprova tra qualche istante.");
       }
-
-      setResult("Accesso eseguito.");
-      router.replace(response.redirectTo ?? "/dashboard");
     });
   };
 

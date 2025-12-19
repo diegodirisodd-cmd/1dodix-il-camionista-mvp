@@ -6,21 +6,21 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
-    const formData = await request.formData();
-    const email = (formData.get("email") as string | null)?.toLowerCase().trim();
-    const password = (formData.get("password") as string | null)?.trim();
+    const { email, password } = await request.json();
+    const normalizedEmail = (email as string | undefined)?.toLowerCase().trim();
+    const normalizedPassword = (password as string | undefined)?.trim();
 
-    if (!email || !password) {
+    if (!normalizedEmail || !normalizedPassword) {
       return NextResponse.json({ error: "Email e password sono obbligatorie." }, { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
 
     if (!user) {
       return NextResponse.json({ error: "Credenziali non valide." }, { status: 401 });
     }
 
-    const passwordMatches = await compare(password, user.password);
+    const passwordMatches = await compare(normalizedPassword, user.password);
 
     if (!passwordMatches) {
       return NextResponse.json({ error: "Credenziali non valide." }, { status: 401 });
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       message: "Accesso eseguito.",
       email: user.email,
       role: user.role,
-      redirectTo: "/dashboard",
+      redirectTo: user.role === "COMPANY" ? "/dashboard/company" : "/dashboard/transporter",
     });
     response.cookies.set(buildSessionCookie(sessionToken));
 
