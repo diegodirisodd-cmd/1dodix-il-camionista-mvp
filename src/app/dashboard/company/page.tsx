@@ -211,8 +211,8 @@ export default async function CompanyDashboardPage({
                   <tr>
                     <th>Titolo</th>
                     <th>Percorso</th>
-                    <th>Finestra</th>
                     <th>Carico</th>
+                    <th>Budget</th>
                     <th>Contatto</th>
                     <th>Pubblicata</th>
                   </tr>
@@ -224,13 +224,8 @@ export default async function CompanyDashboardPage({
                       <td className="whitespace-nowrap text-neutral-100/80">
                         {request.pickup} → {request.dropoff}
                       </td>
-                      <td className="whitespace-nowrap text-neutral-100/80">{request.timeWindow}</td>
-                      <td className="whitespace-nowrap text-neutral-100/80">
-                        <div className="space-y-1">
-                          <div className="font-semibold text-white">{request.cargoType}</div>
-                          <div className="text-xs text-neutral-200/80">{request.estimatedWeight}</div>
-                        </div>
-                      </td>
+                      <td className="whitespace-nowrap text-neutral-100/80">{request.cargo || "—"}</td>
+                      <td className="whitespace-nowrap text-neutral-100/80">{request.budget || "—"}</td>
                       <td className="whitespace-nowrap text-neutral-100/80">
                         <div className="space-y-1 text-sm">
                           <div className="font-semibold text-white">{request.contactName}</div>

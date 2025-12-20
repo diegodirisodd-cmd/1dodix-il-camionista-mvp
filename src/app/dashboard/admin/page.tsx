@@ -142,7 +142,6 @@ export default async function AdminDashboardPage() {
             <thead>
               <tr>
                 <th>Rotta</th>
-                <th>Finestra</th>
                 <th>Carico</th>
                 <th>Azienda</th>
                 <th>Budget</th>
@@ -156,11 +155,7 @@ export default async function AdminDashboardPage() {
                     <div className="font-semibold text-white">{request.pickup} → {request.dropoff}</div>
                     <div className="text-xs text-neutral-300">{request.title}</div>
                   </td>
-                  <td className="text-sm text-neutral-100/80">{request.timeWindow || "—"}</td>
-                  <td className="space-y-1 text-sm text-neutral-100/80">
-                    <div className="font-semibold text-white">{request.cargoType}</div>
-                    <div className="text-xs text-neutral-300">{request.estimatedWeight}</div>
-                  </td>
+                  <td className="space-y-1 text-sm text-neutral-100/80">{request.cargo || "—"}</td>
                   <td className="space-y-1 text-sm text-neutral-100/80">
                     <div className="font-semibold text-white">{request.company.email}</div>
                     <div className="text-xs text-neutral-300">{formatRole(request.company.role)}</div>

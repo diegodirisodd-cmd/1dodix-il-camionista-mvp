@@ -8,20 +8,15 @@ import { prisma } from "@/lib/prisma";
 const REQUIRED_FIELDS = [
   "pickup",
   "dropoff",
-  "timeWindow",
-  "cargoType",
-  "estimatedWeight",
   "contactName",
   "contactPhone",
   "contactEmail",
 ] as const;
 
 type RequestPayload = {
+  title?: string;
   pickup?: string;
   dropoff?: string;
-  timeWindow?: string;
-  cargoType?: string;
-  estimatedWeight?: string;
   cargo?: string;
   budget?: string;
   description?: string;
@@ -73,10 +68,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Solo le aziende possono pubblicare richieste" }, { status: 403 });
   }
 
-  if (!user.subscriptionActive) {
-    return NextResponse.json({ error: "Abbonamento richiesto per creare una richiesta" }, { status: 402 });
-  }
-
   const data: RequestPayload = await request.json();
   const missingFields = REQUIRED_FIELDS.filter((field) => !data[field]);
 
@@ -95,9 +86,6 @@ export async function POST(request: Request) {
         title: derivedTitle,
         pickup: data.pickup!,
         dropoff: data.dropoff!,
-        timeWindow: data.timeWindow!,
-        cargoType: data.cargoType!,
-        estimatedWeight: data.estimatedWeight!,
         cargo: data.cargo,
         budget: data.budget,
         description: data.description,

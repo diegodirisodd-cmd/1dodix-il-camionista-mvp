@@ -46,7 +46,7 @@ export default async function TransporterRequestsPage() {
 
       <SectionCard
         title="Elenco incarichi"
-        description="Percorso, finestra temporale e dettagli carico"
+        description="Percorso, dettagli carico e recapiti"
         actions={<span className="badge">{displayRequests.length} richieste</span>}
       >
         {displayRequests.length === 0 ? (
@@ -54,7 +54,7 @@ export default async function TransporterRequestsPage() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {displayRequests.map((request) => {
-              const dateLabel = request.timeWindow || new Date(request.createdAt).toLocaleDateString("it-IT");
+              const dateLabel = new Date(request.createdAt).toLocaleDateString("it-IT");
 
               return (
                 <div
@@ -86,9 +86,8 @@ export default async function TransporterRequestsPage() {
                         <span>{request.dropoff}</span>
                       </div>
                       <div className="flex flex-wrap gap-2 text-neutral-200/90">
-                        <span className="table-chip">{request.cargoType || "Carico"}</span>
-                        <span className="table-chip">{request.estimatedWeight || "Peso / Volume"}</span>
-                        {request.timeWindow ? <span className="table-chip">{request.timeWindow}</span> : null}
+                        {request.cargo ? <span className="table-chip">{request.cargo}</span> : null}
+                        {request.budget ? <span className="table-chip">Budget {request.budget}</span> : null}
                       </div>
                       <p className="text-sm text-neutral-200/80 line-clamp-3">{request.description || "Nessuna descrizione aggiuntiva."}</p>
                     </div>

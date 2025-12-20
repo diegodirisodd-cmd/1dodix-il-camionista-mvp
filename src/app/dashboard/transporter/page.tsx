@@ -245,7 +245,7 @@ export default async function TransporterDashboardPage() {
                   <tr>
                     <th>Titolo</th>
                     <th>Percorso</th>
-                    <th>Finestra</th>
+                    <th>Budget</th>
                     <th>Contatti</th>
                   </tr>
               </thead>
@@ -256,7 +256,7 @@ export default async function TransporterDashboardPage() {
                     <td className="whitespace-nowrap text-neutral-100/80">
                       {request.pickup} → {request.dropoff}
                     </td>
-                    <td className="whitespace-nowrap text-neutral-100/80">{request.timeWindow}</td>
+                    <td className="whitespace-nowrap text-neutral-100/80">{request.budget || "—"}</td>
                     <td className="text-neutral-100/80">
                       {subscriptionActive ? (
                         <div className="space-y-2 text-sm">

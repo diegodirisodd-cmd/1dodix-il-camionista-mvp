@@ -6,9 +6,6 @@ import { useRouter } from "next/navigation";
 const INITIAL_STATE = {
   pickup: "",
   dropoff: "",
-  timeWindow: "",
-  cargoType: "",
-  estimatedWeight: "",
   cargo: "",
   budget: "",
   description: "",
@@ -80,49 +77,35 @@ export function RequestForm() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="form-field">
-          <span className="label">Data o finestra oraria*</span>
+          <span className="label">Tipologia o note sul carico (opzionale)</span>
           <input
-            required
             className="input-field"
-            value={form.timeWindow}
-            onChange={(e) => updateField("timeWindow", e.target.value)}
-            placeholder="12 marzo, fascia mattina"
+            value={form.cargo}
+            onChange={(e) => updateField("cargo", e.target.value)}
+            placeholder="Pallet, alimentari, ADR, ecc."
           />
         </label>
         <label className="form-field">
-          <span className="label">Tipo di carico*</span>
+          <span className="label">Budget (opzionale)</span>
           <input
-            required
             className="input-field"
-            value={form.cargoType}
-            onChange={(e) => updateField("cargoType", e.target.value)}
-            placeholder="Alimentari, pallet, ADR, ecc."
+            value={form.budget}
+            onChange={(e) => updateField("budget", e.target.value)}
+            placeholder="Es. 750€"
           />
         </label>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <label className="form-field">
-          <span className="label">Peso/volume stimato*</span>
-          <input
-            required
-            className="input-field"
-            value={form.estimatedWeight}
-            onChange={(e) => updateField("estimatedWeight", e.target.value)}
-            placeholder="Es. 8 pallet / 12 ql"
-          />
-        </label>
-        <label className="form-field">
-          <span className="label">Descrizione (opzionale)</span>
-          <textarea
-            className="input-field"
-            rows={3}
-            value={form.description}
-            onChange={(e) => updateField("description", e.target.value)}
-            placeholder="Note di accesso, orari di carico, ecc."
-          />
-        </label>
-      </div>
+      <label className="form-field">
+        <span className="label">Descrizione (opzionale)</span>
+        <textarea
+          className="input-field"
+          rows={3}
+          value={form.description}
+          onChange={(e) => updateField("description", e.target.value)}
+          placeholder="Note di accesso, vincoli, orari preferiti, ecc."
+        />
+      </label>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <label className="form-field">
