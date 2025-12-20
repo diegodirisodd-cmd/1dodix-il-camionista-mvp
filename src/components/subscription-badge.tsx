@@ -42,12 +42,12 @@ export function SubscriptionBadge({
   const content: { label: string; color: string; icon: ReactNode } = active
     ? {
         label: "Abbonamento attivo",
-        color: "bg-gradient-to-r from-green-500 via-emerald-500 to-brand-600 text-white ring-1 ring-white/20 shadow-lg shadow-brand-900/30",
+        color: "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200",
         icon: icon === "lightning" ? <IconLightning /> : <IconCheck />,
       }
     : {
         label: "Funzionalità premium bloccate",
-        color: "bg-white/5 text-neutral-200 ring-1 ring-white/10",
+        color: "bg-amber-100 text-amber-700 ring-1 ring-amber-200",
         icon: <IconLightning />,
       };
 
@@ -55,7 +55,7 @@ export function SubscriptionBadge({
     <div
       className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wide ${content.color} ${className}`.trim()}
     >
-      <span className="inline-flex items-center justify-center rounded-full bg-white/15 p-1 text-white">
+      <span className="inline-flex items-center justify-center rounded-full bg-white/60 p-1 text-current">
         {content.icon}
       </span>
       <span>{content.label}</span>

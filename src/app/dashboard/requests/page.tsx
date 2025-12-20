@@ -17,15 +17,17 @@ export default async function RequestsHubPage() {
 
   return (
     <section className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Richieste</p>
-          <h1>Gestione richieste</h1>
-          <p className="text-neutral-100/80">
-            Accedi rapidamente alle richieste di trasporto in base al tuo ruolo. I contatti completi sono disponibili per gli utenti abbonati.
-          </p>
+      <div className="card space-y-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-slate-500">Richieste</p>
+            <h1 className="text-3xl font-semibold text-slate-900">Gestione richieste</h1>
+            <p className="text-sm leading-relaxed text-slate-600">
+              Accedi alle richieste di trasporto in base al tuo ruolo. I contatti completi sono disponibili per gli utenti abbonati.
+            </p>
+          </div>
+          <SubscriptionBadge active={user.subscriptionActive} className="self-start" />
         </div>
-        <SubscriptionBadge active={user.subscriptionActive} className="self-start" />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -33,14 +35,12 @@ export default async function RequestsHubPage() {
           <div className="card space-y-3">
             <div className="flex items-center justify-between gap-2">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-accent-200">Azienda</p>
-                <p className="text-lg font-semibold">Le tue richieste</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Azienda</p>
+                <h2 className="text-lg font-semibold text-slate-900">Le tue richieste</h2>
               </div>
-              <span className="rounded-full bg-accent-500/15 px-3 py-1 text-xs font-semibold text-accent-100">
-                Pubblica
-              </span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Pubblica</span>
             </div>
-            <p className="text-sm text-neutral-200">
+            <p className="text-sm text-slate-600">
               Crea nuove richieste o controlla quelle esistenti dalla dashboard aziendale.
             </p>
             <div className="flex flex-wrap gap-2">
@@ -58,14 +58,12 @@ export default async function RequestsHubPage() {
           <div className="card space-y-3">
             <div className="flex items-center justify-between gap-2">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-accent-200">Trasportatore</p>
-                <p className="text-lg font-semibold">Richieste disponibili</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Trasportatore</p>
+                <h2 className="text-lg font-semibold text-slate-900">Richieste disponibili</h2>
               </div>
-              <span className="rounded-full bg-accent-500/15 px-3 py-1 text-xs font-semibold text-accent-100">
-                Consulta
-              </span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Consulta</span>
             </div>
-            <p className="text-sm text-neutral-200">
+            <p className="text-sm text-slate-600">
               Vedi le richieste pubblicate dalle aziende e contatta i referenti se il tuo abbonamento è attivo.
             </p>
             <div className="flex flex-wrap gap-2">
@@ -83,12 +81,12 @@ export default async function RequestsHubPage() {
           <div className="card space-y-3 sm:col-span-2">
             <div className="flex items-center justify-between gap-2">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-accent-200">Admin</p>
-                <p className="text-lg font-semibold">Supervisione richieste</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Admin</p>
+                <h2 className="text-lg font-semibold text-slate-900">Supervisione richieste</h2>
               </div>
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white">Solo lettura</span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Solo lettura</span>
             </div>
-            <p className="text-sm text-neutral-200">
+            <p className="text-sm text-slate-600">
               Consulta l’intero elenco delle richieste per monitorare l’attività della piattaforma.
             </p>
             <Link className="btn btn-secondary" href="/dashboard/admin">

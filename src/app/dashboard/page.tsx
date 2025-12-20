@@ -24,15 +24,15 @@ export default async function DashboardPage() {
 
   return (
     <section className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
-          <p className="text-sm font-semibold text-slate-500">Dashboard</p>
-          <h1 className="text-2xl font-semibold text-slate-900">Benvenuto in DodiX</h1>
-          <p className="text-sm leading-relaxed text-slate-600">
-            Qui trovi il controllo rapido su profilo, richieste e abbonamento. Usa le azioni veloci per iniziare subito.
-          </p>
-        </div>
-        <div className="flex justify-end">
+      <div className="card space-y-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-slate-500">Dashboard</p>
+            <h1 className="text-3xl font-semibold text-slate-900">Benvenuto in DodiX</h1>
+            <p className="text-sm leading-relaxed text-slate-600">
+              Controlla profilo, richieste e abbonamento in un’unica panoramica. Usa le azioni rapide per andare subito alla sezione corretta.
+            </p>
+          </div>
           <SubscriptionBadge active={user.subscriptionActive} className="self-start" />
         </div>
       </div>
@@ -40,8 +40,8 @@ export default async function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="card space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Profilo</p>
-          <p className="text-base font-semibold text-slate-900">Dati account</p>
-          <p className="text-sm leading-relaxed text-slate-600">Email, ruolo e storicità in un unico posto.</p>
+          <h2 className="text-lg font-semibold text-slate-900">Dati account</h2>
+          <p className="text-sm leading-relaxed text-slate-600">Email, ruolo e storicità sempre aggiornati.</p>
           <Link className="btn btn-secondary" href="/dashboard/profile">
             Gestisci profilo
           </Link>
@@ -49,7 +49,7 @@ export default async function DashboardPage() {
 
         <div className="card space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Richieste</p>
-          <p className="text-base font-semibold text-slate-900">Operatività</p>
+          <h2 className="text-lg font-semibold text-slate-900">Operatività</h2>
           <p className="text-sm leading-relaxed text-slate-600">Pubblica incarichi se sei azienda o consulta quelli disponibili.</p>
           <Link className="btn btn-primary" href={requestHref}>
             {requestCtaLabel}
@@ -58,8 +58,8 @@ export default async function DashboardPage() {
 
         <div className="card space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Abbonamento</p>
-          <p className="text-base font-semibold text-slate-900">Accesso premium</p>
-          <p className="text-sm leading-relaxed text-slate-600">Vedi lo stato e attiva subito se necessario.</p>
+          <h2 className="text-lg font-semibold text-slate-900">Accesso premium</h2>
+          <p className="text-sm leading-relaxed text-slate-600">Controlla lo stato e attiva l’accesso se necessario.</p>
           <Link className="btn btn-secondary" href="/dashboard/subscription">
             {subscriptionCta}
           </Link>
@@ -67,7 +67,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="card space-y-3 text-sm leading-relaxed text-slate-700">
-        <p className="text-base font-semibold text-slate-900">Dati rapidi</p>
+        <h2 className="text-lg font-semibold text-slate-900">Dati rapidi</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Ruolo</p>

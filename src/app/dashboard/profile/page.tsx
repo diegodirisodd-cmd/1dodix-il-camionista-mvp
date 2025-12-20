@@ -14,34 +14,36 @@ export default async function ProfilePage() {
 
   return (
     <section className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Profilo</p>
-          <h1>Dettagli account</h1>
-          <p className="text-neutral-100/80">
-            Accesso verificato per {user.email}. Gestisci le tue informazioni principali da questa sezione.
-          </p>
+      <div className="card space-y-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-slate-500">Profilo</p>
+            <h1 className="text-3xl font-semibold text-slate-900">Dettagli account</h1>
+            <p className="text-sm leading-relaxed text-slate-600">
+              Accesso verificato per {user.email}. Gestisci le tue informazioni principali da questa sezione.
+            </p>
+          </div>
+          <SubscriptionBadge
+            active={user.subscriptionActive}
+            className="self-start"
+            icon={user.subscriptionActive ? "lightning" : "check"}
+          />
         </div>
-        <SubscriptionBadge
-          active={user.subscriptionActive}
-          className="self-start"
-          icon={user.subscriptionActive ? "lightning" : "check"}
-        />
       </div>
 
-      <div className="card space-y-6 text-sm text-neutral-100/80">
+      <div className="card space-y-6 text-sm text-slate-700">
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-200">Ruolo</p>
-            <p className="text-base font-semibold text-white">{user.role}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Ruolo</p>
+            <p className="text-base font-semibold text-slate-900">{user.role}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-200">Creato il</p>
-            <p className="text-base font-semibold text-white">{new Date(user.createdAt).toLocaleString("it-IT")}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Creato il</p>
+            <p className="text-base font-semibold text-slate-900">{new Date(user.createdAt).toLocaleString("it-IT")}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-200">Stato abbonamento</p>
-            <p className="text-base font-semibold text-white">{user.subscriptionActive ? "Attivo" : "Non attivo"}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Stato abbonamento</p>
+            <p className="text-base font-semibold text-slate-900">{user.subscriptionActive ? "Attivo" : "Non attivo"}</p>
           </div>
         </div>
 
