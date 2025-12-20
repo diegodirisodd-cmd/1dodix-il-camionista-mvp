@@ -70,7 +70,7 @@ export default async function TransporterDashboardPage() {
             <div className="space-y-2">
               <h1 className="text-3xl font-semibold text-white lg:text-4xl">Dashboard Trasportatore</h1>
               <p className="max-w-3xl text-sm text-neutral-100/80 md:text-base">
-                Consulta incarichi pubblicati da aziende verificate, mantieni attivo l’abbonamento e seleziona subito i carichi pertinenti.
+                Consulta gli incarichi delle aziende verificate, scegli i carichi pertinenti e mantieni l’accesso attivo ai contatti.
               </p>
             </div>
           </div>
@@ -82,9 +82,9 @@ export default async function TransporterDashboardPage() {
             />
             <div className="flex flex-col items-start gap-2 lg:items-end">
               <a className="btn-primary px-6 py-3 text-base shadow-lg shadow-brand-900/30" href="/dashboard/transporter/requests">
-                Apri elenco carichi
+                Vedi richieste
               </a>
-              <p className="text-xs text-neutral-100/70 sm:text-sm">Vai direttamente alle richieste disponibili e valuta le tratte.</p>
+              <p className="text-xs text-neutral-100/70 sm:text-sm">Vai subito all’elenco e scegli le tratte più adatte.</p>
             </div>
           </div>
         </div>
@@ -113,23 +113,23 @@ export default async function TransporterDashboardPage() {
           <StatCard
             title="Richieste disponibili"
             value={availableLoads.toString()}
-            hint="Carichi pubblicati da aziende con profilo verificato."
+            hint="Carichi pubblicati da aziende verificate, aggiornati in tempo reale."
             accent="primary"
             action={
               <a className="text-sm font-semibold text-white underline" href="/dashboard/transporter/requests">
-                Consulta richieste
+                Vedi richieste
               </a>
             }
           />
 
           <StatCard
-            title="Priorità operativa"
+            title="Azione rapida"
             value="Apri richieste"
-            hint="Accedi all’elenco completo e blocca i carichi pertinenti."
+            hint="Accedi all’elenco completo e blocca i carichi che ti interessano."
             accent="primary"
             action={
               <a className="btn-secondary px-4 py-2 text-sm" href="/dashboard/transporter/requests">
-                Vai alle richieste
+                Vedi richieste
               </a>
             }
           />

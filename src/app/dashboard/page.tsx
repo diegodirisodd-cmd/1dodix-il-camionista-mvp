@@ -18,6 +18,10 @@ export default async function DashboardPage() {
     redirect("/dashboard/admin");
   }
 
+  const requestCtaLabel = user.role === "COMPANY" ? "Crea richiesta" : "Vedi richieste";
+  const requestHref = user.role === "COMPANY" ? "/dashboard/company#pubblica" : "/dashboard/requests";
+  const subscriptionCta = user.subscriptionActive ? "Gestisci abbonamento" : "Attiva abbonamento";
+
   return (
     <section className="space-y-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -25,7 +29,7 @@ export default async function DashboardPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Dashboard</p>
           <h1>Benvenuto in DodiX</h1>
           <p className="text-neutral-100/80">
-            Gestisci profilo, richieste e abbonamento da un’unica area. Usa le scorciatoie sotto per andare subito dove ti serve.
+            Qui trovi il controllo rapido su profilo, richieste e abbonamento. Usa le azioni veloci per iniziare subito.
           </p>
         </div>
         <SubscriptionBadge active={user.subscriptionActive} className="self-start" />
@@ -34,28 +38,28 @@ export default async function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="card space-y-2">
           <p className="text-xs uppercase tracking-[0.2em] text-neutral-200">Profilo</p>
-          <p className="text-lg font-semibold text-white">Riepilogo account</p>
-          <p className="text-sm text-neutral-300">Controlla ruolo, email e dati di creazione.</p>
+          <p className="text-lg font-semibold text-white">Dati account</p>
+          <p className="text-sm text-neutral-300">Email, ruolo e storicità in un unico posto.</p>
           <Link className="btn btn-secondary" href="/dashboard/profile">
-            Vai al profilo
+            Gestisci profilo
           </Link>
         </div>
 
         <div className="card space-y-2">
           <p className="text-xs uppercase tracking-[0.2em] text-neutral-200">Richieste</p>
-          <p className="text-lg font-semibold text-white">Area operativa</p>
-          <p className="text-sm text-neutral-300">Pubblica incarichi o consulta quelli disponibili.</p>
-          <Link className="btn btn-secondary" href="/dashboard/requests">
-            Vai alle richieste
+          <p className="text-lg font-semibold text-white">Operatività</p>
+          <p className="text-sm text-neutral-300">Pubblica incarichi se sei azienda o consulta quelli disponibili.</p>
+          <Link className="btn btn-primary" href={requestHref}>
+            {requestCtaLabel}
           </Link>
         </div>
 
         <div className="card space-y-2">
           <p className="text-xs uppercase tracking-[0.2em] text-neutral-200">Abbonamento</p>
-          <p className="text-lg font-semibold text-white">Gestisci accesso</p>
-          <p className="text-sm text-neutral-300">Controlla stato e rinnova se necessario.</p>
-          <Link className="btn btn-primary" href="/dashboard/subscription">
-            Gestisci abbonamento
+          <p className="text-lg font-semibold text-white">Accesso premium</p>
+          <p className="text-sm text-neutral-300">Vedi lo stato e attiva subito se necessario.</p>
+          <Link className="btn btn-secondary" href="/dashboard/subscription">
+            {subscriptionCta}
           </Link>
         </div>
       </div>

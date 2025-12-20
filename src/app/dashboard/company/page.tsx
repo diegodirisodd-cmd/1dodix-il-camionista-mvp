@@ -44,9 +44,7 @@ export default async function CompanyDashboardPage({
     ? "bg-success/10 text-success"
     : "bg-accent-500/15 text-accent-50";
   const publishHref = isSubscribed ? "#pubblica" : "/paywall";
-  const publishCtaLabel = isSubscribed
-    ? "Apri il form di pubblicazione"
-    : "Attiva l’abbonamento per pubblicare";
+  const publishCtaLabel = isSubscribed ? "Crea richiesta" : "Attiva abbonamento";
 
   return (
     <div className="space-y-10">
@@ -82,7 +80,7 @@ export default async function CompanyDashboardPage({
                 Dashboard Azienda
               </h1>
               <p className="max-w-3xl text-base text-neutral-100/80 lg:text-lg">
-                Pianifica incarichi di trasporto, ricevi risposte da trasportatori verificati e governa i contatti in modo diretto e documentato.
+                Pubblica incarichi, ricevi contatti di trasportatori verificati e gestisci tutto da un’unica area.
               </p>
             </div>
           </div>
@@ -96,7 +94,7 @@ export default async function CompanyDashboardPage({
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <SectionCard
             title="Profilo azienda"
-            description="Dati essenziali per verifiche e onboarding con i partner."
+            description="Mostra subito chi sei a trasportatori e partner."
             subtle
           >
             <dl className="space-y-3 text-sm text-neutral-100/80">
@@ -139,7 +137,7 @@ export default async function CompanyDashboardPage({
           >
             <div className="flex flex-col gap-3">
               <p className="text-sm text-neutral-100/80">
-                Definisci percorso, finestra, carico e contatti per attivare subito i trasportatori verificati.
+                Inserisci percorso, finestra e contatti: in pochi minuti la richiesta è pronta per i trasportatori verificati.
               </p>
               <a
                 href={publishHref}
