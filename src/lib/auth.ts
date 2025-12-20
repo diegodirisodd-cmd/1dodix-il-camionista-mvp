@@ -3,13 +3,15 @@ import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
+import { type Role } from "./roles";
+
 export const SESSION_COOKIE_NAME = "dodix_session";
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 giorni
 
 type SessionPayload = {
   sub: string;
   email: string;
-  role: string;
+  role: Role;
 };
 
 function getAuthSecretKey() {

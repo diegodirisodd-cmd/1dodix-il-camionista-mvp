@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { Prisma, UserRole } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { hash } from "bcryptjs";
 
 import { prisma } from "@/lib/prisma";
-
-const allowedRoles = [UserRole.COMPANY, UserRole.TRANSPORTER] as const;
+import { type Role, REGISTRABLE_ROLES } from "@/lib/roles";
 
 export async function POST(request: Request) {
   try {
@@ -15,8 +14,8 @@ export async function POST(request: Request) {
 
     const email = emailRaw?.trim().toLowerCase();
     const password = passwordRaw?.trim();
-    const normalizedRole = roleRaw?.toUpperCase() as keyof typeof UserRole | undefined;
-    const role = normalizedRole && UserRole[normalizedRole];
+    const normalizedRole = roleRaw?.toUpperCase() as Role | undefined;
+    const role = normalizedRole && REGISTRABLE_ROLES.find((candidate) => candidate === normalizedRole);
 
     if (!email || !password || !role) {
       return NextResponse.json(

@@ -3,6 +3,7 @@ import { compare } from "bcryptjs";
 
 import { buildSessionCookie, createSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { type Role } from "@/lib/roles";
 
 export async function POST(request: Request) {
   try {
@@ -26,16 +27,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Credenziali non valide." }, { status: 401 });
     }
 
+    const role = user.role as Role;
+
     const sessionToken = await createSessionToken({
       sub: String(user.id),
       email: user.email,
-      role: user.role,
+      role,
     });
     const response = NextResponse.json({
       message: "Accesso eseguito.",
       email: user.email,
-      role: user.role,
-      redirectTo: user.role === "COMPANY" ? "/dashboard/company" : "/dashboard/transporter",
+      role,
+      redirectTo: role === "COMPANY" ? "/dashboard/company" : role === "TRANSPORTER" ? "/dashboard/transporter" : "/dashboard/admin",
     });
     response.cookies.set(buildSessionCookie(sessionToken));
 

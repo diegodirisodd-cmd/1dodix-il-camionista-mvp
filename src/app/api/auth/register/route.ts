@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
-import { Prisma, UserRole } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { hash } from "bcryptjs";
 
 import { prisma } from "@/lib/prisma";
+import { type Role, REGISTRABLE_ROLES } from "@/lib/roles";
 
 export async function POST(request: Request) {
   try {
     const { email, password, role, name, phone, operatingArea } = await request.json();
     const normalizedEmail = (email as string | undefined)?.toLowerCase().trim();
-    const normalizedRole = (role as string | undefined)?.toUpperCase();
+    const normalizedRole = (role as string | undefined)?.toUpperCase() as Role | undefined;
     const normalizedName = (name as string | undefined)?.trim();
     const normalizedPhone = (phone as string | undefined)?.trim();
     const normalizedArea = (operatingArea as string | undefined)?.trim();
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "La password deve contenere almeno 6 caratteri." }, { status: 400 });
     }
 
-    const allowedRoles: UserRole[] = [UserRole.TRANSPORTER, UserRole.COMPANY];
+    const allowedRoles: Role[] = REGISTRABLE_ROLES;
     const selectedRole = allowedRoles.find((allowed) => allowed === normalizedRole);
 
     if (!selectedRole) {

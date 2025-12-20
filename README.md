@@ -44,9 +44,9 @@ L'accesso completo richiede un abbonamento Stripe attivo: gli utenti autenticati
 ```
 
 ## Modello dati
-Prisma definisce un enum `UserRole` con tre valori: `TRANSPORTER`, `COMPANY` e `ADMIN` (quest'ultimo pensato per accessi di sola consultazione nell'MVP).
+I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato per accessi di sola consultazione nell'MVP) compatibili con SQLite.
 
-- `User`: email univoca, password (hash), ruolo, flag `subscriptionActive` (single source of truth per l'accesso), riferimenti Stripe (`stripeCustomerId`, `stripeSubscriptionId`, `subscriptionStatus`) e timestamp di creazione.
+- `User`: email univoca, password (hash), ruolo testuale, flag `subscriptionActive` (single source of truth per l'accesso), riferimenti Stripe (`stripeCustomerId`, `stripeSubscriptionId`, `subscriptionStatus`) e timestamp di creazione.
 - `Request`: richiesta di trasporto pubblicata da un utente `COMPANY` con titolo, origine/destinazione, dati facoltativi su carico/budget/descrizione e riferimenti di contatto (visibili solo ai trasportatori abbonati).
 
 ## Prerequisiti

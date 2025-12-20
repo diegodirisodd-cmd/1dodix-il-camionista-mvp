@@ -12,7 +12,7 @@ model User {
   name         String    @default("")
   email        String    @unique
   password     String
-  role         UserRole
+  role         String    @default("COMPANY")
   phone        String?
   operatingArea String   @default("")
   createdAt    DateTime  @default(now())
@@ -22,12 +22,6 @@ model User {
   subscriptionStatus String?
 
   requests     Request[]
-}
-
-enum UserRole {
-  TRANSPORTER
-  COMPANY
-  ADMIN
 }
 
 model Request {

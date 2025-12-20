@@ -3,6 +3,7 @@ import { compare } from "bcryptjs";
 
 import { buildSessionCookie, createSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { type Role } from "@/lib/roles";
 
 export async function POST(request: Request) {
   try {
@@ -35,13 +36,22 @@ export async function POST(request: Request) {
       );
     }
 
+    const role = user.role as Role;
+
     const sessionToken = await createSessionToken({
       sub: String(user.id),
       email: user.email,
-      role: user.role,
+      role,
     });
 
-    const response = NextResponse.json({ success: true, redirectTo: "/dashboard" });
+    const redirectTo =
+      role === "COMPANY"
+        ? "/dashboard/company"
+        : role === "TRANSPORTER"
+          ? "/dashboard/transporter"
+          : "/dashboard/admin";
+
+    const response = NextResponse.json({ success: true, redirectTo });
     response.cookies.set(buildSessionCookie(sessionToken));
 
     return response;
