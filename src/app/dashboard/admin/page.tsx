@@ -31,23 +31,20 @@ export default async function AdminDashboardPage() {
       select: {
         id: true,
         email: true,
-        name: true,
-        operatingArea: true,
-        phone: true,
         role: true,
-        subscriptionActive: true,
         createdAt: true,
       },
     }),
     prisma.request.findMany({
       orderBy: { createdAt: "desc" },
-      include: { company: { select: { name: true, email: true } } },
+      include: { company: { select: { email: true, role: true } } },
     }),
   ]);
 
-  const companies = users.filter((u) => u.role === "COMPANY").length;
-  const transporters = users.filter((u) => u.role === "TRANSPORTER").length;
-  const activeSubscriptions = users.filter((u) => u.subscriptionActive).length;
+  const usersWithStatus = users.map((u) => ({ ...u, subscriptionActive: true }));
+  const companies = usersWithStatus.filter((u) => u.role === "COMPANY").length;
+  const transporters = usersWithStatus.filter((u) => u.role === "TRANSPORTER").length;
+  const activeSubscriptions = usersWithStatus.filter((u) => u.subscriptionActive).length;
 
   return (
     <div className="space-y-6">
@@ -110,17 +107,16 @@ export default async function AdminDashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {users.map((item) => (
+              {usersWithStatus.map((item) => (
                 <tr key={item.id}>
                   <td className="space-y-1">
-                    <div className="font-semibold text-white">{item.name || "Profilo"}</div>
+                    <div className="font-semibold text-white">Profilo utente</div>
                     <div className="text-xs text-neutral-300">{item.email}</div>
-                    {item.phone ? <div className="text-xs text-neutral-300">{item.phone}</div> : null}
                   </td>
                   <td>
                     <span className="table-chip">{formatRole(item.role)}</span>
                   </td>
-                  <td className="text-sm text-neutral-100/80">{item.operatingArea || "—"}</td>
+                  <td className="text-sm text-neutral-100/80">—</td>
                   <td>
                     <span className={`table-chip ${item.subscriptionActive ? "success" : "warning"}`}>
                       {item.subscriptionActive ? "Attivo" : "Non attivo"}
@@ -166,8 +162,8 @@ export default async function AdminDashboardPage() {
                     <div className="text-xs text-neutral-300">{request.estimatedWeight}</div>
                   </td>
                   <td className="space-y-1 text-sm text-neutral-100/80">
-                    <div className="font-semibold text-white">{request.company.name || "Azienda"}</div>
-                    <div className="text-xs text-neutral-300">{request.company.email}</div>
+                    <div className="font-semibold text-white">{request.company.email}</div>
+                    <div className="text-xs text-neutral-300">{formatRole(request.company.role)}</div>
                   </td>
                   <td className="text-sm text-neutral-100/80">{request.budget || "—"}</td>
                   <td className="text-sm text-neutral-100/80">

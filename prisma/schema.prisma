@@ -4,44 +4,34 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
-  name         String    @default("")
-  email        String    @unique
-  password     String
-  role         String    @default("COMPANY")
-  phone        String?
-  operatingArea String   @default("")
-  createdAt    DateTime  @default(now())
-  subscriptionActive Boolean @default(false)
-  stripeCustomerId   String?
-  stripeSubscriptionId String?
-  subscriptionStatus String?
-
-  requests     Request[]
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      String   @default("COMPANY")
+  createdAt DateTime @default(now())
 }
 
 model Request {
-  id            Int       @id @default(autoincrement())
-  title         String
-  pickup        String
-  dropoff       String
-  timeWindow    String   @default("")
-  cargoType     String   @default("")
-  estimatedWeight String @default("")
-  cargo         String?
-  budget        String?
-  description   String?
-  contactName   String
-  contactPhone  String
-  contactEmail  String
-  company       User      @relation(fields: [companyId], references: [id])
-  companyId     Int
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id              Int      @id @default(autoincrement())
+  title           String
+  pickup          String
+  dropoff         String
+  timeWindow      String   @default("")
+  cargoType       String   @default("")
+  estimatedWeight String   @default("")
+  cargo           String?
+  budget          String?
+  description     String?
+  contactName     String
+  contactPhone    String
+  contactEmail    String
+  company         User     @relation(fields: [companyId], references: [id])
+  companyId       Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@index([companyId])
 }

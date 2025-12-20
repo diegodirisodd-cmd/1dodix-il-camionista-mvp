@@ -7,15 +7,12 @@ import { type Role, REGISTRABLE_ROLES } from "@/lib/roles";
 
 export async function POST(request: Request) {
   try {
-    const { email, password, role, name, phone, operatingArea } = await request.json();
+    const { email, password, role } = await request.json();
     const normalizedEmail = (email as string | undefined)?.toLowerCase().trim();
     const normalizedRole = (role as string | undefined)?.toUpperCase() as Role | undefined;
-    const normalizedName = (name as string | undefined)?.trim();
-    const normalizedPhone = (phone as string | undefined)?.trim();
-    const normalizedArea = (operatingArea as string | undefined)?.trim();
 
-    if (!normalizedEmail || !password || !normalizedRole || !normalizedName || !normalizedArea) {
-      return NextResponse.json({ error: "Email, password, ruolo, nome e area operativa sono obbligatori." }, { status: 400 });
+    if (!normalizedEmail || !password || !normalizedRole) {
+      return NextResponse.json({ error: "Email, password e ruolo sono obbligatori." }, { status: 400 });
     }
 
     if (password.length < 6) {
@@ -35,10 +32,6 @@ export async function POST(request: Request) {
         email: normalizedEmail,
         password: passwordHash,
         role: selectedRole,
-        name: normalizedName,
-        phone: normalizedPhone || null,
-        operatingArea: normalizedArea,
-        subscriptionActive: false,
       },
     });
 

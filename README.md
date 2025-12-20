@@ -1,7 +1,6 @@
 # DodiX – Il Camionista (MVP)
 
 MVP web per autotrasportatori e aziende costruito con **Next.js**, **React**, **Tailwind CSS** e **Prisma** su **SQLite**. Include homepage pubblica, registrazione/login con scelta ruolo (transporter/company), sessione JWT server-side e un'area protetta.
-L'accesso completo richiede un abbonamento Stripe attivo: gli utenti autenticati ma non abbonati vengono indirizzati alla paywall e non possono accedere a dashboard o API fino all'attivazione.
 
 ## Struttura del progetto
 ```
@@ -46,8 +45,8 @@ L'accesso completo richiede un abbonamento Stripe attivo: gli utenti autenticati
 ## Modello dati
 I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato per accessi di sola consultazione nell'MVP) compatibili con SQLite.
 
-- `User`: email univoca, password (hash), ruolo testuale, flag `subscriptionActive` (single source of truth per l'accesso), riferimenti Stripe (`stripeCustomerId`, `stripeSubscriptionId`, `subscriptionStatus`) e timestamp di creazione.
-- `Request`: richiesta di trasporto pubblicata da un utente `COMPANY` con titolo, origine/destinazione, dati facoltativi su carico/budget/descrizione e riferimenti di contatto (visibili solo ai trasportatori abbonati).
+- `User`: email univoca, password (hash), ruolo testuale e timestamp di creazione.
+- `Request`: richiesta di trasporto pubblicata da un utente `COMPANY` con titolo, origine/destinazione, dati facoltativi su carico/budget/descrizione e riferimenti di contatto.
 
 ## Prerequisiti
 - Node.js 18+
@@ -74,12 +73,11 @@ I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato 
    L'app sarà disponibile su http://localhost:3000.
 
 ## Flusso di autenticazione e billing
-- **Registrazione**: la pagina `/register` invia email, password e ruolo a `POST /api/auth/register`, che valida i campi, genera l'hash (bcrypt), crea l'utente in SQLite e imposta un cookie di sessione JWT (`dodix_session`).
-- **Login**: la pagina `/login` invia le credenziali a `POST /api/auth/login`, verifica l'hash e aggiorna il cookie di sessione JWT.
+- **Registrazione**: la pagina `/register` invia email, password e ruolo a `POST /api/auth/register`, che valida i campi, genera l'hash (bcrypt) e crea l'utente in SQLite.
+- **Login**: la pagina `/login` invia le credenziali a `POST /api/auth/login`, verifica l'hash, imposta il cookie di sessione JWT (`dodix_session`) e restituisce il reindirizzamento corretto in base al ruolo.
 - **Logout**: `POST /api/auth/logout` invalida il cookie di sessione.
-- **Protezione pagine/API**: `middleware.ts` richiede un token valido e una sottoscrizione attiva per tutte le rotte `/dashboard` e `/api` (eccezione: `/api/auth/*`). Utenti autenticati ma senza abbonamento vengono reindirizzati a `/paywall` o ricevono risposta `402` sulle API. `getSessionUser` recupera l'utente nei server component per applicare redirect server-side coerenti.
-- **Checkout MVP**: la pagina `/paywall` reindirizza direttamente al link di Stripe Checkout esterno (`https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01`). Non sono utilizzati webhook o API Stripe lato server in questa versione MVP.
-- L'accesso a `/paywall` è bloccato per chi è già abbonato: gli utenti con `subscriptionActive=true` vengono reindirizzati alla dashboard.
+- **Protezione pagine/API**: `middleware.ts` richiede un token valido per tutte le rotte `/dashboard`. `getSessionUser` recupera l'utente nei server component per applicare redirect server-side coerenti.
+- **Checkout MVP**: la pagina `/paywall` reindirizza direttamente al link di Stripe Checkout esterno (`https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01`).
 - **Admin (solo lettura)**: il ruolo `ADMIN` accede a `/dashboard/admin` per visualizzare elenco utenti e richieste in modalità di sola consultazione; non sono previste azioni di modifica o moderazione nell'MVP.
 
 ## Design system

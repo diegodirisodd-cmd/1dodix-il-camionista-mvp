@@ -65,22 +65,15 @@ export async function getSessionUser() {
     where: { id: session.userId },
     select: {
       id: true,
-      name: true,
       email: true,
       role: true,
       createdAt: true,
-      phone: true,
-      operatingArea: true,
-      subscriptionActive: true,
-      stripeCustomerId: true,
-      stripeSubscriptionId: true,
-      subscriptionStatus: true,
     },
   });
 
   if (!user) return null;
 
-  return { ...user };
+  return { ...user, subscriptionActive: true };
 }
 
 export function buildSessionCookie(token: string) {

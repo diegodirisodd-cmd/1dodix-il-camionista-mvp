@@ -29,7 +29,7 @@ export default async function CompanyDashboardPage({
       orderBy: { createdAt: "desc" },
     }),
     prisma.user.count({
-      where: { role: "TRANSPORTER", subscriptionActive: true },
+      where: { role: "TRANSPORTER" },
     }),
   ]);
 
