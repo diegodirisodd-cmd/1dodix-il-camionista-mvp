@@ -47,7 +47,7 @@ export default async function PaywallPage() {
             <div className="mt-5">
               <PaywallActions />
             </div>
-            <p className="mt-3 text-xs text-neutral-300/80">Abbonamento mensile. Disdici in qualsiasi momento.</p>
+            <p className="mt-3 text-xs text-slate-600">Abbonamento mensile. Disdici in qualsiasi momento.</p>
           </div>
         </div>
       </div>

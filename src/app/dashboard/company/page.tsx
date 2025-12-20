@@ -67,8 +67,8 @@ export default async function CompanyDashboardPage({
       <div className="card space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <h1 className="text-3xl font-semibold text-slate-900">Dashboard Azienda</h1>
-            <p className="text-sm leading-relaxed text-slate-600">
+            <h1 className="text-2xl font-semibold text-slate-900">Dashboard Azienda</h1>
+            <p className="text-sm leading-relaxed text-slate-700">
               Pubblica incarichi, ricevi contatti di trasportatori verificati e gestisci tutto da un’unica area.
             </p>
           </div>
@@ -78,9 +78,9 @@ export default async function CompanyDashboardPage({
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <div className="card space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Profilo</p>
-          <h2 className="text-lg font-semibold text-slate-900">Dati account</h2>
-          <div className="space-y-2 text-sm leading-relaxed text-slate-800">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Profilo</p>
+          <h2 className="text-lg font-semibold text-slate-800">Dati account</h2>
+          <div className="space-y-2 text-sm leading-relaxed text-slate-700">
             <p>Email: {user.email}</p>
             <p>Ruolo: {user.role}</p>
             <p>Iscritto dal: {new Date(user.createdAt).toLocaleDateString("it-IT")}</p>
@@ -88,17 +88,17 @@ export default async function CompanyDashboardPage({
         </div>
 
         <div className="card space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Richieste</p>
-          <h2 className="text-lg font-semibold text-slate-900">Incarichi attivi</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Richieste</p>
+          <h2 className="text-lg font-semibold text-slate-800">Incarichi attivi</h2>
           <p className="text-4xl font-semibold text-slate-900">{activeRequests}</p>
-          <p className="text-sm text-slate-600">Ultima pubblicazione: {lastPublication}</p>
+          <p className="text-sm text-slate-700">Ultima pubblicazione: {lastPublication}</p>
         </div>
 
         <div className="card space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Network</p>
-          <h2 className="text-lg font-semibold text-slate-900">Trasportatori verificati</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Network</p>
+          <h2 className="text-lg font-semibold text-slate-800">Trasportatori verificati</h2>
           <p className="text-4xl font-semibold text-slate-900">{verifiedTransporters}</p>
-          <p className="text-sm text-slate-600 leading-relaxed">
+          <p className="text-sm text-slate-700 leading-relaxed">
             Carichi visibili a una rete di professionisti attivi sulla piattaforma.
           </p>
         </div>
@@ -111,7 +111,7 @@ export default async function CompanyDashboardPage({
         className="xl:col-span-3"
       >
         {companyRequests.length === 0 ? (
-          <p className="text-sm leading-relaxed text-slate-600">
+          <p className="text-sm leading-relaxed text-slate-700">
             Pubblica la prima richiesta per ingaggiare trasportatori verificati.
           </p>
         ) : (
@@ -138,8 +138,8 @@ export default async function CompanyDashboardPage({
                     <td className="text-slate-800">{request.budget ?? "—"}</td>
                     <td className="space-y-1 text-slate-800">
                       <div className="font-medium text-slate-900">{request.contactName}</div>
-                      <div className="text-xs text-slate-600">{request.contactEmail}</div>
-                      <div className="text-xs text-slate-600">{request.contactPhone}</div>
+                      <div className="text-xs text-slate-700">{request.contactEmail}</div>
+                      <div className="text-xs text-slate-700">{request.contactPhone}</div>
                     </td>
                     <td className="text-slate-800">
                       {new Date(request.createdAt).toLocaleDateString("it-IT")}

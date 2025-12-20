@@ -49,8 +49,8 @@ export default async function AdminDashboardPage() {
       <div className="card space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <h1 className="text-3xl font-semibold text-slate-900">Dashboard Admin</h1>
-            <p className="text-sm leading-relaxed text-slate-600">
+            <h1 className="text-2xl font-semibold text-slate-900">Dashboard Admin</h1>
+            <p className="text-sm leading-relaxed text-slate-700">
               Supervisione in sola lettura di utenti e richieste. Nessuna azione di modifica è abilitata in questo MVP.
             </p>
           </div>
@@ -60,19 +60,19 @@ export default async function AdminDashboardPage() {
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="card space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Utenti totali</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Utenti totali</p>
           <p className="text-3xl font-semibold text-slate-900">{users.length}</p>
-          <p className="text-sm leading-relaxed text-slate-600">Tutti i profili registrati con ruoli attivi.</p>
+          <p className="text-sm leading-relaxed text-slate-700">Tutti i profili registrati con ruoli attivi.</p>
         </div>
         <div className="card space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Richieste totali</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Richieste totali</p>
           <p className="text-3xl font-semibold text-slate-900">{requests.length}</p>
-          <p className="text-sm leading-relaxed text-slate-600">Consultazione completa in sola lettura.</p>
+          <p className="text-sm leading-relaxed text-slate-700">Consultazione completa in sola lettura.</p>
         </div>
         <div className="card space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Distribuzione</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Distribuzione</p>
           <p className="text-sm leading-relaxed text-slate-800">Aziende: {companies} · Trasportatori: {transporters}</p>
-          <p className="text-sm leading-relaxed text-slate-600">Panoramica rapida del network attivo.</p>
+          <p className="text-sm leading-relaxed text-slate-700">Panoramica rapida del network attivo.</p>
         </div>
       </div>
 

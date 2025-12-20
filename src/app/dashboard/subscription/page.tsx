@@ -16,9 +16,9 @@ export default async function SubscriptionPage() {
       <div className="card space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-slate-500">Abbonamento</p>
-            <h1 className="text-3xl font-semibold text-slate-900">Gestisci l’accesso premium</h1>
-            <p className="text-sm leading-relaxed text-slate-600">
+            <p className="text-sm font-semibold text-slate-700">Abbonamento</p>
+            <h1 className="text-2xl font-semibold text-slate-900">Gestisci l’accesso premium</h1>
+            <p className="text-sm leading-relaxed text-slate-700">
               L’abbonamento sblocca i contatti diretti e le funzionalità avanzate. Attivalo per operare senza limitazioni.
             </p>
           </div>
@@ -26,14 +26,14 @@ export default async function SubscriptionPage() {
         </div>
       </div>
 
-      <div className="card space-y-4 text-sm text-slate-800">
+      <div className="card space-y-4 text-sm text-slate-700">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Stato attuale</p>
-            <p className="text-lg font-semibold text-slate-900">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-700">Stato attuale</p>
+            <p className="text-lg font-semibold text-slate-800">
               {user.subscriptionActive ? "Abbonamento attivo" : "Abbonamento non attivo"}
             </p>
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-slate-700">
               {user.subscriptionActive
                 ? "Hai accesso completo alle funzioni premium."
                 : "Attiva l’abbonamento per sbloccare contatti e pubblicazione richieste."}

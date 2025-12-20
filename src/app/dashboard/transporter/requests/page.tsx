@@ -79,7 +79,7 @@ export default async function TransporterRequestsPage() {
                           Pick-up
                         </span>
                         <span>{request.pickup}</span>
-                        <span className="text-neutral-300">→</span>
+                        <span className="text-slate-600">→</span>
                         <span className="rounded-full bg-accent-500/10 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-100">
                           Drop-off
                         </span>

@@ -171,7 +171,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   className="sticky top-24 flex flex-col gap-1 rounded-2xl border border-white/10 bg-white/5 p-3 text-sm font-semibold text-neutral-100 shadow-card backdrop-blur"
                   aria-label="Menu laterale"
                 >
-                  <div className="rounded-xl border border-white/5 bg-white/5 px-3 py-3 text-[11px] uppercase tracking-wide text-neutral-300">
+                  <div className="rounded-xl border border-white/5 bg-white/5 px-3 py-3 text-[11px] uppercase tracking-wide text-slate-600">
                     Navigazione
                   </div>
                   <div className="flex flex-col px-1 pb-2 pt-2">

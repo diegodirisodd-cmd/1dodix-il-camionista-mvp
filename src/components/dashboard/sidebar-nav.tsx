@@ -16,7 +16,7 @@ export function SidebarNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="space-y-1 text-sm text-slate-600">
+    <nav className="space-y-1 text-sm text-slate-700">
       {navItems.map((item) => {
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
 

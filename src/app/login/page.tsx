@@ -142,7 +142,7 @@ export default function LoginPage() {
                 Email aziendale
               </label>
               <div className="relative">
-                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-neutral-400">
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-600">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
                     <path d="M1.5 8.67v6.66a2.67 2.67 0 002.67 2.67h15.66a2.67 2.67 0 002.67-2.67V8.67L12 13.5 1.5 8.67z" />
                     <path d="M21.5 6.67A2.67 2.67 0 0018.83 4H5.17A2.67 2.67 0 002.5 6.67L12 11.5l9.5-4.83z" />
@@ -165,7 +165,7 @@ export default function LoginPage() {
                 Password
               </label>
               <div className="relative">
-                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-neutral-400">
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-600">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
                     <path d="M12 2a5 5 0 00-5 5v2H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2h-2V7a5 5 0 00-5-5zm-3 7V7a3 3 0 116 0v2H9zm3 4a1.5 1.5 0 011.5 1.5 1.5 1.5 0 11-3 0A1.5 1.5 0 0112 13z" />
                   </svg>

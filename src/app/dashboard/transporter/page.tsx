@@ -37,8 +37,8 @@ export default async function TransporterDashboardPage() {
       <div className="card space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <h1 className="text-3xl font-semibold text-slate-900">Dashboard Trasportatore</h1>
-            <p className="text-sm leading-relaxed text-slate-600">
+            <h1 className="text-2xl font-semibold text-slate-900">Dashboard Trasportatore</h1>
+            <p className="text-sm leading-relaxed text-slate-700">
               Consulta gli incarichi delle aziende verificate, scegli i carichi pertinenti e mantieni l’accesso ai contatti.
             </p>
           </div>
@@ -48,10 +48,10 @@ export default async function TransporterDashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <div className="card space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Stato</p>
-          <h2 className="text-lg font-semibold text-slate-900">Abbonamento</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Stato</p>
+          <h2 className="text-lg font-semibold text-slate-800">Abbonamento</h2>
           <p className="text-3xl font-semibold text-slate-900">{subscriptionActive ? "Attivo" : "Non attivo"}</p>
-          <p className="text-sm leading-relaxed text-slate-600">
+          <p className="text-sm leading-relaxed text-slate-700">
             {subscriptionActive
               ? "Contatti e briefing disponibili."
               : "Contatti oscurati finché non attivi l’abbonamento."}
@@ -59,16 +59,16 @@ export default async function TransporterDashboardPage() {
         </div>
 
         <div className="card space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Richieste</p>
-          <h2 className="text-lg font-semibold text-slate-900">Carichi disponibili</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Richieste</p>
+          <h2 className="text-lg font-semibold text-slate-800">Carichi disponibili</h2>
           <p className="text-3xl font-semibold text-slate-900">{availableLoads}</p>
-          <p className="text-sm leading-relaxed text-slate-600">Incarichi pubblicati dalle aziende registrate.</p>
+          <p className="text-sm leading-relaxed text-slate-700">Incarichi pubblicati dalle aziende registrate.</p>
         </div>
 
         <div className="card space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Azione rapida</p>
-          <h2 className="text-lg font-semibold text-slate-900">Vedi richieste</h2>
-          <p className="text-sm leading-relaxed text-slate-600">Apri l’elenco completo per scegliere le tratte più adatte.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Azione rapida</p>
+          <h2 className="text-lg font-semibold text-slate-800">Vedi richieste</h2>
+          <p className="text-sm leading-relaxed text-slate-700">Apri l’elenco completo per scegliere le tratte più adatte.</p>
           <a className="btn btn-primary w-full justify-center" href="/dashboard/transporter/requests">
             Vedi richieste
           </a>
@@ -82,7 +82,7 @@ export default async function TransporterDashboardPage() {
       >
         <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
           <p className="text-sm font-semibold text-slate-900">Cosa sblocchi</p>
-          <ul className="mt-2 space-y-2 text-sm leading-relaxed text-slate-800">
+          <ul className="mt-2 space-y-2 text-sm leading-relaxed text-slate-700">
             <li>Contatti completi delle aziende (telefono, email, referente).</li>
             <li>Briefing operativi con percorso, finestra e carico chiariti.</li>
             <li>Priorità nelle conferme per profili verificati.</li>
@@ -91,7 +91,7 @@ export default async function TransporterDashboardPage() {
         <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
           <p className="text-sm font-semibold text-slate-900">Senza pagamento</p>
           <p className="mt-1 text-lg font-semibold text-slate-900">Accesso limitato</p>
-          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+          <p className="mt-2 text-sm leading-relaxed text-slate-700">
             Titoli e percorsi restano consultabili, ma i contatti sono oscurati finché non attivi l’abbonamento.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -111,7 +111,7 @@ export default async function TransporterDashboardPage() {
         className="space-y-4"
       >
         {recentRequests.length === 0 ? (
-          <p className="text-sm leading-relaxed text-slate-600">Nessuna richiesta disponibile al momento.</p>
+          <p className="text-sm leading-relaxed text-slate-700">Nessuna richiesta disponibile al momento.</p>
         ) : (
           <div className="table-shell overflow-x-auto">
             <table className="min-w-[900px]">
@@ -134,13 +134,13 @@ export default async function TransporterDashboardPage() {
                     <td className="text-slate-800">{request.budget ?? "—"}</td>
                     <td className="text-slate-800">
                       {subscriptionActive ? (
-                        <div className="space-y-1 text-slate-800">
+                        <div className="space-y-1 text-slate-700">
                           <div className="font-semibold text-slate-900">{request.contactName}</div>
-                          <div className="text-xs text-slate-600">{request.contactEmail}</div>
-                          <div className="text-xs text-slate-600">{request.contactPhone}</div>
+                          <div className="text-xs text-slate-700">{request.contactEmail}</div>
+                          <div className="text-xs text-slate-700">{request.contactPhone}</div>
                         </div>
                       ) : (
-                        <span className="text-sm font-semibold text-slate-600">Contatti bloccati</span>
+                        <span className="text-sm font-semibold text-slate-700">Contatti bloccati</span>
                       )}
                     </td>
                     <td className="text-slate-800">

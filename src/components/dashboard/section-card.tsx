@@ -26,7 +26,7 @@ export function SectionCard({
     >
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="space-y-2">
-          <h2 className="text-base font-medium text-slate-900">{title}</h2>
+          <h2 className="text-lg font-semibold text-slate-800">{title}</h2>
           {description ? <p className="text-sm leading-relaxed text-slate-600">{description}</p> : null}
         </div>
         {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
