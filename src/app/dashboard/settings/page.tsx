@@ -1,0 +1,25 @@
+import { redirect } from "next/navigation";
+
+import { getSessionUser } from "@/lib/auth";
+
+export default async function SettingsPage() {
+  const user = await getSessionUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  return (
+    <section className="space-y-4">
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Impostazioni</p>
+        <h1>Preferenze account</h1>
+        <p className="text-neutral-100/80">Area dedicata per configurazioni generali. Altre opzioni arriveranno nelle prossime iterazioni.</p>
+      </div>
+
+      <div className="card text-sm text-neutral-200">
+        <p>Non ci sono ancora impostazioni modificabili. Continua a usare il profilo, le richieste e l’abbonamento dalle sezioni dedicate.</p>
+      </div>
+    </section>
+  );
+}
