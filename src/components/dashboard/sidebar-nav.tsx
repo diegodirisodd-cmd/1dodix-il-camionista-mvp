@@ -5,10 +5,10 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/dashboard", label: "Panoramica operativa" },
   { href: "/dashboard/profile", label: "Profilo" },
   { href: "/dashboard/requests", label: "Richieste" },
-  { href: "/dashboard/subscription", label: "Abbonamento" },
+  { href: "/dashboard/subscription", label: "Piano di accesso" },
   { href: "/dashboard/settings", label: "Impostazioni" },
 ];
 
@@ -16,7 +16,7 @@ export function SidebarNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="space-y-1 text-sm text-slate-700">
+    <nav className="space-y-1 text-sm text-slate-800">
       {navItems.map((item) => {
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
@@ -27,7 +27,7 @@ export function SidebarNav() {
             className={clsx(
               "flex items-center justify-between rounded-lg px-3 py-2 transition-colors",
               "hover:bg-slate-100 hover:text-slate-900",
-              active ? "bg-slate-100 text-slate-900 shadow-inner" : "text-slate-700"
+              active ? "bg-slate-100 text-slate-900 shadow-inner" : "text-slate-800"
             )}
           >
             <span className="font-medium">{item.label}</span>

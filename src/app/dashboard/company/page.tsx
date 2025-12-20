@@ -39,7 +39,7 @@ export default async function CompanyDashboardPage({
     : "Nessuna";
   const showCreatedBanner = searchParams?.created === "1";
   const publishHref = isSubscribed ? "#pubblica" : "/paywall";
-  const publishCtaLabel = isSubscribed ? "Crea richiesta" : "Attiva abbonamento";
+  const publishCtaLabel = isSubscribed ? "Crea una nuova richiesta di trasporto" : "Sblocca l’accesso completo";
 
   return (
     <section className="space-y-6">
@@ -58,18 +58,19 @@ export default async function CompanyDashboardPage({
               href="/paywall"
               className="btn btn-primary inline-flex w-full justify-center px-4 py-2 text-sm font-semibold sm:w-auto"
             >
-              Attiva abbonamento
+              Sblocca l’accesso completo
             </Link>
           </div>
         </div>
       )}
 
-      <div className="card space-y-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="card space-y-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <h1 className="text-2xl font-semibold text-slate-900">Dashboard Azienda</h1>
+            <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Panoramica azienda</p>
+            <h1 className="text-3xl font-semibold text-slate-900">Gestione operativa</h1>
             <p className="text-sm leading-relaxed text-slate-700">
-              Pubblica incarichi, ricevi contatti di trasportatori verificati e gestisci tutto da un’unica area.
+              Qui gestisci le tue richieste di trasporto, i contatti con i trasportatori verificati e lo stato del piano di accesso.
             </p>
           </div>
           <SubscriptionBadge active={isSubscribed} className="self-start" />
@@ -78,35 +79,38 @@ export default async function CompanyDashboardPage({
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <div className="card space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Profilo</p>
-          <h2 className="text-lg font-semibold text-slate-800">Dati account</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">Profilo</p>
+          <h2 className="text-xl font-semibold text-slate-900">Identità aziendale</h2>
           <div className="space-y-2 text-sm leading-relaxed text-slate-700">
             <p>Email: {user.email}</p>
             <p>Ruolo: {user.role}</p>
             <p>Iscritto dal: {new Date(user.createdAt).toLocaleDateString("it-IT")}</p>
           </div>
+          <p className="text-xs text-slate-600">Mantieni queste informazioni aggiornate per accelerare i contatti diretti.</p>
         </div>
 
         <div className="card space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Richieste</p>
-          <h2 className="text-lg font-semibold text-slate-800">Incarichi attivi</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">Richieste</p>
+          <h2 className="text-xl font-semibold text-slate-900">Incarichi attivi</h2>
           <p className="text-4xl font-semibold text-slate-900">{activeRequests}</p>
           <p className="text-sm text-slate-700">Ultima pubblicazione: {lastPublication}</p>
+          <p className="text-xs text-slate-600">Controlla spesso per mantenere il flusso di spedizioni aperte.</p>
         </div>
 
         <div className="card space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Network</p>
-          <h2 className="text-lg font-semibold text-slate-800">Trasportatori verificati</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">Network</p>
+          <h2 className="text-xl font-semibold text-slate-900">Trasportatori verificati</h2>
           <p className="text-4xl font-semibold text-slate-900">{verifiedTransporters}</p>
           <p className="text-sm text-slate-700 leading-relaxed">
             Carichi visibili a una rete di professionisti attivi sulla piattaforma.
           </p>
+          <p className="text-xs text-slate-600">Nessun intermediario. Contatto diretto.</p>
         </div>
       </div>
 
       <SectionCard
-        title="Richieste in corso"
-        description="Monitoraggio delle spedizioni aperte e dei contatti condivisi."
+        title="Richieste disponibili ora"
+        description="Visualizza tutte le richieste inviate e i contatti ricevuti."
         actions={<span className="text-sm font-semibold text-slate-800">{activeRequests} attive</span>}
         className="xl:col-span-3"
       >
@@ -153,12 +157,13 @@ export default async function CompanyDashboardPage({
       </SectionCard>
 
       <SectionCard
-        title="Pubblica una nuova richiesta"
-        description="Inserisci i dettagli principali: percorso, finestra temporale, carico e contatti."
+        title="Crea una nuova richiesta di trasporto"
+        description="Inserisci i dettagli per ricevere contatti da trasportatori compatibili. La richiesta sarà visibile solo a trasportatori registrati."
         id="pubblica"
         className="xl:col-span-3"
       >
         <RequestForm publishHref={publishHref} publishCtaLabel={publishCtaLabel} />
+        <p className="text-xs text-slate-600">Nessun intermediario. Contatto diretto.</p>
       </SectionCard>
     </section>
   );

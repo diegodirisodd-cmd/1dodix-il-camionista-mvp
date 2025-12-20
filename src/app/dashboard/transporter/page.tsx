@@ -34,12 +34,13 @@ export default async function TransporterDashboardPage() {
         </div>
       )}
 
-      <div className="card space-y-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="card space-y-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <h1 className="text-2xl font-semibold text-slate-900">Dashboard Trasportatore</h1>
+            <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Panoramica profilo</p>
+            <h1 className="text-3xl font-semibold text-slate-900">Dashboard Trasportatore</h1>
             <p className="text-sm leading-relaxed text-slate-700">
-              Consulta gli incarichi delle aziende verificate, scegli i carichi pertinenti e mantieni l’accesso ai contatti.
+              Questa è la tua area operativa: consulta le richieste delle aziende verificate, valuta i carichi disponibili e mantieni l’accesso ai contatti.
             </p>
           </div>
           <SubscriptionBadge active={subscriptionActive} className="self-start" />
@@ -48,39 +49,40 @@ export default async function TransporterDashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <div className="card space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Stato</p>
-          <h2 className="text-lg font-semibold text-slate-800">Abbonamento</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">Stato accesso</p>
+          <h2 className="text-xl font-semibold text-slate-900">Abbonamento</h2>
           <p className="text-3xl font-semibold text-slate-900">{subscriptionActive ? "Attivo" : "Non attivo"}</p>
           <p className="text-sm leading-relaxed text-slate-700">
             {subscriptionActive
-              ? "Contatti e briefing disponibili."
-              : "Contatti oscurati finché non attivi l’abbonamento."}
+              ? "Hai accesso completo ai contatti aziendali."
+              : "Attiva l’accesso per contattare direttamente le aziende."}
           </p>
         </div>
 
         <div className="card space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Richieste</p>
-          <h2 className="text-lg font-semibold text-slate-800">Carichi disponibili</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">Richieste</p>
+          <h2 className="text-xl font-semibold text-slate-900">Carichi disponibili</h2>
           <p className="text-3xl font-semibold text-slate-900">{availableLoads}</p>
-          <p className="text-sm leading-relaxed text-slate-700">Incarichi pubblicati dalle aziende registrate.</p>
+          <p className="text-sm leading-relaxed text-slate-700">Solo richieste reali, pubblicate da aziende registrate.</p>
         </div>
 
         <div className="card space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Azione rapida</p>
-          <h2 className="text-lg font-semibold text-slate-800">Vedi richieste</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">Azione rapida</p>
+          <h2 className="text-xl font-semibold text-slate-900">Vedi richieste</h2>
           <p className="text-sm leading-relaxed text-slate-700">Apri l’elenco completo per scegliere le tratte più adatte.</p>
           <a className="btn btn-primary w-full justify-center" href="/dashboard/transporter/requests">
             Vedi richieste
           </a>
+          <p className="text-xs text-slate-600">Contatti sbloccati solo con abbonamento attivo.</p>
         </div>
       </div>
 
       <SectionCard
-        title="Accesso e abbonamento"
+        title="Stato accesso"
         description="Cosa sblocchi con il pagamento e cosa rimane oscurato."
         className="grid gap-4 lg:grid-cols-2"
       >
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+        <div className="rounded-lg border border-[#e2e8f0] bg-slate-50 p-4">
           <p className="text-sm font-semibold text-slate-900">Cosa sblocchi</p>
           <ul className="mt-2 space-y-2 text-sm leading-relaxed text-slate-700">
             <li>Contatti completi delle aziende (telefono, email, referente).</li>
@@ -88,7 +90,7 @@ export default async function TransporterDashboardPage() {
             <li>Priorità nelle conferme per profili verificati.</li>
           </ul>
         </div>
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+        <div className="rounded-lg border border-[#e2e8f0] bg-slate-50 p-4">
           <p className="text-sm font-semibold text-slate-900">Senza pagamento</p>
           <p className="mt-1 text-lg font-semibold text-slate-900">Accesso limitato</p>
           <p className="mt-2 text-sm leading-relaxed text-slate-700">
@@ -96,7 +98,7 @@ export default async function TransporterDashboardPage() {
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <a className="btn btn-primary" href="/paywall">
-              Attiva abbonamento
+              Sblocca l’accesso completo
             </a>
             <a className="btn btn-secondary" href="/dashboard/transporter/requests">
               Consulta i carichi
@@ -106,8 +108,8 @@ export default async function TransporterDashboardPage() {
       </SectionCard>
 
       <SectionCard
-        title="Richieste recenti"
-        description="Ultime pubblicazioni dalle aziende registrate."
+        title="Richieste disponibili ora"
+        description="Solo richieste reali, pubblicate da aziende registrate."
         className="space-y-4"
       >
         {recentRequests.length === 0 ? (

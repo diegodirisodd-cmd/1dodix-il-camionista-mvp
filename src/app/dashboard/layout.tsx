@@ -19,11 +19,11 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <aside className="hidden h-full w-64 shrink-0 border-r border-slate-200 bg-white px-4 py-6 md:fixed md:inset-y-0 md:block md:px-6">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900">
+      <aside className="hidden h-full w-64 shrink-0 border-r border-[#e2e8f0] bg-white px-4 py-6 md:fixed md:inset-y-0 md:block md:px-6">
         <div className="flex flex-col gap-8">
           <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Area utente</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">Area utente</p>
             <p className="text-lg font-semibold leading-tight text-slate-900">{user.email}</p>
             <p className="text-xs text-slate-700">Ruolo: {user.role}</p>
             <SubscriptionBadge active={user.subscriptionActive} size="sm" className="mt-2" />
@@ -31,13 +31,13 @@ export default async function DashboardLayout({
 
           <SidebarNav />
 
-          <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 text-xs text-slate-700">
+          <div className="rounded-lg border border-[#e2e8f0] bg-slate-50 px-3 py-3 text-xs text-slate-700">
             <p className="font-semibold text-slate-900">Supporto</p>
-            <p className="mt-1 text-slate-700">Gestisci profilo, richieste e abbonamento dalle sezioni dedicate.</p>
+            <p className="mt-1 text-slate-700 leading-relaxed">Gestisci profilo, richieste e abbonamento dalle sezioni dedicate.</p>
           </div>
 
           <div className="mt-auto flex items-center justify-between text-sm text-slate-800">
-            <Link href="/" className="font-semibold text-slate-900 hover:text-blue-700">
+            <Link href="/" className="font-semibold text-slate-900 hover:text-slate-700">
               Torna al sito
             </Link>
             <LogoutButton />
