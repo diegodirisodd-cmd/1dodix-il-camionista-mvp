@@ -15,39 +15,40 @@ export default async function PaywallPage() {
   }
 
   return (
-    <div className="flex min-h-[70vh] items-center justify-center px-4 py-16">
-      <div className="w-full max-w-3xl rounded-2xl border border-white/10 bg-white/5 p-10 shadow-2xl shadow-brand-900/30 backdrop-blur">
-        <div className="space-y-4 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent-300">Accesso riservato</p>
-          <h1 className="text-3xl font-semibold text-white md:text-4xl">Sblocca Dodix Pro</h1>
-          <p className="text-neutral-100/80">
-            Attiva l’abbonamento per usare la piattaforma con piena operatività e contatti garantiti.
+    <div className="flex min-h-[70vh] items-center justify-center bg-[#f5f7fa] px-4 py-16">
+      <div className="w-full max-w-4xl space-y-8 rounded-2xl border border-[#e5e7eb] bg-white p-10 shadow-lg">
+        <div className="space-y-3 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#64748b]">Accesso riservato</p>
+          <h1 className="text-3xl font-semibold text-[#0f172a] md:text-4xl">Sblocca l’accesso completo</h1>
+          <p className="text-sm leading-relaxed text-[#475569]">
+            Con l’abbonamento annuale accedi ai contatti diretti e lavori senza limiti. Nessun intermediario, solo aziende e trasportatori verificati.
           </p>
         </div>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-2">
-          <div className="rounded-xl border border-white/10 bg-brand-900/40 p-6 text-left shadow-inner shadow-brand-900/20">
-            <h2 className="text-lg font-semibold text-white">Cosa ottieni</h2>
-            <ul className="mt-3 space-y-2 text-neutral-100/80">
-              <li>• Pubblica incarichi o rispondi alle richieste</li>
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="space-y-3 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+            <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Cosa include</p>
+            <ul className="space-y-2 text-sm leading-relaxed text-[#475569]">
+              <li>• Pubblica richieste di trasporto senza limiti</li>
               <li>• Contatti diretti con interlocutori verificati</li>
-              <li>• Maggiore visibilità per rotte e disponibilità</li>
-              <li>• Accesso prioritario alle opportunità strategiche</li>
+              <li>• Visibilità prioritaria sulle tratte operative</li>
+              <li>• Supporto dedicato per aziende e trasportatori</li>
             </ul>
+            <p className="text-xs text-[#64748b]">Le richieste sono visibili solo a utenti registrati.</p>
           </div>
 
-          <div className="rounded-xl border border-white/10 bg-white/5 p-6 text-left">
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-accent-200">Piano unico</p>
-            <h3 className="mt-2 text-2xl font-semibold text-white">Accesso completo</h3>
-            <p className="text-neutral-100/80">Un solo abbonamento per aziende e trasportatori.</p>
-            <div className="mt-4 rounded-lg border border-white/10 bg-white/5 p-4 text-center">
-              <p className="text-4xl font-bold text-accent-200">€99/mese</p>
-              <p className="text-xs text-neutral-200/70">Pagamento sicuro con Stripe Checkout</p>
+          <div className="space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+            <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Piano unico</p>
+            <h3 className="text-2xl font-semibold text-[#0f172a]">Accesso annuale</h3>
+            <p className="text-sm leading-relaxed text-[#475569]">Un solo piano per aziende e trasportatori, con contatti sbloccati.</p>
+            <div className="rounded-lg border border-[#e5e7eb] bg-slate-50 p-5 text-center">
+              <p className="text-4xl font-bold text-[#0f172a]">360€ / anno</p>
+              <p className="text-xs text-[#64748b]">Pagamento sicuro via Stripe Checkout</p>
             </div>
-            <div className="mt-5">
+            <div className="space-y-2">
               <PaywallActions />
+              <p className="text-xs text-[#64748b]">Abbonamento annuale. Disdici quando vuoi.</p>
             </div>
-            <p className="mt-3 text-xs text-slate-600">Abbonamento mensile. Disdici in qualsiasi momento.</p>
           </div>
         </div>
       </div>

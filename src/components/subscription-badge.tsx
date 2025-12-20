@@ -46,7 +46,7 @@ export function SubscriptionBadge({
         icon: icon === "lightning" ? <IconLightning /> : <IconCheck />,
       }
     : {
-        label: "Funzionalità premium bloccate",
+        label: "Abbonamento non attivo",
         color: "bg-amber-100 text-amber-700 ring-1 ring-amber-200",
         icon: <IconLightning />,
       };

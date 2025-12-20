@@ -12,11 +12,11 @@ const navItems = [
   { href: "/dashboard/settings", label: "Impostazioni" },
 ];
 
-export function SidebarNav() {
+export function SidebarNav({ variant = "light" }: { variant?: "light" | "dark" }) {
   const pathname = usePathname();
 
   return (
-    <nav className="space-y-1 text-sm text-slate-800">
+    <nav className={`space-y-1 text-sm ${variant === "dark" ? "text-white/80" : "text-[#0f172a]"}`}>
       {navItems.map((item) => {
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
@@ -26,8 +26,14 @@ export function SidebarNav() {
             href={item.href}
             className={clsx(
               "flex items-center justify-between rounded-lg px-3 py-2 transition-colors",
-              "hover:bg-slate-100 hover:text-slate-900",
-              active ? "bg-slate-100 text-slate-900 shadow-inner" : "text-slate-800"
+              variant === "dark"
+                ? "hover:bg-white/10"
+                : "hover:bg-slate-100 hover:text-[#0f172a]",
+              active
+                ? variant === "dark"
+                  ? "bg-white/15 text-white shadow-inner"
+                  : "bg-slate-100 text-[#0f172a] shadow-inner"
+                : undefined
             )}
           >
             <span className="font-medium">{item.label}</span>
