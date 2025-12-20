@@ -15,17 +15,14 @@ export async function POST(request: Request) {
     const email = emailRaw?.trim().toLowerCase();
     const password = passwordRaw?.trim();
     const normalizedRole = roleRaw?.toUpperCase() as Role | undefined;
-    const role = normalizedRole && REGISTRABLE_ROLES.find((candidate) => candidate === normalizedRole);
+    const allowedRoles: Role[] = REGISTRABLE_ROLES;
+    const role = normalizedRole && allowedRoles.find((candidate) => candidate === normalizedRole);
 
     if (!email || !password || !role) {
       return NextResponse.json(
         { error: "Email, password e ruolo sono obbligatori." },
         { status: 400 }
       );
-    }
-
-    if (!allowedRoles.includes(role)) {
-      return NextResponse.json({ error: "Ruolo non valido." }, { status: 400 });
     }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
