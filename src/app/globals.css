@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at 10% 20%, rgba(60, 92, 146, 0.18), transparent 35%),
+    radial-gradient(circle at 90% 10%, rgba(244, 111, 0, 0.14), transparent 30%),
+    linear-gradient(135deg, #0f1a2a, #0c1524 45%, #0c1524 65%, #0f1a2a);
+  color: #0f1624;
+}
+
+main {
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+@layer base {
+  h1 {
+    @apply text-4xl md:text-5xl font-semibold leading-tight text-brand-50;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl font-semibold text-brand-50;
+  }
+
+  h3 {
+    @apply text-2xl font-semibold text-brand-100;
+  }
+
+  h4 {
+    @apply text-xl font-semibold text-brand-100;
+  }
+
+  p {
+    @apply text-base text-neutral-100/90;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg bg-accent-500 px-4 py-2 text-sm font-semibold text-white shadow-card transition duration-150 hover:bg-accent-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-200 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-900 disabled:cursor-not-allowed disabled:bg-accent-300 disabled:text-white/80;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-lg border border-brand-300 bg-white/10 px-4 py-2 text-sm font-semibold text-brand-50 shadow-sm transition duration-150 hover:border-accent-300 hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-200 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-900 disabled:cursor-not-allowed disabled:border-brand-200 disabled:text-brand-100;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold text-neutral-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-200 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-900;
+  }
+
+  .card {
+    @apply rounded-2xl border border-white/10 bg-white/5 p-6 shadow-card backdrop-blur;
+  }
+
+  .card-contrast {
+    @apply rounded-2xl border border-white/15 bg-brand-900/60 p-6 shadow-card backdrop-blur;
+  }
+
+  .card-muted {
+    @apply rounded-2xl border border-white/10 bg-white/10 p-6 shadow-sm backdrop-blur;
+  }
+
+  .input-field {
+    @apply w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-white/90 shadow-inner transition placeholder:text-neutral-200/60 focus:border-accent-300 focus:bg-brand-900/40 focus:outline-none focus:ring-2 focus:ring-accent-300/40;
+  }
+
+  .label {
+    @apply text-sm font-semibold uppercase tracking-wide text-neutral-200;
+  }
+
+  .table-shell {
+    @apply overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-sm backdrop-blur;
+  }
+
+  .table-shell table {
+    @apply min-w-full divide-y divide-white/10 text-sm text-neutral-100;
+  }
+
+  .table-shell thead {
+    @apply bg-white/10 text-neutral-200 uppercase tracking-wide text-xs font-semibold;
+  }
+
+  .table-shell th,
+  .table-shell td {
+    @apply px-4 py-3 text-left align-middle;
+  }
+
+  .table-shell tbody tr:hover {
+    @apply bg-white/5;
+  }
+
+  .table-shell tbody tr:nth-child(even) {
+    @apply bg-white/5;
+  }
+
+  .table-shell tbody tr:nth-child(odd) {
+    @apply bg-white/0;
+  }
+
+  .table-chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-100;
+  }
+
+  .table-chip.success {
+    @apply border-success/40 bg-success/10 text-success;
+  }
+
+  .table-chip.warning {
+    @apply border-accent-400/50 bg-accent-500/10 text-accent-100;
+  }
+
+  .table-meta {
+    @apply text-xs font-semibold uppercase tracking-wide text-neutral-200/80;
+  }
+
+  .alert {
+    @apply flex items-start gap-3 rounded-lg border px-4 py-3 text-sm text-neutral-100;
+  }
+
+  .alert-success {
+    @apply alert border-success/25 bg-success/15 text-success;
+  }
+
+  .alert-warning {
+    @apply alert border-warning/25 bg-warning/15 text-warning;
+  }
+
+  .alert-danger {
+    @apply alert border-danger/25 bg-danger/15 text-danger;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full border border-white/20 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-100;
+  }
+
+  .badge-verified {
+    @apply badge border-success/40 bg-success/10 text-success;
+  }
+}

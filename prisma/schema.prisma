@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  role      String    @default("COMPANY")
+  createdAt DateTime  @default(now())
+
+  requests  Request[]
+}
+
+model Request {
+  id           Int      @id @default(autoincrement())
+  title        String
+  pickup       String
+  dropoff      String
+  cargo        String?
+  budget       String?
+  description  String?
+  contactName  String
+  contactPhone String
+  contactEmail String
+
+  companyId Int
+  company   User @relation(fields: [companyId], references: [id])
+
+  createdAt DateTime @default(now())
+}
