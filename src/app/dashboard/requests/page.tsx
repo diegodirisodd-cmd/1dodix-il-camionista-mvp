@@ -38,7 +38,7 @@ export default async function RequestsHubPage() {
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Azienda</p>
                 <h2 className="text-lg font-semibold text-slate-900">Le tue richieste</h2>
               </div>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Pubblica</span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-800">Pubblica</span>
             </div>
             <p className="text-sm text-slate-600">
               Crea nuove richieste o controlla quelle esistenti dalla dashboard aziendale.
@@ -61,7 +61,7 @@ export default async function RequestsHubPage() {
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Trasportatore</p>
                 <h2 className="text-lg font-semibold text-slate-900">Richieste disponibili</h2>
               </div>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Consulta</span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-800">Consulta</span>
             </div>
             <p className="text-sm text-slate-600">
               Vedi le richieste pubblicate dalle aziende e contatta i referenti se il tuo abbonamento è attivo.
@@ -84,7 +84,7 @@ export default async function RequestsHubPage() {
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Admin</p>
                 <h2 className="text-lg font-semibold text-slate-900">Supervisione richieste</h2>
               </div>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Solo lettura</span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-800">Solo lettura</span>
             </div>
             <p className="text-sm text-slate-600">
               Consulta l’intero elenco delle richieste per monitorare l’attività della piattaforma.

@@ -80,15 +80,15 @@ a {
   }
 
   .card {
-    @apply rounded-xl border border-slate-200 bg-white p-6 shadow-sm;
+    @apply rounded-lg border border-slate-200 bg-white p-6 shadow-sm;
   }
 
   .card-contrast {
-    @apply rounded-xl border border-slate-200 bg-white p-6 shadow-sm;
+    @apply rounded-lg border border-slate-200 bg-white p-6 shadow-sm;
   }
 
   .card-muted {
-    @apply rounded-xl border border-slate-200 bg-slate-50 p-6 shadow-sm;
+    @apply rounded-lg border border-slate-200 bg-slate-50 p-6 shadow-sm;
   }
 
   /* Normalize legacy dark-mode text utilities inside light dashboard cards */
@@ -115,11 +115,11 @@ a {
   }
 
   .table-shell table {
-    @apply min-w-full divide-y divide-slate-200 whitespace-normal text-sm text-slate-700;
+    @apply min-w-full divide-y divide-slate-200 whitespace-normal text-sm text-slate-800;
   }
 
   .table-shell thead {
-    @apply bg-slate-50 text-slate-500 uppercase tracking-wide text-xs font-semibold;
+    @apply bg-slate-50 text-slate-700 text-xs font-semibold;
   }
 
   .table-shell th,

@@ -66,7 +66,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <div className="card space-y-3 text-sm leading-relaxed text-slate-700">
+      <div className="card space-y-3 text-sm leading-relaxed text-slate-800">
         <h2 className="text-lg font-semibold text-slate-900">Dati rapidi</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-1">

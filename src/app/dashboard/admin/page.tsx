@@ -1,8 +1,8 @@
 import { SectionCard } from "@/components/dashboard/section-card";
+import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { SubscriptionBadge } from "@/components/subscription-badge";
 
 function formatRole(role: string) {
   if (role === "COMPANY") return "Azienda";
@@ -41,90 +41,61 @@ export default async function AdminDashboardPage() {
     }),
   ]);
 
-  const usersWithStatus = users.map((u) => ({ ...u, subscriptionActive: true }));
-  const companies = usersWithStatus.filter((u) => u.role === "COMPANY").length;
-  const transporters = usersWithStatus.filter((u) => u.role === "TRANSPORTER").length;
-  const activeSubscriptions = usersWithStatus.filter((u) => u.subscriptionActive).length;
+  const companies = users.filter((u) => u.role === "COMPANY").length;
+  const transporters = users.filter((u) => u.role === "TRANSPORTER").length;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex flex-col gap-2">
-          <div className="inline-flex w-fit items-center gap-2 rounded-full border border-accent-400/50 bg-accent-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-100">
-            Ruolo
-            <span className="rounded-full bg-accent-500 px-2 py-0.5 text-[11px] font-bold uppercase text-brand-900">Admin</span>
+    <section className="space-y-6">
+      <div className="card space-y-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-semibold text-slate-900">Dashboard Admin</h1>
+            <p className="text-sm leading-relaxed text-slate-600">
+              Supervisione in sola lettura di utenti e richieste. Nessuna azione di modifica è abilitata in questo MVP.
+            </p>
           </div>
-          <h1>Dashboard Admin</h1>
-          <p className="text-neutral-100/80">
-            Supervisione in sola lettura di utenti e richieste. Nessuna azione di modifica o moderazione è abilitata in questo MVP.
-          </p>
+          <SubscriptionBadge active={user.subscriptionActive} className="self-start" />
         </div>
-        <SubscriptionBadge active={user.subscriptionActive} className="self-start" />
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="card space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-200">Utenti totali</p>
-          <p className="text-3xl font-semibold text-white">{users.length}</p>
-          <p className="text-xs text-neutral-300">Tutti i profili registrati con ruoli attivi.</p>
-          <div className="flex items-center gap-3 text-xs text-neutral-300">
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-1 font-semibold text-neutral-100">
-              Aziende
-              <span className="text-white">{companies}</span>
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-1 font-semibold text-neutral-100">
-              Trasportatori
-              <span className="text-white">{transporters}</span>
-            </span>
-          </div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Utenti totali</p>
+          <p className="text-3xl font-semibold text-slate-900">{users.length}</p>
+          <p className="text-sm leading-relaxed text-slate-600">Tutti i profili registrati con ruoli attivi.</p>
         </div>
         <div className="card space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-200">Richieste totali</p>
-          <p className="text-3xl font-semibold text-white">{requests.length}</p>
-          <p className="text-xs text-neutral-300">Consultazione completa in sola lettura.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Richieste totali</p>
+          <p className="text-3xl font-semibold text-slate-900">{requests.length}</p>
+          <p className="text-sm leading-relaxed text-slate-600">Consultazione completa in sola lettura.</p>
         </div>
         <div className="card space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-200">Abbonamenti attivi</p>
-          <p className="text-3xl font-semibold text-white">{activeSubscriptions}</p>
-          <p className="text-xs text-neutral-300">Totale utenti con accesso sbloccato.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Distribuzione</p>
+          <p className="text-sm leading-relaxed text-slate-800">Aziende: {companies} · Trasportatori: {transporters}</p>
+          <p className="text-sm leading-relaxed text-slate-600">Panoramica rapida del network attivo.</p>
         </div>
       </div>
 
       <SectionCard
         title="Utenti"
-        description="Vista in sola lettura di aziende e trasportatori. Nessuna azione di modifica disponibile."
+        description="Vista in sola lettura di aziende e trasportatori registrati."
         className="space-y-4"
       >
-        <div id="utenti" className="table-shell">
+        <div className="table-shell">
           <table>
             <thead>
               <tr>
-                <th>Nome / Azienda</th>
+                <th>Email</th>
                 <th>Ruolo</th>
-                <th>Area operativa</th>
-                <th>Abbonamento</th>
                 <th>Creato il</th>
               </tr>
             </thead>
             <tbody>
-              {usersWithStatus.map((item) => (
+              {users.map((item) => (
                 <tr key={item.id}>
-                  <td className="space-y-1">
-                    <div className="font-semibold text-white">Profilo utente</div>
-                    <div className="text-xs text-neutral-300">{item.email}</div>
-                  </td>
-                  <td>
-                    <span className="table-chip">{formatRole(item.role)}</span>
-                  </td>
-                  <td className="text-sm text-neutral-100/80">—</td>
-                  <td>
-                    <span className={`table-chip ${item.subscriptionActive ? "success" : "warning"}`}>
-                      {item.subscriptionActive ? "Attivo" : "Non attivo"}
-                    </span>
-                  </td>
-                  <td className="text-sm text-neutral-100/80">
-                    {new Date(item.createdAt).toLocaleString("it-IT")}
-                  </td>
+                  <td className="font-semibold text-slate-900">{item.email}</td>
+                  <td className="text-slate-800">{formatRole(item.role)}</td>
+                  <td className="text-slate-800">{new Date(item.createdAt).toLocaleDateString("it-IT")}</td>
                 </tr>
               ))}
             </tbody>
@@ -134,42 +105,34 @@ export default async function AdminDashboardPage() {
 
       <SectionCard
         title="Richieste"
-        description="Elenco completo delle richieste pubblicate. I dettagli di contatto restano visibili solo in consultazione."
+        description="Elenco completo delle richieste pubblicate dalle aziende."
         className="space-y-4"
       >
-        <div id="richieste" className="table-shell">
+        <div className="table-shell">
           <table>
             <thead>
               <tr>
-                <th>Rotta</th>
-                <th>Carico</th>
+                <th>Titolo</th>
+                <th>Percorso</th>
                 <th>Azienda</th>
-                <th>Budget</th>
-                <th>Creato il</th>
+                <th>Pubblicata</th>
               </tr>
             </thead>
             <tbody>
               {requests.map((request) => (
                 <tr key={request.id}>
-                  <td>
-                    <div className="font-semibold text-white">{request.pickup} → {request.dropoff}</div>
-                    <div className="text-xs text-neutral-300">{request.title}</div>
+                  <td className="font-semibold text-slate-900">{request.title}</td>
+                  <td className="text-slate-800">
+                    {request.pickup} → {request.dropoff}
                   </td>
-                  <td className="space-y-1 text-sm text-neutral-100/80">{request.cargo || "—"}</td>
-                  <td className="space-y-1 text-sm text-neutral-100/80">
-                    <div className="font-semibold text-white">{request.company.email}</div>
-                    <div className="text-xs text-neutral-300">{formatRole(request.company.role)}</div>
-                  </td>
-                  <td className="text-sm text-neutral-100/80">{request.budget || "—"}</td>
-                  <td className="text-sm text-neutral-100/80">
-                    {new Date(request.createdAt).toLocaleString("it-IT")}
-                  </td>
+                  <td className="text-slate-800">{request.company.email}</td>
+                  <td className="text-slate-800">{new Date(request.createdAt).toLocaleDateString("it-IT")}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </SectionCard>
-    </div>
+    </section>
   );
 }

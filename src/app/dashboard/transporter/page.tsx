@@ -1,39 +1,8 @@
-import type { ReactNode } from "react";
-
 import { SectionCard } from "@/components/dashboard/section-card";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-
-type StatCardProps = {
-  title: string;
-  value: string;
-  hint?: string;
-  accent?: "primary" | "success" | "warning";
-  action?: ReactNode;
-};
-
-function StatCard({ title, value, hint, accent = "primary", action }: StatCardProps) {
-  const accents: Record<NonNullable<StatCardProps["accent"]>, string> = {
-    primary: "from-brand-800 via-brand-700 to-brand-600",
-    success: "from-green-800 via-green-600 to-green-500",
-    warning: "from-accent-600 via-accent-500 to-accent-400",
-  };
-
-  return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-card backdrop-blur">
-      <div className={`bg-gradient-to-r ${accents[accent]} px-4 py-3 text-white shadow-inner`}>
-        <p className="text-xs font-semibold uppercase tracking-wide text-white/80">{title}</p>
-        <p className="text-2xl font-semibold">{value}</p>
-      </div>
-      <div className="flex items-center justify-between gap-3 px-4 py-3 text-sm text-neutral-100/80">
-        <p className="leading-relaxed">{hint}</p>
-        {action}
-      </div>
-    </div>
-  );
-}
 
 export default async function TransporterDashboardPage() {
   const user = await getSessionUser();
@@ -58,221 +27,124 @@ export default async function TransporterDashboardPage() {
   const subscriptionActive = user.subscriptionActive;
 
   return (
-    <div className="space-y-6">
-      <header className="card space-y-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <section className="space-y-6">
+      {!subscriptionActive && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-slate-800 shadow-sm">
+          Per sbloccare contatti e briefing completi attiva l’abbonamento dalla sezione dedicata.
+        </div>
+      )}
+
+      <div className="card space-y-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold text-white/80 ring-1 ring-white/15">
-              <span className="rounded-full bg-accent-500/25 px-3 py-0.5 text-accent-50">Ruolo</span>
-              <span className="text-white/90">Trasportatore</span>
-              <span className="text-neutral-200/80">{user.email}</span>
-            </div>
-            <div className="space-y-2">
-              <h1 className="text-3xl font-semibold text-white lg:text-4xl">Dashboard Trasportatore</h1>
-              <p className="max-w-3xl text-sm text-neutral-100/80 md:text-base">
-                Consulta gli incarichi delle aziende verificate, scegli i carichi pertinenti e mantieni l’accesso attivo ai contatti.
-              </p>
-            </div>
+            <h1 className="text-3xl font-semibold text-slate-900">Dashboard Trasportatore</h1>
+            <p className="text-sm leading-relaxed text-slate-600">
+              Consulta gli incarichi delle aziende verificate, scegli i carichi pertinenti e mantieni l’accesso ai contatti.
+            </p>
           </div>
-          <div className="flex flex-col items-start gap-3 lg:items-end">
-            <SubscriptionBadge
-              active={subscriptionActive}
-              className="self-start lg:self-end"
-              icon={subscriptionActive ? "lightning" : "check"}
-            />
-            <div className="flex flex-col items-start gap-2 lg:items-end">
-              <a className="btn-primary px-6 py-3 text-base shadow-lg shadow-brand-900/30" href="/dashboard/transporter/requests">
-                Vedi richieste
-              </a>
-              <p className="text-xs text-neutral-100/70 sm:text-sm">Vai subito all’elenco e scegli le tratte più adatte.</p>
-            </div>
-          </div>
+          <SubscriptionBadge active={subscriptionActive} className="self-start" />
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="card space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Stato</p>
+          <h2 className="text-lg font-semibold text-slate-900">Abbonamento</h2>
+          <p className="text-3xl font-semibold text-slate-900">{subscriptionActive ? "Attivo" : "Non attivo"}</p>
+          <p className="text-sm leading-relaxed text-slate-600">
+            {subscriptionActive
+              ? "Contatti e briefing disponibili."
+              : "Contatti oscurati finché non attivi l’abbonamento."}
+          </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          <StatCard
-            title="Stato abbonamento"
-            value={subscriptionActive ? "Attivo" : "Non attivo"}
-            hint={
-              subscriptionActive
-                ? "Contatti e briefing sono sbloccati."
-                : "Contatti oscurati finché non attivi l’abbonamento."
-            }
-            accent={subscriptionActive ? "success" : "warning"}
-            action={
-              subscriptionActive ? (
-                <span className="badge-verified">Attivo</span>
-              ) : (
-                <a className="btn-primary px-4 py-2 text-sm" href="/paywall">
-                  Attiva abbonamento
-                </a>
-              )
-            }
-          />
-
-          <StatCard
-            title="Richieste disponibili"
-            value={availableLoads.toString()}
-            hint="Carichi pubblicati da aziende verificate, aggiornati in tempo reale."
-            accent="primary"
-            action={
-              <a className="text-sm font-semibold text-white underline" href="/dashboard/transporter/requests">
-                Vedi richieste
-              </a>
-            }
-          />
-
-          <StatCard
-            title="Azione rapida"
-            value="Apri richieste"
-            hint="Accedi all’elenco completo e blocca i carichi che ti interessano."
-            accent="primary"
-            action={
-              <a className="btn-secondary px-4 py-2 text-sm" href="/dashboard/transporter/requests">
-                Vedi richieste
-              </a>
-            }
-          />
+        <div className="card space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Richieste</p>
+          <h2 className="text-lg font-semibold text-slate-900">Carichi disponibili</h2>
+          <p className="text-3xl font-semibold text-slate-900">{availableLoads}</p>
+          <p className="text-sm leading-relaxed text-slate-600">Incarichi pubblicati dalle aziende registrate.</p>
         </div>
-      </header>
 
-      {!subscriptionActive ? (
-        <SectionCard
-          title="Contenuto bloccato"
-          description="Serve un abbonamento attivo per sbloccare contatti, briefing e richieste complete."
-          className="border-accent-500/40 bg-gradient-to-r from-brand-900/70 via-brand-800/60 to-brand-700/60"
-        >
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="space-y-2 text-neutral-100/90">
-              <p className="text-lg font-semibold text-white">Attiva l’accesso premium</p>
-              <p className="text-sm text-neutral-100/80">
-                Sblocca i dettagli di contatto delle aziende, ricevi briefing completi e prenota i carichi direttamente.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <a className="btn-primary px-6 py-3 text-base shadow-lg shadow-brand-900/40" href="/paywall">
-                Attiva abbonamento
-              </a>
-              <a className="btn-secondary" href="/dashboard/transporter/requests">
-                Visualizza richieste (anteprima)
-              </a>
-            </div>
-          </div>
-        </SectionCard>
-      ) : null}
+        <div className="card space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Azione rapida</p>
+          <h2 className="text-lg font-semibold text-slate-900">Vedi richieste</h2>
+          <p className="text-sm leading-relaxed text-slate-600">Apri l’elenco completo per scegliere le tratte più adatte.</p>
+          <a className="btn btn-primary w-full justify-center" href="/dashboard/transporter/requests">
+            Vedi richieste
+          </a>
+        </div>
+      </div>
 
-      <section className="grid gap-6 lg:grid-cols-2">
-        <SectionCard
-          title="Accesso e abbonamento"
-          description="Cosa sblocchi con il pagamento e cosa rimane oscurato."
-          className="flex flex-col justify-between"
-        >
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-2xl border border-accent-400/30 bg-white/5 p-4 shadow-card">
-              <p className="text-xs font-semibold uppercase tracking-wide text-accent-200">Cosa sblocchi</p>
-              <ul className="mt-2 space-y-2 text-sm text-neutral-100/80">
-                <li>Contatti completi delle aziende (telefono, email, referente).</li>
-                <li>Briefing operativi con percorso, finestra e carico chiariti.</li>
-                <li>Priorità nelle conferme per profili verificati.</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-card">
-              <p className="text-xs font-semibold uppercase tracking-wide text-white/80">Senza pagamento</p>
-              <p className="mt-1 text-lg font-semibold text-white">Accesso limitato</p>
-              <p className="mt-2 text-sm text-neutral-100/80">
-                Titoli e percorsi restano consultabili, ma i contatti sono oscurati. Abbonati per parlare direttamente con le aziende.
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <a className="btn-primary" href="/paywall">
-                  Attiva abbonamento
-                </a>
-                <a className="btn-secondary" href="/dashboard/transporter/requests">
-                  Consulta i carichi
-                </a>
-              </div>
-            </div>
-          </div>
-        </SectionCard>
-
-        <SectionCard
-          title="Affidabilità e verifica"
-          description="Metti in evidenza il tuo profilo per creare fiducia con le aziende del network."
-          actions={<span className="badge">In verifica</span>}
-          subtle
-        >
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2 rounded-xl border border-accent-300/30 bg-white/5 px-4 py-3 text-neutral-100/80">
-              <p className="text-sm font-semibold text-white">Perché è importante</p>
-              <p className="text-sm">
-                Le aziende assegnano più velocemente i carichi ai trasportatori verificati. Completa la verifica documentale per dimostrare affidabilità e ridurre i tempi di onboarding.
-              </p>
-            </div>
-            <div className="space-y-3">
-              <p className="text-sm font-semibold text-white">Cosa fare ora</p>
-              <ul className="list-disc space-y-1 pl-5 text-sm text-neutral-100/80">
-                <li>Carica licenza e assicurazione per ottenere il badge di verifica.</li>
-                <li>Associa il numero operativo per garantire contatti rapidi.</li>
-                <li>Mantieni l’abbonamento attivo per consultare subito i dettagli.</li>
-              </ul>
-              <div className="flex flex-wrap gap-2">
-                <a className="btn-secondary" href="mailto:ops@dodix.com">
-                  Invia documenti
-                </a>
-                <a className="btn-primary" href="/dashboard/transporter/requests">
-                  Apri carichi prioritari
-                </a>
-              </div>
-            </div>
-          </div>
-        </SectionCard>
-      </section>
-
-        <SectionCard
-          title="Carichi pubblicati dalle aziende"
-          description="Incarichi recenti; i contatti completi si sbloccano solo con abbonamento attivo."
-          actions={
-            <a className="text-sm font-semibold text-accent-200 underline" href="/dashboard/transporter/requests">
-              Vai alla lista completa
+      <SectionCard
+        title="Accesso e abbonamento"
+        description="Cosa sblocchi con il pagamento e cosa rimane oscurato."
+        className="grid gap-4 lg:grid-cols-2"
+      >
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <p className="text-sm font-semibold text-slate-900">Cosa sblocchi</p>
+          <ul className="mt-2 space-y-2 text-sm leading-relaxed text-slate-800">
+            <li>Contatti completi delle aziende (telefono, email, referente).</li>
+            <li>Briefing operativi con percorso, finestra e carico chiariti.</li>
+            <li>Priorità nelle conferme per profili verificati.</li>
+          </ul>
+        </div>
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <p className="text-sm font-semibold text-slate-900">Senza pagamento</p>
+          <p className="mt-1 text-lg font-semibold text-slate-900">Accesso limitato</p>
+          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+            Titoli e percorsi restano consultabili, ma i contatti sono oscurati finché non attivi l’abbonamento.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a className="btn btn-primary" href="/paywall">
+              Attiva abbonamento
             </a>
-          }
-        >
+            <a className="btn btn-secondary" href="/dashboard/transporter/requests">
+              Consulta i carichi
+            </a>
+          </div>
+        </div>
+      </SectionCard>
+
+      <SectionCard
+        title="Richieste recenti"
+        description="Ultime pubblicazioni dalle aziende registrate."
+        className="space-y-4"
+      >
         {recentRequests.length === 0 ? (
-          <p className="text-sm text-neutral-200/80">Ancora nessuna richiesta pubblicata.</p>
+          <p className="text-sm leading-relaxed text-slate-600">Nessuna richiesta disponibile al momento.</p>
         ) : (
           <div className="table-shell overflow-x-auto">
-            <table className="min-w-[820px]">
+            <table className="min-w-[900px]">
               <thead>
-                  <tr>
-                    <th>Titolo</th>
-                    <th>Percorso</th>
-                    <th>Budget</th>
-                    <th>Contatti</th>
-                  </tr>
+                <tr>
+                  <th>Percorso</th>
+                  <th>Carico</th>
+                  <th>Budget</th>
+                  <th>Contatti</th>
+                  <th>Pubblicata</th>
+                </tr>
               </thead>
               <tbody>
                 {recentRequests.map((request) => (
                   <tr key={request.id}>
-                    <td className="whitespace-nowrap font-semibold text-white">{request.title}</td>
-                    <td className="whitespace-nowrap text-neutral-100/80">
-                      {request.pickup} → {request.dropoff}
+                    <td className="text-slate-800">
+                      <span className="font-semibold text-slate-900">{request.pickup}</span> → {request.dropoff}
                     </td>
-                    <td className="whitespace-nowrap text-neutral-100/80">{request.budget || "—"}</td>
-                    <td className="text-neutral-100/80">
+                    <td className="text-slate-800">{request.cargo ?? "—"}</td>
+                    <td className="text-slate-800">{request.budget ?? "—"}</td>
+                    <td className="text-slate-800">
                       {subscriptionActive ? (
-                        <div className="space-y-2 text-sm">
-                          <span className="table-chip success">Contatti sbloccati</span>
-                          <div className="space-y-1">
-                            <div className="font-semibold text-white">{request.contactName}</div>
-                            <div className="text-neutral-200/80">{request.contactPhone}</div>
-                            <div className="text-neutral-200/80">{request.contactEmail}</div>
-                          </div>
+                        <div className="space-y-1 text-slate-800">
+                          <div className="font-semibold text-slate-900">{request.contactName}</div>
+                          <div className="text-xs text-slate-600">{request.contactEmail}</div>
+                          <div className="text-xs text-slate-600">{request.contactPhone}</div>
                         </div>
                       ) : (
-                        <div className="space-y-2 text-sm text-neutral-200/80">
-                          <span className="table-chip warning">Contatti bloccati</span>
-                          <p className="leading-snug">Attiva l’abbonamento per sbloccare contatti e briefing.</p>
-                        </div>
+                        <span className="text-sm font-semibold text-slate-600">Contatti bloccati</span>
                       )}
+                    </td>
+                    <td className="text-slate-800">
+                      {new Date(request.createdAt).toLocaleDateString("it-IT")}
                     </td>
                   </tr>
                 ))}
@@ -281,6 +153,6 @@ export default async function TransporterDashboardPage() {
           </div>
         )}
       </SectionCard>
-    </div>
+    </section>
   );
 }

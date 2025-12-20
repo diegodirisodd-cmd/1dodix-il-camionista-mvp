@@ -31,7 +31,7 @@ export default async function ProfilePage() {
         </div>
       </div>
 
-      <div className="card space-y-6 text-sm text-slate-700">
+      <div className="card space-y-6 text-sm text-slate-800">
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Ruolo</p>

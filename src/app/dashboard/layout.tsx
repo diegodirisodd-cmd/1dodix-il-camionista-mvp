@@ -36,7 +36,7 @@ export default async function DashboardLayout({
             <p className="mt-1 text-slate-600">Gestisci profilo, richieste e abbonamento dalle sezioni dedicate.</p>
           </div>
 
-          <div className="mt-auto flex items-center justify-between text-sm text-slate-700">
+          <div className="mt-auto flex items-center justify-between text-sm text-slate-800">
             <Link href="/" className="font-semibold text-slate-900 hover:text-blue-700">
               Torna al sito
             </Link>
@@ -45,7 +45,7 @@ export default async function DashboardLayout({
         </div>
       </aside>
 
-      <main className="min-h-screen px-4 py-4 md:ml-64 md:px-6 md:py-6">
+      <main className="min-h-screen px-6 py-8 md:ml-64 md:px-6 md:py-8">
         <div className="mx-auto flex max-w-7xl flex-col space-y-6">{children}</div>
       </main>
     </div>
