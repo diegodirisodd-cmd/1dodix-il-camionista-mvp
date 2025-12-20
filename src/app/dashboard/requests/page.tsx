@@ -16,7 +16,7 @@ export default async function RequestsHubPage() {
   const isAdmin = user.role === "ADMIN";
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Richieste</p>

@@ -16,7 +16,7 @@ export function SidebarNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="space-y-1 text-sm text-neutral-200">
+    <nav className="space-y-1 text-sm text-slate-600">
       {navItems.map((item) => {
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
@@ -26,8 +26,8 @@ export function SidebarNav() {
             href={item.href}
             className={clsx(
               "flex items-center justify-between rounded-lg px-3 py-2 transition-colors",
-              "hover:bg-white/5 hover:text-white",
-              active ? "bg-white/10 text-white shadow-inner" : "text-neutral-300"
+              "hover:bg-slate-100 hover:text-slate-900",
+              active ? "bg-slate-100 text-slate-900 shadow-inner" : "text-slate-700"
             )}
           >
             <span className="font-medium">{item.label}</span>

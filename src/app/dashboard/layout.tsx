@@ -19,13 +19,13 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="grid min-h-screen grid-cols-1 bg-neutral-950 text-white lg:grid-cols-[260px_1fr]">
-      <aside className="border-b border-white/5 bg-neutral-900/60 px-4 py-6 backdrop-blur lg:border-r lg:border-b-0 lg:px-6">
+    <div className="grid min-h-screen grid-cols-1 bg-slate-50 text-slate-900 md:grid-cols-[16rem_1fr]">
+      <aside className="hidden border-r border-slate-200 bg-white px-4 py-6 md:block md:w-64 md:px-6">
         <div className="flex items-center justify-between gap-2">
           <div className="space-y-1">
-            <p className="text-xs uppercase tracking-[0.2em] text-accent-300">Area utente</p>
-            <p className="text-lg font-semibold leading-tight">{user.email}</p>
-            <p className="text-xs text-neutral-300">Ruolo: {user.role}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Area utente</p>
+            <p className="text-lg font-semibold leading-tight text-slate-900">{user.email}</p>
+            <p className="text-xs text-slate-600">Ruolo: {user.role}</p>
           </div>
           <SubscriptionBadge active={user.subscriptionActive} size="sm" />
         </div>
@@ -34,21 +34,21 @@ export default async function DashboardLayout({
           <SidebarNav />
         </div>
 
-        <div className="mt-8 rounded-lg border border-white/5 bg-white/5 px-3 py-3 text-xs text-neutral-200">
-          <p className="font-semibold text-white">Supporto</p>
-          <p className="mt-1 text-neutral-300">Gestisci il tuo profilo, richieste e abbonamento dalle sezioni dedicate.</p>
+        <div className="mt-8 rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 text-xs text-slate-600">
+          <p className="font-semibold text-slate-900">Supporto</p>
+          <p className="mt-1 text-slate-600">Gestisci il tuo profilo, richieste e abbonamento dalle sezioni dedicate.</p>
         </div>
 
-        <div className="mt-6 flex items-center justify-between text-sm text-neutral-200">
-          <Link href="/" className="font-semibold text-white hover:text-accent-200">
+        <div className="mt-6 flex items-center justify-between text-sm text-slate-700">
+          <Link href="/" className="font-semibold text-slate-900 hover:text-blue-700">
             Torna al sito
           </Link>
           <LogoutButton />
         </div>
       </aside>
 
-      <main className="min-h-screen bg-gradient-to-b from-neutral-950 via-neutral-950 to-neutral-900 px-4 py-8 lg:px-10">
-        <div className="mx-auto max-w-5xl space-y-8">{children}</div>
+      <main className="min-h-screen px-4 py-4 md:px-6 md:py-6">
+        <div className="mx-auto flex max-w-6xl flex-col space-y-6">{children}</div>
       </main>
     </div>
   );

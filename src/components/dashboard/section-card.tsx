@@ -25,13 +25,13 @@ export function SectionCard({
       className={`${subtle ? "card-muted" : "card"} ${className ?? ""}`.trim()}
     >
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-white">{title}</h2>
-          {description ? <p className="text-sm text-neutral-100/80">{description}</p> : null}
+        <div className="space-y-2">
+          <h2 className="text-base font-medium text-slate-900">{title}</h2>
+          {description ? <p className="text-sm leading-relaxed text-slate-600">{description}</p> : null}
         </div>
         {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
       </div>
-      <div className="mt-5 space-y-4 text-sm text-neutral-100/80">{children}</div>
+      <div className="mt-4 space-y-4 text-sm leading-relaxed text-slate-700">{children}</div>
     </section>
   );
 }
