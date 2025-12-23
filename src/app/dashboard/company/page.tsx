@@ -43,13 +43,24 @@ export default async function CompanyDashboardPage({
       <div className="card space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Panoramica azienda</p>
-            <h1 className="text-3xl font-semibold text-[#0f172a]">Gestisci le tue spedizioni in modo diretto</h1>
+            <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Dashboard Azienda</p>
+            <h1 className="text-3xl font-semibold text-[#0f172a]">Trova trasportatori affidabili, senza intermediari</h1>
             <p className="text-sm leading-relaxed text-[#475569]">
-              Pubblica richieste di trasporto e ricevi contatti da trasportatori verificati, senza intermediari.
+              Pubblica una richiesta e ricevi contatti verificati: la gestione rimane sempre sotto il tuo controllo.
             </p>
           </div>
           <SubscriptionBadge active={isSubscribed} className="self-start" />
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href={publishHref}
+            className="btn btn-primary"
+            target={isSubscribed ? undefined : "_blank"}
+            rel={isSubscribed ? undefined : "noopener noreferrer"}
+          >
+            Crea nuova richiesta di spedizione
+          </Link>
+          <p className="text-xs text-[#64748b]">Le richieste sono visibili solo a trasportatori registrati.</p>
         </div>
         {!isSubscribed && (
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-slate-800 shadow-sm">
@@ -104,6 +115,7 @@ export default async function CompanyDashboardPage({
       </SectionCard>
 
       <SectionCard
+        id="storico"
         title="Storico richieste"
         description="Visualizza tutte le richieste inviate e i contatti ricevuti."
         className="xl:col-span-3"
@@ -114,13 +126,14 @@ export default async function CompanyDashboardPage({
           </p>
         ) : (
           <div className="table-shell overflow-x-auto">
-            <table className="min-w-[980px]">
+            <table className="min-w-[1020px]">
               <thead>
                 <tr>
                   <th>Titolo</th>
                   <th>Percorso</th>
                   <th>Carico</th>
                   <th>Budget</th>
+                  <th>Stato</th>
                   <th>Contatto</th>
                   <th>Pubblicata</th>
                 </tr>
@@ -134,6 +147,7 @@ export default async function CompanyDashboardPage({
                     </td>
                     <td className="text-[#475569]">{request.cargo ?? "—"}</td>
                     <td className="text-[#475569]">{request.budget ?? "—"}</td>
+                    <td className="text-[#0f172a]">Attiva</td>
                     <td className="space-y-1 text-[#475569]">
                       <div className="font-medium text-[#0f172a]">{request.contactName}</div>
                       <div className="text-xs text-[#64748b]">{request.contactEmail}</div>

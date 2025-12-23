@@ -29,7 +29,7 @@ export default async function DashboardLayout({
             <SubscriptionBadge active={user.subscriptionActive} size="sm" className="mt-2 bg-white/10 text-white" />
           </div>
 
-          <SidebarNav variant="dark" />
+          <SidebarNav variant="dark" role={user.role} />
 
           <div className="rounded-lg border border-white/15 bg-white/5 px-3 py-3 text-xs text-white/80">
             <p className="font-semibold text-white">Supporto</p>

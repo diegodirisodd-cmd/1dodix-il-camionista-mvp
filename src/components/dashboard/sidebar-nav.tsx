@@ -4,16 +4,35 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
-const navItems = [
-  { href: "/dashboard", label: "Panoramica operativa" },
-  { href: "/dashboard/profile", label: "Profilo" },
-  { href: "/dashboard/requests", label: "Richieste" },
-  { href: "/dashboard/subscription", label: "Piano di accesso" },
-  { href: "/dashboard/settings", label: "Impostazioni" },
-];
+type Role = "COMPANY" | "TRANSPORTER" | "ADMIN";
 
-export function SidebarNav({ variant = "light" }: { variant?: "light" | "dark" }) {
+const navByRole: Record<Role, { href: string; label: string }[]> = {
+  COMPANY: [
+    { href: "/dashboard/company", label: "Dashboard" },
+    { href: "/dashboard/company#storico", label: "Le mie richieste" },
+    { href: "/dashboard/profile", label: "Profilo" },
+  ],
+  TRANSPORTER: [
+    { href: "/dashboard/transporter", label: "Dashboard" },
+    { href: "/dashboard/transporter/requests", label: "Richieste disponibili" },
+    { href: "/dashboard/subscription", label: "Abbonamento" },
+    { href: "/dashboard/profile", label: "Profilo" },
+  ],
+  ADMIN: [
+    { href: "/dashboard/admin", label: "Dashboard" },
+    { href: "/dashboard/profile", label: "Profilo" },
+  ],
+};
+
+export function SidebarNav({
+  variant = "light",
+  role,
+}: {
+  variant?: "light" | "dark";
+  role: Role;
+}) {
   const pathname = usePathname();
+  const navItems = navByRole[role] ?? [];
 
   return (
     <nav className={`space-y-1 text-sm ${variant === "dark" ? "text-white/80" : "text-[#0f172a]"}`}>

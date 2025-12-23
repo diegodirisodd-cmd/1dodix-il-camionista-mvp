@@ -15,14 +15,11 @@ export default async function TransporterDashboardPage() {
     redirect("/dashboard");
   }
 
-  const [recentRequests, availableLoads] = await Promise.all([
-    prisma.request.findMany({
-      orderBy: { createdAt: "desc" },
-      include: { company: { select: { email: true } } },
-      take: 6,
-    }),
-    prisma.request.count(),
-  ]);
+  const recentRequests = await prisma.request.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { company: { select: { email: true } } },
+    take: 6,
+  });
 
   const subscriptionActive = user.subscriptionActive;
 
@@ -31,11 +28,9 @@ export default async function TransporterDashboardPage() {
       <div className="card space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Panoramica profilo</p>
-            <h1 className="text-3xl font-semibold text-[#0f172a]">Trova nuovi incarichi di trasporto</h1>
-            <p className="text-sm leading-relaxed text-[#475569]">
-              Accedi a richieste reali pubblicate da aziende operative nel tuo settore.
-            </p>
+            <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Dashboard Trasportatore</p>
+            <h1 className="text-3xl font-semibold text-[#0f172a]">Nuovi trasporti pronti per te</h1>
+            <p className="text-sm leading-relaxed text-[#475569]">Accedi alle richieste delle aziende registrate.</p>
           </div>
           <SubscriptionBadge active={subscriptionActive} className="self-start" />
         </div>
@@ -43,7 +38,7 @@ export default async function TransporterDashboardPage() {
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-[#475569] shadow-sm">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="leading-relaxed text-slate-800">
-                Senza abbonamento puoi visualizzare solo i dettagli generali. Attiva l’accesso per vedere i contatti.
+                Senza abbonamento i contatti restano nascosti. Attiva l’accesso per vedere i referenti delle aziende.
               </p>
               <a
                 className="btn btn-primary w-full justify-center sm:w-auto"
@@ -54,40 +49,13 @@ export default async function TransporterDashboardPage() {
                 Attiva accesso completo
               </a>
             </div>
-            <p className="mt-2 text-xs font-medium text-[#475569]">
-              Sblocca contatti diretti, richieste illimitate e priorità di visibilità.
-            </p>
+            <p className="mt-2 text-xs font-medium text-[#475569]">Sblocca contatti diretti e lavora senza intermediari.</p>
           </div>
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="card space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0f172a]">Stato accesso</p>
-          <h2 className="text-xl font-semibold text-[#0f172a]">Abbonamento</h2>
-          <p className="text-lg font-semibold text-[#0f172a]">
-            {subscriptionActive ? "Abbonamento attivo" : "Abbonamento non attivo"}
-          </p>
-          <p className="text-sm leading-relaxed text-[#475569]">
-            {subscriptionActive
-              ? "Hai accesso completo ai contatti aziendali."
-              : "Attiva l’abbonamento per contattare direttamente le aziende."}
-          </p>
-        </div>
-        <div className="card space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0f172a]">Richieste disponibili</p>
-          <h2 className="text-xl font-semibold text-[#0f172a]">Carichi pubblicati</h2>
-          <p className="text-3xl font-semibold text-[#0f172a]">{availableLoads}</p>
-          <p className="text-sm leading-relaxed text-[#475569]">Solo richieste reali, pubblicate da aziende registrate.</p>
-          <a className="btn btn-secondary w-full justify-center" href="/dashboard/transporter/requests">
-            Vedi richieste
-          </a>
-          <p className="text-xs text-[#64748b]">Contatti sbloccati con abbonamento attivo.</p>
-        </div>
-      </div>
-
       <SectionCard
-        title="Richieste disponibili ora"
+        title="Richieste disponibili"
         description="Solo richieste reali, pubblicate da aziende registrate."
         className="space-y-4"
       >
