@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { OnboardingSteps } from "./onboarding-steps";
 import { getSessionUser } from "@/lib/auth";
-import { getDashboardPath } from "@/lib/navigation";
+import { routeForUser } from "@/lib/navigation";
 
 export default async function OnboardingPage() {
   const user = await getSessionUser();
@@ -12,7 +12,7 @@ export default async function OnboardingPage() {
   }
 
   if (user.onboardingCompleted) {
-    redirect(getDashboardPath(user.role));
+    redirect(routeForUser({ role: user.role, onboardingCompleted: true }));
   }
 
   return (

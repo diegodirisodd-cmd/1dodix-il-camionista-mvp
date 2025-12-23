@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getDashboardPath } from "@/lib/navigation";
+import { routeForUser } from "@/lib/navigation";
 
 export async function POST() {
   try {
@@ -15,10 +15,10 @@ export async function POST() {
     const updated = await prisma.user.update({
       where: { id: user.id },
       data: { onboardingCompleted: true },
-      select: { role: true },
+      select: { role: true, onboardingCompleted: true },
     });
 
-    const redirectTo = getDashboardPath(updated.role);
+    const redirectTo = routeForUser({ role: updated.role, onboardingCompleted: updated.onboardingCompleted });
 
     return NextResponse.json({ success: true, redirectTo });
   } catch (error) {

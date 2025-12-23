@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-import { getDashboardPath } from "@/lib/navigation";
+import { routeForUser } from "@/lib/navigation";
 
 type CompanyProfile = { companyName: string; operatingArea: string };
 type TransporterProfile = { transporterName: string; mainRoutes: string; capacity: string };
@@ -88,7 +88,9 @@ export function OnboardingSteps({ role }: { role: string }) {
         throw new Error(data?.error ?? "Impossibile completare l'onboarding.");
       }
 
-      window.location.replace(data?.redirectTo ?? getDashboardPath(role));
+      window.location.replace(
+        data?.redirectTo ?? routeForUser({ role: role as "COMPANY" | "TRANSPORTER" | "ADMIN", onboardingCompleted: true }),
+      );
     } catch (err) {
       console.error("Errore nel completamento onboarding", err);
       setError("Non è stato possibile completare l'onboarding. Riprova.");

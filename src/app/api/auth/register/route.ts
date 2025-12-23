@@ -4,6 +4,7 @@ import { hash } from "bcryptjs";
 
 import { buildSessionCookie, createSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { routeForUser } from "@/lib/navigation";
 import { type Role, REGISTRABLE_ROLES } from "@/lib/roles";
 
 export async function POST(request: Request) {
@@ -46,7 +47,12 @@ export async function POST(request: Request) {
     });
 
     const response = NextResponse.json(
-      { userId: user.id, email: user.email, role: user.role, redirectTo: "/onboarding" },
+      {
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        redirectTo: routeForUser({ role: user.role as Role, onboardingCompleted: false }),
+      },
       { status: 201 },
     );
 

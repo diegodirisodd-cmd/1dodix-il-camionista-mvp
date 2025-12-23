@@ -3,7 +3,7 @@ import { compare } from "bcryptjs";
 
 import { buildSessionCookie, createSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getDashboardPath } from "@/lib/navigation";
+import { routeForUser } from "@/lib/navigation";
 import { type Role } from "@/lib/roles";
 
 export async function POST(request: Request) {
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       email: user.email,
       role,
     });
-    const redirectTo = onboardingCompleted ? getDashboardPath(role) : "/onboarding";
+    const redirectTo = routeForUser({ role, onboardingCompleted });
 
     const response = NextResponse.json({
       message: "Accesso eseguito.",

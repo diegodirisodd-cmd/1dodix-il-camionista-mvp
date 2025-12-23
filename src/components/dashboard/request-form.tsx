@@ -14,7 +14,12 @@ const INITIAL_STATE = {
   contactEmail: "",
 };
 
-export function RequestForm() {
+type RequestFormProps = {
+  onSuccessRedirect?: string;
+  [key: string]: unknown;
+};
+
+export function RequestForm({ onSuccessRedirect }: RequestFormProps) {
   const [form, setForm] = useState(INITIAL_STATE);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +48,7 @@ export function RequestForm() {
 
     setSuccess("Richiesta pubblicata correttamente");
     setForm(INITIAL_STATE);
-    router.push("/dashboard/company?created=1");
+    router.push(onSuccessRedirect ?? "/app/company/requests?created=1");
   }
 
   function updateField(field: string, value: string) {

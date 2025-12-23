@@ -33,7 +33,7 @@ export default function LoginPage() {
         }
 
         setResult("Accesso eseguito.");
-        router.replace(data?.redirectTo ?? "/dashboard");
+        router.replace(data?.redirectTo ?? "/app");
       } catch (err) {
         console.error("Errore durante il login", err);
         setError("Accesso non riuscito. Riprova tra qualche istante.");

@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getDashboardPath } from "@/lib/navigation";
+import { routeForUser } from "@/lib/navigation";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isDashboard = pathname.startsWith("/dashboard");
+  const isApp = pathname.startsWith("/app");
+  const isDashboardLegacy = pathname.startsWith("/dashboard");
   const isOnboarding = pathname.startsWith("/onboarding");
 
-  if (!isDashboard && !isOnboarding) {
+  if (!isApp && !isDashboardLegacy && !isOnboarding) {
     return NextResponse.next();
   }
 
@@ -36,10 +37,14 @@ export async function middleware(request: NextRequest) {
 
   if (isOnboarding) {
     if (user.onboardingCompleted) {
-      return NextResponse.redirect(new URL(getDashboardPath(user.role), request.url));
+      return NextResponse.redirect(new URL(routeForUser({ ...user, onboardingCompleted: true }), request.url));
     }
 
     return NextResponse.next();
+  }
+
+  if (isDashboardLegacy) {
+    return NextResponse.redirect(new URL(routeForUser(user), request.url));
   }
 
   if (!user.onboardingCompleted) {
@@ -50,5 +55,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/onboarding"],
+  matcher: ["/app/:path*", "/dashboard/:path*", "/onboarding"],
 };
