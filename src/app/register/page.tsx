@@ -31,8 +31,8 @@ export default function RegisterPage() {
           return;
         }
 
-        setResult("Account creato con successo. Accedi per continuare.");
-        router.replace("/login");
+        setResult("Account creato con successo. Completa l'onboarding per iniziare.");
+        router.replace((data?.redirectTo as string) || "/onboarding");
       } catch (err) {
         console.error("Errore durante la registrazione", err);
         setError("Registrazione non riuscita. Controlla i dati e riprova.");

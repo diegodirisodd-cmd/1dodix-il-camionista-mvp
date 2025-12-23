@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { hash } from "bcryptjs";
 
+import { buildSessionCookie, createSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { type Role, REGISTRABLE_ROLES } from "@/lib/roles";
 
@@ -38,7 +39,20 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ userId: user.id, email: user.email, role: user.role }, { status: 201 });
+    const sessionToken = await createSessionToken({
+      sub: String(user.id),
+      email: user.email,
+      role: user.role as Role,
+    });
+
+    const response = NextResponse.json(
+      { userId: user.id, email: user.email, role: user.role, redirectTo: "/onboarding" },
+      { status: 201 },
+    );
+
+    response.cookies.set(buildSessionCookie(sessionToken));
+
+    return response;
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return NextResponse.json({ error: "Esiste già un utente con questa email." }, { status: 409 });
