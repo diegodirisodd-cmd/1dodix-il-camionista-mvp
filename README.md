@@ -99,6 +99,17 @@ I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato 
 - `npm run prisma:migrate` – Crea o applica migrazioni sul database SQLite configurato.
 - `npm run prisma:studio` – Apre Prisma Studio per ispezionare i dati.
 
+### Reset database locale (per errori Prisma / colonne mancanti)
+Se l'ambiente locale segnala colonne mancanti (es. `subscriptionActive`), azzera il database di sviluppo e riallinea lo schema:
+
+```bash
+rm -f prisma/dev.db prisma/dev.db-journal
+npx prisma generate
+npx prisma migrate dev --name reset_local_db
+```
+
+Questo rigenera il client, ricrea `dev.db` coerente con lo schema corrente e mantiene intatte le migrazioni tracciate nel repository.
+
 ## Note
 - Il database SQLite è locale al progetto (file `dev.db`) e non è incluso nel controllo versione.
 - Il cookie JWT viene firmato con `AUTH_SECRET`; assicurati di mantenere la chiave segreta e rigenerarla per ambienti diversi.
