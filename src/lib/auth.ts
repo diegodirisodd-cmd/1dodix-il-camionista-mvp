@@ -69,6 +69,7 @@ export async function getSessionUser() {
       role: true,
       createdAt: true,
       subscriptionActive: true,
+      subscriptionStatus: true,
     },
   });
 

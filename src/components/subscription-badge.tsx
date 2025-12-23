@@ -40,23 +40,36 @@ export function SubscriptionBadge({
   className?: string;
   icon?: "check" | "lightning";
 }) {
-  const content: { label: string; color: string; icon: ReactNode; cta?: ReactNode } = active
+  const content: {
+    label: string;
+    color: string;
+    icon: ReactNode;
+    cta?: ReactNode;
+    helper?: ReactNode;
+  } = active
     ? {
         label: "Abbonamento attivo",
-        color: "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200",
+        color: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
         icon: icon === "lightning" ? <IconLightning /> : <IconCheck />,
       }
     : {
-        label: "Abbonamento non attivo",
-        color: "bg-slate-200 text-slate-700 ring-1 ring-slate-300",
+        label: "Sblocca i contatti delle aziende",
+        color: "bg-amber-100 text-amber-800 ring-1 ring-amber-200",
         icon: <IconLightning />,
         cta: (
           <Link
             href="https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center font-semibold text-[#0b3c5d] underline-offset-4 hover:underline"
           >
-            Attiva abbonamento
+            Attiva accesso completo
           </Link>
+        ),
+        helper: (
+          <span className="text-[11px] font-medium text-[#475569]">
+            Sblocca contatti diretti, richieste illimitate e priorità di visibilità
+          </span>
         ),
       };
 
@@ -67,7 +80,10 @@ export function SubscriptionBadge({
       <span className="inline-flex items-center justify-center rounded-full bg-white/60 p-1 text-current">
         {content.icon}
       </span>
-      <span className="flex items-center gap-2">{content.label}</span>
+      <div className="flex flex-col gap-1">
+        <span className="flex items-center gap-2">{content.label}</span>
+        {!active && content.helper}
+      </div>
       {!active && content.cta}
     </div>
   );

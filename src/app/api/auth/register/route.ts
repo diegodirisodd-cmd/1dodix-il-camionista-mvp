@@ -33,6 +33,7 @@ export async function POST(request: Request) {
         password: passwordHash,
         role: selectedRole,
         subscriptionActive: false,
+        subscriptionStatus: "inactive",
       },
     });
 

@@ -23,23 +23,15 @@ export default async function CompanyDashboardPage({
 
   const isSubscribed = user.subscriptionActive;
 
-  const [companyRequests, verifiedTransporters] = await Promise.all([
-    prisma.request.findMany({
-      where: { companyId: user.id },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.user.count({
-      where: { role: "TRANSPORTER" },
-    }),
-  ]);
+  const companyRequests = await prisma.request.findMany({
+    where: { companyId: user.id },
+    orderBy: { createdAt: "desc" },
+  });
 
   const activeRequests = companyRequests.length;
-  const lastPublication = companyRequests[0]
-    ? new Date(companyRequests[0].createdAt).toLocaleDateString("it-IT")
-    : "Nessuna";
   const showCreatedBanner = searchParams?.created === "1";
-  const publishHref = isSubscribed ? "#pubblica" : "/paywall";
-  const publishCtaLabel = isSubscribed ? "Pubblica nuova richiesta" : "Sblocca l’accesso completo";
+  const publishHref = isSubscribed ? "#pubblica" : "https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01";
+  const publishCtaLabel = isSubscribed ? "Crea una nuova richiesta di trasporto" : "Attiva accesso completo";
 
   return (
     <section className="space-y-6">
@@ -48,22 +40,6 @@ export default async function CompanyDashboardPage({
           Richiesta creata correttamente. Puoi gestirla qui nella dashboard.
         </div>
       )}
-      {!isSubscribed && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-slate-800 shadow-sm">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="leading-relaxed text-slate-800">
-              Per pubblicare nuove richieste e condividere contatti è necessario attivare l’abbonamento.
-            </p>
-            <Link
-              href="/paywall"
-              className="btn btn-primary inline-flex w-full justify-center px-4 py-2 text-sm font-semibold sm:w-auto"
-            >
-              Sblocca l’accesso completo
-            </Link>
-          </div>
-        </div>
-      )}
-
       <div className="card space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
@@ -75,43 +51,61 @@ export default async function CompanyDashboardPage({
           </div>
           <SubscriptionBadge active={isSubscribed} className="self-start" />
         </div>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <div className="card space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0f172a]">Profilo</p>
-          <h2 className="text-xl font-semibold text-[#0f172a]">Identità aziendale</h2>
-          <div className="space-y-2 text-sm leading-relaxed text-[#475569]">
-            <p>Email: {user.email}</p>
-            <p>Ruolo: {user.role}</p>
-            <p>Iscritto dal: {new Date(user.createdAt).toLocaleDateString("it-IT")}</p>
+        {!isSubscribed && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-slate-800 shadow-sm">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="leading-relaxed text-slate-800">
+                Per pubblicare nuove richieste e condividere contatti è necessario attivare l’abbonamento.
+              </p>
+              <Link
+                href="https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary inline-flex w-full justify-center px-4 py-2 text-sm font-semibold sm:w-auto"
+              >
+                Attiva accesso completo
+              </Link>
+            </div>
+            <p className="mt-2 text-xs font-medium text-[#475569]">
+              Sblocca contatti diretti, richieste illimitate e priorità di visibilità.
+            </p>
           </div>
-          <p className="text-xs text-[#64748b]">Mantieni queste informazioni aggiornate per accelerare i contatti diretti.</p>
-        </div>
-
-        <div className="card space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0f172a]">Richieste</p>
-          <h2 className="text-xl font-semibold text-[#0f172a]">Incarichi attivi</h2>
-          <p className="text-4xl font-semibold text-[#0f172a]">{activeRequests}</p>
-          <p className="text-sm text-[#475569]">Ultima pubblicazione: {lastPublication}</p>
-          <p className="text-xs text-[#64748b]">Controlla spesso per mantenere il flusso di spedizioni aperte.</p>
-        </div>
-
-        <div className="card space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0f172a]">Network</p>
-          <h2 className="text-xl font-semibold text-[#0f172a]">Trasportatori verificati</h2>
-          <p className="text-4xl font-semibold text-[#0f172a]">{verifiedTransporters}</p>
-          <p className="text-sm text-[#475569] leading-relaxed">
-            Carichi visibili a una rete di professionisti attivi sulla piattaforma.
-          </p>
-          <p className="text-xs text-[#64748b]">Nessun intermediario. Contatto diretto.</p>
-        </div>
+        )}
       </div>
 
       <SectionCard
-        title="Richieste disponibili ora"
-        description="Le richieste sono visibili solo a trasportatori registrati."
-        actions={<span className="text-sm font-semibold text-slate-800">{activeRequests} attive</span>}
+        title="Crea una nuova richiesta di trasporto"
+        description="Inserisci i dettagli per ricevere contatti da trasportatori compatibili. La richiesta sarà visibile solo a trasportatori registrati."
+        id="pubblica"
+        className="xl:col-span-3"
+        actions={
+          !isSubscribed ? (
+            <Link
+              href="https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-secondary"
+            >
+              Attiva accesso completo
+            </Link>
+          ) : undefined
+        }
+      >
+        {isSubscribed ? (
+          <>
+            <RequestForm publishHref={publishHref} publishCtaLabel={publishCtaLabel} />
+            <p className="text-xs text-[#64748b]">Le richieste sono visibili solo a trasportatori registrati.</p>
+          </>
+        ) : (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-slate-800">
+            Attiva l’abbonamento per pubblicare subito una richiesta e condividere i tuoi contatti con trasportatori verificati.
+          </div>
+        )}
+      </SectionCard>
+
+      <SectionCard
+        title="Storico richieste"
+        description="Visualizza tutte le richieste inviate e i contatti ricevuti."
         className="xl:col-span-3"
       >
         {companyRequests.length === 0 ? (
@@ -154,16 +148,6 @@ export default async function CompanyDashboardPage({
             </table>
           </div>
         )}
-      </SectionCard>
-
-      <SectionCard
-        title="Pubblica nuova richiesta"
-        description="Inserisci i dettagli per ricevere contatti da trasportatori compatibili. La richiesta sarà visibile solo a trasportatori registrati."
-        id="pubblica"
-        className="xl:col-span-3"
-      >
-        <RequestForm publishHref={publishHref} publishCtaLabel={publishCtaLabel} />
-        <p className="text-xs text-[#64748b]">Nessun intermediario. Contatto diretto.</p>
       </SectionCard>
     </section>
   );
