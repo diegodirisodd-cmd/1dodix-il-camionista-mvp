@@ -3,6 +3,7 @@ import { compare } from "bcryptjs";
 
 import { buildSessionCookie, createSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getDashboardPath } from "@/lib/navigation";
 import { type Role } from "@/lib/roles";
 
 export async function POST(request: Request) {
@@ -28,17 +29,21 @@ export async function POST(request: Request) {
     }
 
     const role = user.role as Role;
+    const onboardingCompleted = Boolean(user.onboardingCompleted);
 
     const sessionToken = await createSessionToken({
       sub: String(user.id),
       email: user.email,
       role,
     });
+    const redirectTo = onboardingCompleted ? getDashboardPath(role) : "/onboarding";
+
     const response = NextResponse.json({
       message: "Accesso eseguito.",
       email: user.email,
       role,
-      redirectTo: role === "COMPANY" ? "/dashboard/company" : role === "TRANSPORTER" ? "/dashboard/transporter" : "/dashboard/admin",
+      onboardingCompleted,
+      redirectTo,
     });
     response.cookies.set(buildSessionCookie(sessionToken));
 

@@ -34,6 +34,7 @@ export async function POST(request: Request) {
         role: selectedRole,
         subscriptionActive: false,
         subscriptionStatus: "inactive",
+        onboardingCompleted: false,
       },
     });
 

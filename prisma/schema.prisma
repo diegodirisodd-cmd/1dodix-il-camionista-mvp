@@ -14,6 +14,7 @@ model User {
   role      String    @default("COMPANY")
   createdAt DateTime  @default(now())
   subscriptionActive Boolean  @default(false)
+  onboardingCompleted Boolean @default(false)
   stripeCustomerId     String?
   stripeSubscriptionId String?
   subscriptionStatus   String? @default("inactive")

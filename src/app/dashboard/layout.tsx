@@ -18,6 +18,10 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  if (!user.onboardingCompleted) {
+    redirect("/onboarding");
+  }
+
   return (
     <div className="min-h-screen bg-[#f5f7fa] text-[#0f172a]">
       <aside className="hidden h-full w-64 shrink-0 bg-[#0b3c5d] px-4 py-6 text-white md:fixed md:inset-y-0 md:block md:px-6">

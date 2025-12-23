@@ -70,6 +70,7 @@ export async function getSessionUser() {
       createdAt: true,
       subscriptionActive: true,
       subscriptionStatus: true,
+      onboardingCompleted: true,
     },
   });
 
