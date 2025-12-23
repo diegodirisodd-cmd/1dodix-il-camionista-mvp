@@ -32,6 +32,7 @@ export async function POST(request: Request) {
         email: normalizedEmail,
         password: passwordHash,
         role: selectedRole,
+        subscriptionActive: false,
       },
     });
 

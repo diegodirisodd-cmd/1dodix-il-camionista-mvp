@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 function IconCheck() {
@@ -39,7 +40,7 @@ export function SubscriptionBadge({
   className?: string;
   icon?: "check" | "lightning";
 }) {
-  const content: { label: string; color: string; icon: ReactNode } = active
+  const content: { label: string; color: string; icon: ReactNode; cta?: ReactNode } = active
     ? {
         label: "Abbonamento attivo",
         color: "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200",
@@ -47,8 +48,16 @@ export function SubscriptionBadge({
       }
     : {
         label: "Abbonamento non attivo",
-        color: "bg-amber-100 text-amber-700 ring-1 ring-amber-200",
+        color: "bg-slate-200 text-slate-700 ring-1 ring-slate-300",
         icon: <IconLightning />,
+        cta: (
+          <Link
+            href="https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"
+            className="inline-flex items-center font-semibold text-[#0b3c5d] underline-offset-4 hover:underline"
+          >
+            Attiva abbonamento
+          </Link>
+        ),
       };
 
   return (
@@ -58,7 +67,8 @@ export function SubscriptionBadge({
       <span className="inline-flex items-center justify-center rounded-full bg-white/60 p-1 text-current">
         {content.icon}
       </span>
-      <span>{content.label}</span>
+      <span className="flex items-center gap-2">{content.label}</span>
+      {!active && content.cta}
     </div>
   );
 }

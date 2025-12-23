@@ -13,6 +13,7 @@ model User {
   password  String
   role      String    @default("COMPANY")
   createdAt DateTime  @default(now())
+  subscriptionActive Boolean  @default(false)
 
   requests  Request[]
 }
