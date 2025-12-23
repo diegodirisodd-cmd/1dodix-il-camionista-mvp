@@ -28,7 +28,7 @@ export default async function TransporterDashboardPage() {
       <div className="card space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Dashboard Trasportatore</p>
+            <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Panoramica operativa</p>
             <h1 className="text-3xl font-semibold text-[#0f172a]">Nuovi trasporti pronti per te</h1>
             <p className="text-sm leading-relaxed text-[#475569]">Accedi alle richieste delle aziende registrate.</p>
           </div>

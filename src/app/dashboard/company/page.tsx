@@ -31,7 +31,7 @@ export default async function CompanyDashboardPage({
   const activeRequests = companyRequests.length;
   const showCreatedBanner = searchParams?.created === "1";
   const publishHref = isSubscribed ? "#pubblica" : "https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01";
-  const publishCtaLabel = isSubscribed ? "Crea una nuova richiesta di trasporto" : "Attiva accesso completo";
+  const publishCtaLabel = isSubscribed ? "Pubblica una nuova spedizione" : "Attiva accesso completo";
 
   return (
     <section className="space-y-6">
@@ -43,7 +43,7 @@ export default async function CompanyDashboardPage({
       <div className="card space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Dashboard Azienda</p>
+            <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Panoramica operativa</p>
             <h1 className="text-3xl font-semibold text-[#0f172a]">Trova trasportatori affidabili, senza intermediari</h1>
             <p className="text-sm leading-relaxed text-[#475569]">
               Pubblica una richiesta e ricevi contatti verificati: la gestione rimane sempre sotto il tuo controllo.
@@ -58,7 +58,7 @@ export default async function CompanyDashboardPage({
             target={isSubscribed ? undefined : "_blank"}
             rel={isSubscribed ? undefined : "noopener noreferrer"}
           >
-            Crea nuova richiesta di spedizione
+            Pubblica una nuova spedizione
           </Link>
           <p className="text-xs text-[#64748b]">Le richieste sono visibili solo a trasportatori registrati.</p>
         </div>
@@ -85,7 +85,7 @@ export default async function CompanyDashboardPage({
       </div>
 
       <SectionCard
-        title="Crea una nuova richiesta di trasporto"
+        title="Pubblica una nuova spedizione"
         description="Inserisci i dettagli per ricevere contatti da trasportatori compatibili. La richiesta sarà visibile solo a trasportatori registrati."
         id="pubblica"
         className="xl:col-span-3"
