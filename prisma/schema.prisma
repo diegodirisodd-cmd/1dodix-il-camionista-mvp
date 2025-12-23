@@ -8,16 +8,16 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  password  String
-  role      String    @default("COMPANY")
-  createdAt DateTime  @default(now())
-  subscriptionActive Boolean  @default(false)
-  onboardingCompleted Boolean @default(false)
-  stripeCustomerId     String?
-  stripeSubscriptionId String?
-  subscriptionStatus   String? @default("inactive")
+  id                     Int      @id @default(autoincrement())
+  email                  String   @unique
+  password               String
+  role                   String   @default("COMPANY")
+  subscriptionActive     Boolean  @default(false)
+  stripeCustomerId       String?
+  stripeSubscriptionId   String?
+  subscriptionStatus     String?  @default("inactive")
+  onboardingCompleted    Boolean  @default(false)
+  createdAt              DateTime @default(now())
 
   requests  Request[]
 }
@@ -38,4 +38,5 @@ model Request {
   company   User @relation(fields: [companyId], references: [id])
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

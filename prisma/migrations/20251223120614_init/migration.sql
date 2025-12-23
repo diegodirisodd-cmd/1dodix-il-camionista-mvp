@@ -4,12 +4,12 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "role" TEXT NOT NULL DEFAULT 'COMPANY',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "subscriptionActive" BOOLEAN NOT NULL DEFAULT false,
-    "onboardingCompleted" BOOLEAN NOT NULL DEFAULT false,
     "stripeCustomerId" TEXT,
     "stripeSubscriptionId" TEXT,
-    "subscriptionStatus" TEXT DEFAULT 'inactive'
+    "subscriptionStatus" TEXT DEFAULT 'inactive',
+    "onboardingCompleted" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CreateTable
@@ -26,6 +26,7 @@ CREATE TABLE "Request" (
     "contactEmail" TEXT NOT NULL,
     "companyId" INTEGER NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
     CONSTRAINT "Request_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
