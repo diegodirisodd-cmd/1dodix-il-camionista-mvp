@@ -8,15 +8,17 @@ type Role = "COMPANY" | "TRANSPORTER" | "ADMIN";
 
 const navByRole: Record<Role, { href: string; label: string }[]> = {
   COMPANY: [
-    { href: "/dashboard/company", label: "Panoramica operativa" },
-    { href: "/dashboard/company#storico", label: "Le mie richieste" },
+    { href: "/dashboard/company", label: "Dashboard" },
+    { href: "/dashboard/requests/new", label: "Crea richiesta" },
+    { href: "/dashboard/requests", label: "Richieste inviate" },
     { href: "/dashboard/profile", label: "Profilo" },
+    { href: "/dashboard/subscription", label: "Abbonamento" },
   ],
   TRANSPORTER: [
-    { href: "/dashboard/transporter", label: "Panoramica operativa" },
+    { href: "/dashboard/transporter", label: "Dashboard" },
     { href: "/dashboard/transporter/requests", label: "Richieste disponibili" },
-    { href: "/dashboard/subscription", label: "Abbonamento" },
     { href: "/dashboard/profile", label: "Profilo" },
+    { href: "/dashboard/subscription", label: "Abbonamento" },
   ],
   ADMIN: [
     { href: "/dashboard/admin", label: "Panoramica operativa" },
@@ -26,8 +28,10 @@ const navByRole: Record<Role, { href: string; label: string }[]> = {
 
 export function SidebarNav({
   role,
+  onNavigate,
 }: {
   role: Role;
+  onNavigate?: () => void;
 }) {
   const pathname = usePathname();
   const navItems = navByRole[role] ?? [];
@@ -41,6 +45,7 @@ export function SidebarNav({
           <Link
             key={item.href}
             href={item.href}
+            onClick={onNavigate}
             className={clsx(
               "flex items-center justify-between rounded-lg px-3 py-3 transition-colors",
               active

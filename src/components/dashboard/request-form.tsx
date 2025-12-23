@@ -48,7 +48,7 @@ export function RequestForm({ onSuccessRedirect }: RequestFormProps) {
 
     setSuccess("Richiesta pubblicata correttamente");
     setForm(INITIAL_STATE);
-    router.push(onSuccessRedirect ?? "/app/company/requests?created=1");
+    router.push(onSuccessRedirect ?? "/dashboard/requests?created=1");
   }
 
   function updateField(field: string, value: string) {

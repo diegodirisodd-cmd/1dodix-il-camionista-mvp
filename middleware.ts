@@ -7,10 +7,10 @@ import { routeForUser } from "@/lib/navigation";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isApp = pathname.startsWith("/app");
-  const isDashboardLegacy = pathname.startsWith("/dashboard");
+  const isDashboard = pathname.startsWith("/dashboard");
   const isOnboarding = pathname.startsWith("/onboarding");
 
-  if (!isApp && !isDashboardLegacy && !isOnboarding) {
+  if (!isApp && !isDashboard && !isOnboarding) {
     return NextResponse.next();
   }
 
@@ -43,7 +43,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (isDashboardLegacy) {
+  if (isApp) {
     return NextResponse.redirect(new URL(routeForUser(user), request.url));
   }
 
