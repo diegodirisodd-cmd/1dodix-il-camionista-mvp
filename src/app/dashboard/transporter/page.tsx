@@ -55,7 +55,7 @@ export default async function TransporterDashboardPage() {
             <h2 className="text-lg font-semibold text-[#0f172a]">Richieste disponibili</h2>
             <p className="text-sm leading-relaxed text-[#475569]">Consulta le tratte compatibili e valuta i carichi.</p>
           </div>
-          <Link href="/dashboard/transporter/requests" className="btn btn-primary">
+          <Link href="/dashboard/transporter/jobs" className="btn btn-primary">
             Vedi richieste
           </Link>
           <p className="text-xs text-[#64748b]">Contatti visibili solo con abbonamento attivo.</p>
@@ -67,7 +67,7 @@ export default async function TransporterDashboardPage() {
             <p className="text-sm leading-relaxed text-[#475569]">Gestisci il tuo accesso e verifica lo stato dei contatti.</p>
           </div>
           <Link
-            href={subscriptionActive ? "/dashboard/transporter/requests" : "https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"}
+            href={subscriptionActive ? "/dashboard/transporter/billing" : "https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"}
             className="btn btn-secondary"
             target={subscriptionActive ? undefined : "_blank"}
             rel={subscriptionActive ? undefined : "noopener noreferrer"}
@@ -82,7 +82,7 @@ export default async function TransporterDashboardPage() {
             <h2 className="text-lg font-semibold text-[#0f172a]">Profilo</h2>
             <p className="text-sm leading-relaxed text-[#475569]">Aggiorna mezzi, tratte preferite e recapiti.</p>
           </div>
-          <Link href="/dashboard/profile" className="btn btn-secondary">
+          <Link href="/dashboard/transporter/profile" className="btn btn-secondary">
             Vai al profilo
           </Link>
           <p className="text-xs text-[#64748b]">Resta visibile alle aziende verifiche.</p>

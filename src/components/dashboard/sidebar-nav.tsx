@@ -9,16 +9,16 @@ import { type Role } from "@/lib/roles";
 export const navByRole: Record<Role, { href: string; label: string }[]> = {
   COMPANY: [
     { href: "/dashboard/company", label: "Dashboard" },
-    { href: "/dashboard/requests/new", label: "Crea richiesta" },
-    { href: "/dashboard/requests", label: "Richieste inviate" },
-    { href: "/dashboard/profile", label: "Profilo" },
-    { href: "/dashboard/subscription", label: "Abbonamento" },
+    { href: "/dashboard/company/new-request", label: "Crea richiesta" },
+    { href: "/dashboard/company/requests", label: "Richieste inviate" },
+    { href: "/dashboard/company/profile", label: "Profilo" },
+    { href: "/dashboard/company/billing", label: "Abbonamento" },
   ],
   TRANSPORTER: [
     { href: "/dashboard/transporter", label: "Dashboard" },
-    { href: "/dashboard/transporter/requests", label: "Richieste disponibili" },
-    { href: "/dashboard/profile", label: "Profilo" },
-    { href: "/dashboard/subscription", label: "Abbonamento" },
+    { href: "/dashboard/transporter/jobs", label: "Richieste disponibili" },
+    { href: "/dashboard/transporter/profile", label: "Profilo" },
+    { href: "/dashboard/transporter/billing", label: "Abbonamento" },
   ],
   ADMIN: [
     { href: "/dashboard/admin", label: "Panoramica operativa" },
