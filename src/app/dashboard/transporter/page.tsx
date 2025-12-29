@@ -55,7 +55,7 @@ export default async function TransporterDashboardPage() {
             <h2 className="text-lg font-semibold text-[#0f172a]">Richieste disponibili</h2>
             <p className="text-sm leading-relaxed text-[#475569]">Consulta le tratte compatibili e valuta i carichi.</p>
           </div>
-          <Link href="/dashboard/transporter/jobs" className="btn btn-primary">
+          <Link href="/dashboard/transporter/requests" className="btn btn-primary">
             Vedi richieste
           </Link>
           <p className="text-xs text-[#64748b]">Contatti visibili solo con abbonamento attivo.</p>

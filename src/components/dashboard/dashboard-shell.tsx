@@ -23,12 +23,12 @@ type DashboardShellProps = {
 export function DashboardShell({ user, children }: DashboardShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const navItems = useMemo(() => navByRole[user.role] ?? [], [user.role]);
 
   const pageLabel = useMemo(() => {
-    const items = navByRole[user.role] ?? [];
-    const activeItem = items.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
+    const activeItem = navItems.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
     return activeItem?.label ?? "Panoramica operativa";
-  }, [pathname, user.role]);
+  }, [navItems, pathname]);
 
   return (
     <div className="min-h-screen bg-[#f5f7fa] text-[#0f172a]">
@@ -82,7 +82,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
           </div>
         </aside>
 
-        <main className="min-h-screen w-full px-4 py-6 sm:px-6 md:ml-64 md:px-6 md:py-8">
+        <main className="min-h-screen w-full px-4 pb-24 pt-6 sm:px-6 md:ml-64 md:px-6 md:pb-10 md:pt-8">
           <div className="mx-auto flex max-w-6xl flex-col space-y-6">
             <div className="hidden items-center justify-between rounded-lg border border-[#e2e8f0] bg-white px-4 py-3 text-sm text-[#475569] shadow-sm md:flex">
               <div className="space-y-1">
@@ -122,6 +122,46 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
           </div>
         </div>
       )}
+
+      <MobileBottomNav items={navItems} activePath={pathname} />
     </div>
+  );
+}
+
+function MobileBottomNav({
+  items,
+  activePath,
+}: {
+  items: { href: string; label: string }[];
+  activePath: string;
+}) {
+  const visibleItems = items.slice(0, 5);
+
+  return (
+    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-[#e2e8f0] bg-white/95 backdrop-blur shadow-lg md:hidden">
+      <div className="flex items-center justify-around px-2 py-3 text-xs font-semibold text-[#475569]">
+        {visibleItems.map((item) => {
+          const active = activePath === item.href || activePath.startsWith(`${item.href}/`);
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex flex-col items-center gap-1 rounded-md px-2 py-1 ${
+                active ? "text-[#0f172a]" : "text-[#475569] hover:text-[#0f172a]"
+              }`}
+            >
+              <span className="text-[13px] font-semibold leading-tight">{item.label}</span>
+              <span
+                className={`h-1 w-6 rounded-full transition ${
+                  active ? "bg-[#f97316]" : "bg-transparent"
+                }`}
+                aria-hidden
+              />
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
   );
 }
