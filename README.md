@@ -19,7 +19,7 @@ MVP web per autotrasportatori e aziende costruito con **Next.js**, **React**, **
 │   │   │   └── health/route.ts          # API di esempio per stato
 │   │   ├── dashboard/page.tsx           # Pagina protetta (richiede sessione)
 │   │   ├── dashboard/transporter/page.tsx # Dashboard dedicata al ruolo TRANSPORTER
-│   │   ├── dashboard/transporter/requests/page.tsx # Lista richieste visibile ai trasportatori
+│   │   ├── dashboard/transporter/jobs/page.tsx # Lista richieste visibile ai trasportatori
 │   │   ├── dashboard/company/page.tsx    # Dashboard dedicata al ruolo COMPANY con form pubblicazione richieste
 │   │   ├── paywall/page.tsx             # Spiega il paywall e avvia il checkout Stripe
 │   │   ├── globals.css                  # Stili globali minimi
@@ -88,7 +88,7 @@ I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato 
 
 ## Pubblicazione richieste
 - **Company**: compila il form nella pagina `/dashboard/company` oppure invia una `POST /api/requests` con `title`, `pickup`, `dropoff`, `contactName`, `contactPhone`, `contactEmail` (campi facoltativi: `cargo`, `budget`, `description`).
-- **Transporter**: consulta `/dashboard/transporter/requests` o chiama `GET /api/requests`. I contatti vengono restituiti solo se l'utente ha `subscriptionActive=true`, altrimenti vengono mascherati (`contactHidden`).
+- **Transporter**: consulta `/dashboard/transporter/jobs` o chiama `GET /api/requests`. I contatti vengono restituiti solo se l'utente ha `subscriptionActive=true`, altrimenti vengono mascherati (`contactHidden`).
 
 ## Comandi utili
 - `npm run dev` – Avvia il server Next.js in modalità sviluppo.

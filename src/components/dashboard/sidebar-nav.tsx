@@ -9,14 +9,13 @@ import { type Role } from "@/lib/roles";
 export const navByRole: Record<Role, { href: string; label: string }[]> = {
   COMPANY: [
     { href: "/dashboard/company", label: "Panoramica azienda" },
-    { href: "/dashboard/company/new-request", label: "Nuova richiesta" },
     { href: "/dashboard/company/requests", label: "Richieste inviate" },
     { href: "/dashboard/company/profile", label: "Profilo aziendale" },
     { href: "/dashboard/company/billing", label: "Piano di accesso" },
   ],
   TRANSPORTER: [
     { href: "/dashboard/transporter", label: "Panoramica trasportatore" },
-    { href: "/dashboard/transporter/requests", label: "Richieste disponibili" },
+    { href: "/dashboard/transporter/jobs", label: "Richieste disponibili" },
     { href: "/dashboard/transporter/profile", label: "Profilo operatore" },
     { href: "/dashboard/transporter/billing", label: "Piano di accesso" },
   ],

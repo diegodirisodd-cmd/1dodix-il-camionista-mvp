@@ -14,7 +14,7 @@ export default async function RequestsPage() {
   }
 
   if (user.role === "TRANSPORTER") {
-    redirect("/dashboard/transporter/requests");
+    redirect("/dashboard/transporter/jobs");
   }
 
   redirect("/dashboard/admin");
