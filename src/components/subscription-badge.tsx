@@ -1,6 +1,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { billingPathForRole } from "@/lib/subscription";
+import { type Role } from "@/lib/roles";
+
 function IconCheck() {
   return (
     <svg
@@ -35,10 +38,12 @@ export function SubscriptionBadge({
   active,
   className = "",
   icon = "check",
+  role = "COMPANY",
 }: {
   active: boolean;
   className?: string;
   icon?: "check" | "lightning";
+  role?: Role;
 }) {
   const content: {
     label: string;
@@ -53,22 +58,20 @@ export function SubscriptionBadge({
         icon: icon === "lightning" ? <IconLightning /> : <IconCheck />,
       }
     : {
-        label: "Sblocca i contatti delle aziende",
+        label: "Accesso limitato",
         color: "bg-amber-100 text-amber-800 ring-1 ring-amber-200",
         icon: <IconLightning />,
         cta: (
           <Link
-            href="https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center font-semibold text-[#0b3c5d] underline-offset-4 hover:underline"
+            href={billingPathForRole(role)}
+            className="inline-flex items-center rounded-full bg-white/80 px-3 py-1 text-[11px] font-semibold text-[#0b3c5d] shadow-sm ring-1 ring-amber-200 transition hover:bg-white"
           >
             Attiva accesso completo
           </Link>
         ),
         helper: (
           <span className="text-[11px] font-medium text-[#475569]">
-            Sblocca contatti diretti, richieste illimitate e priorità di visibilità
+            Funzionalità premium: sblocca contatti diretti e richieste illimitate
           </span>
         ),
       };

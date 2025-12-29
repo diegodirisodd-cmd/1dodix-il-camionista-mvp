@@ -6,6 +6,7 @@ import Link from "next/link";
 import { LogoutButton } from "@/components/logout-button";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { type Role } from "@/lib/roles";
+import { hasActiveSubscription } from "@/lib/subscription";
 
 import { AppSidebar } from "./app-sidebar";
 
@@ -17,6 +18,7 @@ type AppUser = {
 
 export function AppFrame({ user, children }: { user: AppUser; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const subscriptionActive = hasActiveSubscription(user);
 
   return (
     <div className="min-h-screen bg-[#f5f7fa] text-[#0f172a]">
@@ -39,7 +41,7 @@ export function AppFrame({ user, children }: { user: AppUser; children: React.Re
             </div>
 
             <div className="flex items-center gap-3 text-sm text-[#475569]">
-              <SubscriptionBadge active={user.subscriptionActive} />
+              <SubscriptionBadge active={subscriptionActive} role={user.role} />
               <LogoutButton variant="light" />
             </div>
           </div>

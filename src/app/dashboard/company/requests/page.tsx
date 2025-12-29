@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { hasActiveSubscription, billingPathForRole } from "@/lib/subscription";
 
 export default async function CompanyRequestsPage({ searchParams }: { searchParams?: { created?: string } }) {
   const user = await getSessionUser();
@@ -17,6 +18,7 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
   }
 
   const showCreated = searchParams?.created === "1";
+  const isSubscribed = hasActiveSubscription(user);
   const companyRequests = await prisma.request.findMany({
     where: { companyId: user.id },
     orderBy: { createdAt: "desc" },
@@ -39,13 +41,19 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
               Tutte le tue richieste di trasporto in un unico posto, pronte per contattare trasportatori verificati.
             </p>
           </div>
-          <SubscriptionBadge active={user.subscriptionActive} className="self-start" />
+          <SubscriptionBadge active={isSubscribed} className="self-start" role={user.role} />
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Link href="/dashboard/company/new-request" className="btn btn-primary">
+          <Link
+            href={isSubscribed ? "/dashboard/company/new-request" : billingPathForRole(user.role)}
+            className="btn btn-primary"
+          >
             Pubblica una nuova spedizione
           </Link>
           <p className="text-xs text-[#64748b]">Le richieste sono visibili solo a trasportatori registrati.</p>
+          {!isSubscribed && (
+            <p className="text-xs font-semibold text-amber-700">Questa funzione richiede un abbonamento attivo.</p>
+          )}
         </div>
       </div>
 

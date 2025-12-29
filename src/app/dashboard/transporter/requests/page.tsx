@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { Request as RequestModel } from "@prisma/client";
 
@@ -5,6 +6,7 @@ import { SectionCard } from "@/components/dashboard/section-card";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { billingPathForRole, hasActiveSubscription } from "@/lib/subscription";
 
 type RequestWithCompany = RequestModel & { company: { email: string } };
 
@@ -31,7 +33,8 @@ export default async function TransporterRequestsPage() {
     include: { company: { select: { email: true } } },
   });
 
-  const displayRequests = requests.map((request) => maskContact(user.subscriptionActive, request));
+  const subscriptionActive = hasActiveSubscription(user);
+  const displayRequests = requests.map((request) => maskContact(subscriptionActive, request));
 
   return (
     <section className="space-y-6">
@@ -45,22 +48,17 @@ export default async function TransporterRequestsPage() {
               attivo.
             </p>
           </div>
-          <SubscriptionBadge active={user.subscriptionActive} className="self-start" />
+          <SubscriptionBadge active={subscriptionActive} className="self-start" role={user.role} />
         </div>
-        {!user.subscriptionActive && (
+        {!subscriptionActive && (
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-slate-800 shadow-sm">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="leading-relaxed text-slate-800">Attiva l’abbonamento per vedere subito i referenti aziendali.</p>
-              <a
-                className="btn-primary w-full justify-center sm:w-auto"
-                href="https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <p className="leading-relaxed text-slate-800">Questa funzione richiede un abbonamento attivo. Sblocca i contatti delle aziende.</p>
+              <Link className="btn-primary w-full justify-center sm:w-auto" href={billingPathForRole(user.role)}>
                 Attiva accesso completo
-              </a>
+              </Link>
             </div>
-            <p className="mt-2 text-xs font-medium text-[#475569]">Sblocca contatti diretti, richieste illimitate e priorità di visibilità.</p>
+            <p className="mt-2 text-xs font-medium text-[#475569]">Funzionalità premium: contatti diretti e richieste illimitate.</p>
           </div>
         )}
       </div>

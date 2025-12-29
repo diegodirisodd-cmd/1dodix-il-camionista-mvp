@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { LogoutButton } from "@/components/logout-button";
 import { getSessionUser } from "@/lib/auth";
+import { hasActiveSubscription } from "@/lib/subscription";
 
 export default async function ProfilePage() {
   const user = await getSessionUser();
@@ -11,6 +12,8 @@ export default async function ProfilePage() {
   if (!user) {
     redirect("/login");
   }
+
+  const subscriptionActive = hasActiveSubscription(user);
 
   return (
     <section className="space-y-6">
@@ -24,9 +27,10 @@ export default async function ProfilePage() {
             </p>
           </div>
           <SubscriptionBadge
-            active={user.subscriptionActive}
+            active={subscriptionActive}
             className="self-start"
-            icon={user.subscriptionActive ? "lightning" : "check"}
+            icon={subscriptionActive ? "lightning" : "check"}
+            role={user.role}
           />
         </div>
       </div>
@@ -43,7 +47,7 @@ export default async function ProfilePage() {
           </div>
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">Stato abbonamento</p>
-            <p className="text-base font-semibold text-slate-900">{user.subscriptionActive ? "Attivo" : "Non attivo"}</p>
+            <p className="text-base font-semibold text-slate-900">{subscriptionActive ? "Attivo" : "Accesso limitato"}</p>
           </div>
         </div>
 

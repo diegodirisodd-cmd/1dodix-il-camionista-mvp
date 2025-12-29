@@ -7,6 +7,7 @@ import Link from "next/link";
 import { LogoutButton } from "@/components/logout-button";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { type Role } from "@/lib/roles";
+import { hasActiveSubscription } from "@/lib/subscription";
 
 import { SidebarNav, navByRole } from "./sidebar-nav";
 
@@ -24,6 +25,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const navItems = useMemo(() => navByRole[user.role] ?? [], [user.role]);
+  const subscriptionActive = hasActiveSubscription(user);
 
   const pageLabel = useMemo(() => {
     const activeItem = navItems.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
@@ -51,7 +53,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
           </button>
         </div>
         <div className="mt-3 flex items-center justify-between text-sm text-[#475569]">
-          <SubscriptionBadge active={user.subscriptionActive} size="sm" />
+          <SubscriptionBadge active={subscriptionActive} size="sm" role={user.role} />
           <LogoutButton variant="light" />
         </div>
       </div>
@@ -63,7 +65,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#64748b]">Area utente</p>
               <p className="text-lg font-semibold leading-tight text-[#0f172a]">{user.email}</p>
               <p className="text-xs text-[#475569]">Ruolo: {user.role}</p>
-              <SubscriptionBadge active={user.subscriptionActive} size="sm" className="mt-2" />
+              <SubscriptionBadge active={subscriptionActive} size="sm" role={user.role} className="mt-2" />
             </div>
 
             <SidebarNav role={user.role} />
@@ -90,7 +92,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
                 <p className="text-base font-semibold text-[#0f172a]">{pageLabel}</p>
               </div>
               <div className="flex items-center gap-3 text-sm text-[#475569]">
-                <SubscriptionBadge active={user.subscriptionActive} size="sm" />
+                <SubscriptionBadge active={subscriptionActive} size="sm" role={user.role} />
                 <LogoutButton variant="light" />
               </div>
             </div>
@@ -108,7 +110,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
             <div className="mb-4 space-y-1">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#64748b]">Navigazione</p>
               <p className="text-sm font-semibold text-[#0f172a]">{user.email}</p>
-              <SubscriptionBadge active={user.subscriptionActive} size="sm" />
+              <SubscriptionBadge active={subscriptionActive} size="sm" role={user.role} />
             </div>
             <SidebarNav
               role={user.role}

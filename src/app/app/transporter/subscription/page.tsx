@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { routeForUser } from "@/lib/navigation";
+import { billingPathForRole, hasActiveSubscription } from "@/lib/subscription";
 
 export default async function TransporterSubscriptionPage() {
   const user = await getSessionUser();
@@ -16,6 +17,8 @@ export default async function TransporterSubscriptionPage() {
     redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
   }
 
+  const subscriptionActive = hasActiveSubscription(user);
+
   return (
     <section className="space-y-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -25,16 +28,14 @@ export default async function TransporterSubscriptionPage() {
             Attiva l’abbonamento per vedere email e telefono delle aziende e contattarle senza intermediari.
           </p>
         </div>
-        <SubscriptionBadge active={user.subscriptionActive} />
+        <SubscriptionBadge active={subscriptionActive} role={user.role} />
       </div>
 
       <div className="card space-y-3 text-sm text-[#475569]">
         <p className="text-base font-semibold text-[#0f172a]">Abbonamento annuale</p>
         <p className="leading-relaxed">Accesso completo a contatti, richieste illimitate e visibilità prioritaria.</p>
         <Link
-          href="https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"
-          target="_blank"
-          rel="noopener noreferrer"
+          href={billingPathForRole(user.role)}
           className="btn-primary inline-flex w-full justify-center sm:w-auto"
         >
           Attiva accesso completo

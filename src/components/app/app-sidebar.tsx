@@ -7,6 +7,7 @@ import clsx from "clsx";
 
 import { type Role } from "@/lib/roles";
 import { SubscriptionBadge } from "@/components/subscription-badge";
+import { hasActiveSubscription } from "@/lib/subscription";
 
 type NavItem = { href: string; label: string };
 
@@ -38,6 +39,7 @@ export function AppSidebar({
 }) {
   const pathname = usePathname();
   const items = useMemo(() => navByRole[user.role] ?? [], [user.role]);
+  const subscriptionActive = hasActiveSubscription(user);
 
   const SidebarContent = (
     <div className="flex h-full flex-col gap-8 px-4 py-6 text-[#0f172a]">
@@ -45,7 +47,7 @@ export function AppSidebar({
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#64748b]">Area utente</p>
         <p className="text-lg font-semibold leading-tight text-[#0f172a]">{user.email}</p>
         <p className="text-xs text-[#475569]">Ruolo: {user.role}</p>
-        <SubscriptionBadge active={user.subscriptionActive} size="sm" className="mt-2" />
+        <SubscriptionBadge active={subscriptionActive} size="sm" role={user.role} className="mt-2" />
       </div>
 
       <nav className="space-y-2 text-sm text-[#475569]">

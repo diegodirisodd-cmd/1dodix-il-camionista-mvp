@@ -5,6 +5,7 @@ import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { routeForUser } from "@/lib/navigation";
 import { prisma } from "@/lib/prisma";
+import { billingPathForRole, hasActiveSubscription } from "@/lib/subscription";
 
 export default async function TransporterAppPage() {
   const user = await getSessionUser();
@@ -18,6 +19,7 @@ export default async function TransporterAppPage() {
   }
 
   const requestsCount = await prisma.request.count();
+  const subscriptionActive = hasActiveSubscription(user);
 
   return (
     <section className="space-y-6">
@@ -30,7 +32,7 @@ export default async function TransporterAppPage() {
               Accedi alle richieste delle aziende registrate e abilita i contatti quando sei pronto a collaborare.
             </p>
           </div>
-          <SubscriptionBadge active={user.subscriptionActive} />
+          <SubscriptionBadge active={subscriptionActive} role={user.role} />
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
@@ -60,12 +62,10 @@ export default async function TransporterAppPage() {
               Sblocca i contatti aziendali e lavora senza intermediari.
             </p>
             <Link
-              href="https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"
-              target="_blank"
-              rel="noopener noreferrer"
+              href={billingPathForRole(user.role)}
               className="btn-primary mt-3 inline-flex w-full justify-center"
             >
-              Attiva abbonamento
+              Attiva accesso completo
             </Link>
           </div>
         </div>

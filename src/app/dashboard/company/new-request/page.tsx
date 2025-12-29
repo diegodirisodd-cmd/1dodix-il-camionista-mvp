@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { RequestForm } from "@/components/dashboard/request-form";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
+import { billingPathForRole, hasActiveSubscription } from "@/lib/subscription";
 
 export default async function CompanyNewRequestPage() {
   const user = await getSessionUser();
@@ -16,7 +17,7 @@ export default async function CompanyNewRequestPage() {
     redirect("/dashboard");
   }
 
-  const isSubscribed = Boolean(user.subscriptionActive);
+  const isSubscribed = hasActiveSubscription(user);
 
   return (
     <section className="space-y-6">
@@ -29,7 +30,7 @@ export default async function CompanyNewRequestPage() {
               Inserisci tratta, carico e referenti. La richiesta sarà visibile solo ai trasportatori registrati.
             </p>
           </div>
-          <SubscriptionBadge active={isSubscribed} className="self-start" />
+          <SubscriptionBadge active={isSubscribed} className="self-start" role={user.role} />
         </div>
         <p className="text-xs text-[#64748b]">Nessun intermediario. Contatto diretto.</p>
       </div>
@@ -41,13 +42,11 @@ export default async function CompanyNewRequestPage() {
         </div>
       ) : (
         <div className="card space-y-3 border-amber-200 bg-amber-50/60 text-sm leading-relaxed text-[#0f172a]">
-          <p className="font-semibold">Sblocca i contatti verificati prima di pubblicare.</p>
-          <p className="text-[#475569]">Attiva l&apos;abbonamento per pubblicare nuove richieste e condividere i tuoi contatti.</p>
+          <p className="font-semibold">Accesso limitato</p>
+          <p className="text-[#475569]">Questa funzione richiede un abbonamento attivo. Sblocca i contatti verificati e pubblica subito.</p>
           <div className="flex flex-wrap gap-3">
             <Link
-              href="https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"
-              target="_blank"
-              rel="noopener noreferrer"
+              href={billingPathForRole(user.role)}
               className="btn btn-primary"
             >
               Attiva accesso completo

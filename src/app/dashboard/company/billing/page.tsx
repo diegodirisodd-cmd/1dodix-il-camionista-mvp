@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
+import { hasActiveSubscription } from "@/lib/subscription";
 
 export default async function CompanyBillingPage() {
   const user = await getSessionUser();
@@ -15,6 +16,8 @@ export default async function CompanyBillingPage() {
     redirect("/dashboard");
   }
 
+  const subscriptionActive = hasActiveSubscription(user);
+
   return (
     <section className="space-y-6">
       <div className="card space-y-3">
@@ -26,7 +29,7 @@ export default async function CompanyBillingPage() {
               Sblocca i contatti dei trasportatori e pubblica richieste senza limiti.
             </p>
           </div>
-          <SubscriptionBadge active={user.subscriptionActive} className="self-start" />
+          <SubscriptionBadge active={subscriptionActive} className="self-start" role={user.role} />
         </div>
       </div>
 

@@ -5,6 +5,7 @@ import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { routeForUser } from "@/lib/navigation";
 import { prisma } from "@/lib/prisma";
+import { billingPathForRole, hasActiveSubscription } from "@/lib/subscription";
 
 export default async function CompanyAppPage() {
   const user = await getSessionUser();
@@ -22,6 +23,7 @@ export default async function CompanyAppPage() {
     orderBy: { createdAt: "desc" },
     take: 5,
   });
+  const subscriptionActive = hasActiveSubscription(user);
 
   return (
     <section className="space-y-6">
@@ -34,7 +36,7 @@ export default async function CompanyAppPage() {
               Pubblica richieste di trasporto e ricevi contatti verificati. Gestisci tutto da un’unica area operativa.
             </p>
           </div>
-          <SubscriptionBadge active={user.subscriptionActive} />
+          <SubscriptionBadge active={subscriptionActive} role={user.role} />
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
@@ -43,9 +45,15 @@ export default async function CompanyAppPage() {
             <p className="mt-2 text-sm leading-relaxed text-[#475569]">
               Inserisci tratta, carico e contatti per ricevere disponibilità mirate.
             </p>
-            <Link href="/app/company/requests/new" className="btn-primary mt-3 inline-flex w-full justify-center">
+            <Link
+              href={subscriptionActive ? "/app/company/requests/new" : billingPathForRole(user.role)}
+              className="btn-primary mt-3 inline-flex w-full justify-center"
+            >
               Crea nuova richiesta di spedizione
             </Link>
+            {!subscriptionActive && (
+              <p className="mt-2 text-xs font-semibold text-amber-700">Questa funzione richiede un abbonamento attivo.</p>
+            )}
           </div>
 
           <div className="rounded-lg border border-[#e2e8f0] bg-white p-5 shadow-sm">

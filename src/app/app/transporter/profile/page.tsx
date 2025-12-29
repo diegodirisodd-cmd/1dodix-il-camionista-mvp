@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { routeForUser } from "@/lib/navigation";
+import { hasActiveSubscription } from "@/lib/subscription";
 
 export default async function TransporterProfilePage() {
   const user = await getSessionUser();
@@ -15,6 +16,8 @@ export default async function TransporterProfilePage() {
     redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
   }
 
+  const subscriptionActive = hasActiveSubscription(user);
+
   return (
     <section className="space-y-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -22,7 +25,7 @@ export default async function TransporterProfilePage() {
           <h1 className="text-3xl font-semibold text-[#0f172a]">Profilo trasportatore</h1>
           <p className="text-sm leading-relaxed text-[#475569]">Questa è la tua area operativa.</p>
         </div>
-        <SubscriptionBadge active={user.subscriptionActive} />
+        <SubscriptionBadge active={subscriptionActive} role={user.role} />
       </div>
 
       <div className="card space-y-3 text-sm text-[#0f172a]">

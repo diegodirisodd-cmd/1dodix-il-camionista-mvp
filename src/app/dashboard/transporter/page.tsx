@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
+import { billingPathForRole, hasActiveSubscription } from "@/lib/subscription";
 
 export default async function TransporterDashboardPage() {
   const user = await getSessionUser();
@@ -15,7 +16,7 @@ export default async function TransporterDashboardPage() {
     redirect("/dashboard");
   }
 
-  const subscriptionActive = Boolean(user.subscriptionActive);
+  const subscriptionActive = hasActiveSubscription(user);
 
   return (
     <section className="space-y-6">
@@ -26,23 +27,21 @@ export default async function TransporterDashboardPage() {
             <h1 className="text-3xl font-semibold text-[#0f172a]">Nuovi trasporti pronti per te</h1>
             <p className="text-sm leading-relaxed text-[#475569]">Accedi alle richieste delle aziende registrate.</p>
           </div>
-          <SubscriptionBadge active={subscriptionActive} className="self-start" />
+          <SubscriptionBadge active={subscriptionActive} className="self-start" role={user.role} />
         </div>
         <p className="text-xs text-[#64748b]">Solo richieste reali, pubblicate da aziende operative.</p>
       </div>
 
       {!subscriptionActive && (
         <div className="card space-y-3 border-amber-200 bg-amber-50/60 text-sm leading-relaxed text-[#0f172a]">
-          <p className="font-semibold">Sblocca i contatti delle aziende</p>
-          <p className="text-[#475569]">Senza abbonamento puoi vedere solo i dettagli generali delle richieste.</p>
+          <p className="font-semibold">Accesso limitato</p>
+          <p className="text-[#475569]">Sblocca l&apos;accesso completo per contattare direttamente le aziende e vedere i referenti.</p>
           <div className="flex flex-wrap gap-3">
             <Link
               className="btn btn-primary"
-              href="https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"
-              target="_blank"
-              rel="noopener noreferrer"
+              href={billingPathForRole(user.role)}
             >
-              Attiva l&apos;abbonamento per vedere i contatti
+              Attiva accesso completo
             </Link>
             <p className="text-xs text-[#64748b]">Accesso diretto ai referenti aziendali senza intermediari.</p>
           </div>
@@ -67,10 +66,8 @@ export default async function TransporterDashboardPage() {
             <p className="text-sm leading-relaxed text-[#475569]">Gestisci il tuo accesso e verifica lo stato dei contatti.</p>
           </div>
           <Link
-            href={subscriptionActive ? "/dashboard/transporter/billing" : "https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"}
+            href={billingPathForRole(user.role)}
             className="btn btn-secondary"
-            target={subscriptionActive ? undefined : "_blank"}
-            rel={subscriptionActive ? undefined : "noopener noreferrer"}
           >
             {subscriptionActive ? "Stato abbonamento" : "Attiva abbonamento"}
           </Link>

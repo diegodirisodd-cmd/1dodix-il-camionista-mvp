@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { hasActiveSubscription, billingPathForRole } from "@/lib/subscription";
 
 export default async function CompanyDashboardPage() {
   const user = await getSessionUser();
@@ -16,7 +17,7 @@ export default async function CompanyDashboardPage() {
     redirect("/dashboard");
   }
 
-  const isSubscribed = Boolean(user.subscriptionActive);
+  const isSubscribed = hasActiveSubscription(user);
   const requestCount = await prisma.request.count({ where: { companyId: user.id } });
 
   return (
@@ -30,7 +31,7 @@ export default async function CompanyDashboardPage() {
               Pubblica richieste di trasporto e ricevi contatti verificati. Gestisci ogni spedizione in modo chiaro e diretto.
             </p>
           </div>
-          <SubscriptionBadge active={isSubscribed} className="self-start" />
+          <SubscriptionBadge active={isSubscribed} className="self-start" role={user.role} />
         </div>
         <p className="text-xs text-[#64748b]">Le richieste sono visibili solo a trasportatori registrati.</p>
       </div>
@@ -42,14 +43,15 @@ export default async function CompanyDashboardPage() {
             <p className="text-sm leading-relaxed text-[#475569]">Inserisci tratta, carico e referenti per ricevere contatti diretti.</p>
           </div>
           <Link
-            href={isSubscribed ? "/dashboard/company/new-request" : "https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"}
+            href={isSubscribed ? "/dashboard/company/new-request" : billingPathForRole(user.role)}
             className="btn btn-primary"
-            target={isSubscribed ? undefined : "_blank"}
-            rel={isSubscribed ? undefined : "noopener noreferrer"}
           >
             Crea una nuova richiesta di trasporto
           </Link>
           <p className="text-xs text-[#64748b]">Nessun intermediario. Contatto diretto.</p>
+          {!isSubscribed && (
+            <p className="text-xs font-semibold text-amber-700">Questa funzione richiede un abbonamento attivo.</p>
+          )}
         </div>
 
         <div className="card space-y-3">
