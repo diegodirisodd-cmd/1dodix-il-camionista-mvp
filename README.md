@@ -15,7 +15,8 @@ MVP web per autotrasportatori e aziende costruito con **Next.js**, **React**, **
 │   │   │   ├── auth/register/route.ts   # Endpoint registrazione con ruolo
 │   │   │   ├── requests/route.ts        # API creazione/lista richieste di trasporto
 │   │   │   ├── requests/[id]/route.ts   # API dettaglio/aggiornamento/cancellazione richiesta
-│   │   │   ├── (api billing)             # Non usato in questa versione MVP (checkout via link esterno)
+│   │   │   ├── stripe/checkout/route.ts  # Avvia Stripe Checkout (abbonamento)
+│   │   │   ├── stripe/webhook/route.ts   # Webhook Stripe per attivare l'abbonamento
 │   │   │   └── health/route.ts          # API di esempio per stato
 │   │   ├── dashboard/page.tsx           # Pagina protetta (richiede sessione)
 │   │   ├── dashboard/transporter/page.tsx # Dashboard dedicata al ruolo TRANSPORTER
@@ -36,7 +37,7 @@ MVP web per autotrasportatori e aziende costruito con **Next.js**, **React**, **
 │       ├── auth.ts                      # Firma/verifica token e lettura sessione
 │       └── prisma.ts                    # Client Prisma condiviso
 ├── middleware.ts                        # Protezione delle rotte (dashboard)
-├── .env.example                         # Variabili d'ambiente per SQLite e JWT secret
+├── .env.example                         # Variabili d'ambiente per SQLite, JWT e Stripe
 ├── next.config.mjs                      # Configurazione Next.js
 ├── tailwind.config.ts                   # Configurazione Tailwind CSS
 └── tsconfig.json                        # Config TypeScript
@@ -61,7 +62,12 @@ I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato 
    ```bash
    cp .env.example .env
    ```
-   Popola `AUTH_SECRET` con una stringa random e robusta (es. `openssl rand -base64 32`). Il checkout usa un link Stripe esterno e non richiede chiavi aggiuntive in questa versione.
+   Popola `AUTH_SECRET` con una stringa random e robusta (es. `openssl rand -base64 32`).
+   Configura anche le chiavi Stripe reali per il checkout:
+   - `STRIPE_SECRET_KEY`
+   - `STRIPE_PRICE_ID` (price in modalità subscription)
+   - `STRIPE_WEBHOOK_SECRET` (dallo Stripe CLI o dalla dashboard)
+   - `NEXT_PUBLIC_APP_URL` (es. `http://localhost:3000` in locale)
 3. **Migrazione database** (genera anche Prisma Client)
    ```bash
    npx prisma migrate dev
@@ -77,7 +83,8 @@ I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato 
 - **Login**: la pagina `/login` invia le credenziali a `POST /api/auth/login`, verifica l'hash, imposta il cookie di sessione JWT (`dodix_session`) e restituisce il reindirizzamento corretto in base al ruolo.
 - **Logout**: `POST /api/auth/logout` invalida il cookie di sessione.
 - **Protezione pagine/API**: `middleware.ts` richiede un token valido per tutte le rotte `/dashboard`. `getSessionUser` recupera l'utente nei server component per applicare redirect server-side coerenti.
-- **Checkout MVP**: la pagina `/paywall` reindirizza direttamente al link di Stripe Checkout esterno (`https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01`).
+- **Checkout**: la pagina `/paywall` e i CTA premium chiamano `POST /api/stripe/checkout`, che crea una sessione Stripe Checkout in modalità subscription e reindirizza all'URL restituito. Al ritorno, `success_url` punta a `/dashboard?checkout=success`.
+- **Webhook Stripe**: `POST /api/stripe/webhook` valida la firma (`STRIPE_WEBHOOK_SECRET`) e, su `checkout.session.completed`, imposta `subscriptionActive=true` e aggiorna i riferimenti Stripe sull'utente (email usata come chiave).
 - **Admin (solo lettura)**: il ruolo `ADMIN` accede a `/dashboard/admin` per visualizzare elenco utenti e richieste in modalità di sola consultazione; non sono previste azioni di modifica o moderazione nell'MVP.
 
 ## Design system
@@ -109,6 +116,17 @@ npx prisma migrate dev --name reset_local_db
 ```
 
 Questo rigenera il client, ricrea `dev.db` coerente con lo schema corrente e mantiene intatte le migrazioni tracciate nel repository.
+
+### Test manuali abbonamento Stripe
+1. **Eseguire il checkout**
+   - Avvia l'app: `npm run dev`
+   - Accedi come utente non abbonato e clicca su "Attiva abbonamento" (es. da /paywall o dalla pagina billing): il client chiama `POST /api/stripe/checkout` e ti reindirizza a Stripe.
+2. **Configurare il webhook in locale**
+   - Installa Stripe CLI e autenticati.
+   - Avvia il forwarding: `stripe listen --forward-to localhost:3000/api/stripe/webhook`
+   - Esegui un checkout di test: al completamento l'evento `checkout.session.completed` aggiorna `subscriptionActive=true` per l'email usata.
+3. **Verifica stato in app**
+   - Dopo il pagamento, torna su `/dashboard`: il badge deve mostrare "Abbonamento attivo" e le funzionalità premium devono risultare sbloccate.
 
 ## Note
 - Il database SQLite è locale al progetto (file `dev.db`) e non è incluso nel controllo versione.

@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { X } from "lucide-react";
 import { useMemo } from "react";
 
-import { billingDestinationForRole } from "@/lib/subscription";
 import { type Role } from "@/lib/roles";
+import { CheckoutButton } from "./checkout-button";
 
 export function PaywallModal({
   open,
@@ -16,8 +15,6 @@ export function PaywallModal({
   onClose: () => void;
   role?: Role;
 }) {
-  const billingPath = billingDestinationForRole(role);
-
   const roleHeadline = useMemo(
     () =>
       role === "TRANSPORTER"
@@ -71,12 +68,7 @@ export function PaywallModal({
           </div>
 
           <div className="space-y-2">
-            <Link
-              href={billingPath}
-              className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-[#f5c76a] to-[#f29f58] px-4 py-3 text-sm font-semibold text-[#0f172a] shadow-sm transition hover:brightness-95"
-            >
-              Attiva abbonamento
-            </Link>
+            <CheckoutButton role={role} />
             <button
               type="button"
               onClick={onClose}

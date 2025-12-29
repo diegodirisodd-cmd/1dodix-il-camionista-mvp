@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { CheckoutButton } from "@/components/checkout-button";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { hasActiveSubscription } from "@/lib/subscription";
@@ -38,14 +38,7 @@ export default async function CompanyBillingPage() {
           Il piano professionale attivo garantisce contatti diretti con trasportatori verificati. Se non attivo, sbloccalo ora per gestire le spedizioni senza intermediari.
         </p>
         <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href="https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-primary"
-          >
-            Sblocca operatività
-          </Link>
+          <CheckoutButton label="Attiva abbonamento" role={user.role} />
           <div className="space-y-1 text-xs font-medium text-[#475569]">
             <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Contatti diretti verificati</div>
             <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Nessuna intermediazione</div>

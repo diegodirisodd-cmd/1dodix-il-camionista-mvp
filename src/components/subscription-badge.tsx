@@ -1,8 +1,9 @@
-import Link from "next/link";
+"use client";
+
 import type { ReactNode } from "react";
 
-import { billingPathForRole } from "@/lib/subscription";
 import { type Role } from "@/lib/roles";
+import { CheckoutButton } from "./checkout-button";
 
 function IconCheck() {
   return (
@@ -67,12 +68,11 @@ export function SubscriptionBadge({
           </span>
         ),
         cta: (
-          <Link
-            href={billingPathForRole(role)}
-            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#f5c76a] to-[#f29f58] px-3 py-1 text-[11px] font-semibold text-[#0f172a] shadow-sm transition hover:brightness-95"
-          >
-            Passa a Professional
-          </Link>
+          <CheckoutButton
+            role={role}
+            label="Passa a Professional"
+            className="px-3 py-2 text-[11px]"
+          />
         ),
       };
 

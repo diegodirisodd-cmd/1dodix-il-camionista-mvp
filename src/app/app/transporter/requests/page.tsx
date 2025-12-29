@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { CheckoutButton } from "@/components/checkout-button";
 import { getSessionUser } from "@/lib/auth";
 import { routeForUser } from "@/lib/navigation";
 import { prisma } from "@/lib/prisma";
@@ -28,14 +29,11 @@ export default async function TransporterRequestsPage() {
           </p>
         </div>
         {!canViewContacts && (
-          <a
-            href="https://buy.stripe.com/dRm5kv6bn2MqdGK984c7u01"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary"
-          >
-            Attiva abbonamento per vedere i contatti
-          </a>
+          <CheckoutButton
+            role={user.role}
+            label="Attiva abbonamento per vedere i contatti"
+            className="w-full sm:w-auto"
+          />
         )}
       </div>
 

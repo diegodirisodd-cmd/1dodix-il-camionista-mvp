@@ -1,8 +1,9 @@
-import Link from "next/link";
+"use client";
+
 import type { ReactNode } from "react";
 
-import { billingDestinationForRole } from "@/lib/subscription";
 import { type Role } from "@/lib/roles";
+import { CheckoutButton } from "./checkout-button";
 
 export function SubscriptionOverlay({
   show,
@@ -33,8 +34,6 @@ export function SubscriptionOverlay({
           "Gestione centralizzata delle spedizioni",
         ];
 
-  const billingPath = billingDestinationForRole(role);
-
   return (
     <div className="space-y-4">
       <div className="pointer-events-none blur-[1px] opacity-70">{children}</div>
@@ -56,18 +55,13 @@ export function SubscriptionOverlay({
           </ul>
         </div>
         <div className="mt-4 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-3">
-          <Link
-            href={billingPath}
-            className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-[#f5c76a] to-[#f29f58] px-5 py-3 text-sm font-semibold text-[#0f172a] shadow-sm transition hover:brightness-95 sm:w-auto"
-          >
-            Sblocca operatività
-          </Link>
-          <Link
-            href={billingPath}
-            className="text-sm font-semibold text-[#0f172a] underline-offset-4 hover:underline"
-          >
-            Scopri cosa sblocchi
-          </Link>
+          <CheckoutButton role={role} label="Sblocca operatività" className="w-full sm:w-auto" />
+          <CheckoutButton
+            role={role}
+            variant="ghost"
+            label="Scopri cosa sblocchi"
+            className="w-full sm:w-auto"
+          />
         </div>
         <div className="mt-3 space-y-1 text-[12px] font-semibold text-[#0f172a]">
           <div className="flex flex-wrap items-center gap-3 text-xs text-[#0f172a]">

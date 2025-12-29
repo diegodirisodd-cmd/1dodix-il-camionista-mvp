@@ -1,9 +1,7 @@
 "use client";
 
+import { CheckoutButton } from "./checkout-button";
+
 export function PaywallActions() {
-  return (
-    <a href="/dashboard/billing" className="btn-primary w-full justify-center py-3">
-      Sblocca operatività
-    </a>
-  );
+  return <CheckoutButton label="Sblocca operatività" />;
 }
