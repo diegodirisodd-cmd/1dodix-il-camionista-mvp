@@ -53,17 +53,17 @@ export function SubscriptionBadge({
     cta?: ReactNode;
   } = active
     ? {
-        label: "Accesso operativo completo attivo",
+        label: "Abbonamento attivo",
         color: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
         icon: icon === "lightning" ? <IconLightning /> : <IconCheck />,
       }
     : {
-        label: "Accesso limitato",
-        color: "bg-[#f8fafc] text-[#334155] ring-1 ring-[#f5c76a]",
+        label: "Account base",
+        color: "bg-[#f8fafc] text-[#334155] ring-1 ring-[#e2e8f0]",
         icon: <IconLightning />,
         helper: (
           <span className="text-[11px] font-medium text-[#475569]">
-            Accesso limitato. Per lavorare davvero sblocca l’operatività completa.
+            Accesso limitato. Questa azione è disponibile per gli account Professional.
           </span>
         ),
         cta: (
@@ -71,7 +71,7 @@ export function SubscriptionBadge({
             href={billingPathForRole(role)}
             className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#f5c76a] to-[#f29f58] px-3 py-1 text-[11px] font-semibold text-[#0f172a] shadow-sm transition hover:brightness-95"
           >
-            Sblocca operatività
+            Passa a Professional
           </Link>
         ),
       };
