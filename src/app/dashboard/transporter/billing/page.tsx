@@ -26,7 +26,7 @@ export default async function TransporterBillingPage() {
             <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Piano di accesso</p>
             <h1 className="text-3xl font-semibold text-[#0f172a]">Sblocca i contatti delle aziende</h1>
             <p className="text-sm leading-relaxed text-[#475569]">
-              Con l&apos;abbonamento attivo visualizzi subito i referenti e rispondi alle richieste reali.
+              Con il piano professionale attivo visualizzi subito i referenti e rispondi alle richieste reali.
             </p>
           </div>
           <SubscriptionBadge active={subscriptionActive} className="self-start" role={user.role} />
@@ -35,7 +35,7 @@ export default async function TransporterBillingPage() {
 
       <div className="card space-y-4">
         <p className="text-sm leading-relaxed text-[#475569]">
-          Se l&apos;abbonamento non è attivo puoi vedere solo i dettagli generali delle richieste. Attivalo per contattare direttamente le aziende.
+          Se il piano professionale non è attivo puoi vedere solo i dettagli generali delle richieste. Sbloccalo per contattare direttamente le aziende.
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <Link
@@ -44,9 +44,14 @@ export default async function TransporterBillingPage() {
             rel="noopener noreferrer"
             className="btn btn-primary"
           >
-            Attiva accesso completo
+            Sblocca operatività
           </Link>
-          <p className="text-xs text-[#64748b]">Sblocca contatti diretti, richieste illimitate e priorità di visibilità.</p>
+          <div className="space-y-1 text-xs font-medium text-[#475569]">
+            <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Contatti diretti verificati</div>
+            <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Nessuna intermediazione</div>
+            <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Priorità nelle richieste</div>
+            <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Disdici quando vuoi</div>
+          </div>
         </div>
       </div>
     </section>

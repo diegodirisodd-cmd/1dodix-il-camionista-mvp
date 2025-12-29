@@ -50,7 +50,7 @@ export default async function TransporterJobsPage() {
             <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Richieste disponibili</p>
             <h1 className="text-3xl font-semibold text-[#0f172a]">Nuovi trasporti pronti da prendere in carico</h1>
             <p className="text-sm leading-relaxed text-[#475569]">
-              Consulta le tratte pubblicate dalle aziende registrate. I contatti restano protetti finché l’abbonamento non è attivo.
+              Consulta le tratte pubblicate dalle aziende registrate. I contatti restano protetti finché il piano professionale non è attivo.
             </p>
           </div>
           <SubscriptionBadge active={subscriptionActive} className="self-start" role={user.role} />
@@ -63,9 +63,9 @@ export default async function TransporterJobsPage() {
             Accesso limitato
           </div>
           <div className="space-y-2">
-            <h2 className="text-xl font-semibold text-[#0f172a]">Sblocca l’accesso completo</h2>
+            <h2 className="text-xl font-semibold text-[#0f172a]">Sblocca l’accesso operativo completo</h2>
             <p className="text-sm leading-relaxed text-[#475569]">
-              Con l’accesso completo puoi contattare subito le aziende e rispondere alle richieste reali.
+              Con l’accesso operativo completo puoi contattare subito le aziende e rispondere alle richieste reali.
             </p>
             <ul className="mt-2 space-y-1 text-sm leading-relaxed text-[#475569]">
               <li className="flex items-start gap-2">
@@ -83,7 +83,7 @@ export default async function TransporterJobsPage() {
                 href={billingPath}
                 className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-[#f5c76a] to-[#f29f58] px-5 py-3 text-sm font-semibold text-[#0f172a] shadow-sm transition hover:brightness-95 sm:w-auto"
               >
-                Attiva accesso completo
+                Sblocca operatività
               </Link>
               <Link
                 href={billingPath}
@@ -92,7 +92,13 @@ export default async function TransporterJobsPage() {
                 Scopri cosa sblocchi
               </Link>
             </div>
-            <p className="text-xs font-medium text-[#64748b]">Pagamenti sicuri con Stripe · Disdici quando vuoi</p>
+            <div className="space-y-1 text-sm font-medium text-[#475569]">
+              <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Contatti diretti verificati</div>
+              <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Nessuna intermediazione</div>
+              <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Priorità nelle richieste</div>
+              <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Disdici quando vuoi</div>
+            </div>
+            <p className="text-xs font-medium text-[#64748b]">Pagamenti sicuri con Stripe · Accesso immediato</p>
           </div>
         </div>
       )}
@@ -141,11 +147,11 @@ export default async function TransporterJobsPage() {
                               href={billingPath}
                               className="text-xs font-semibold text-[#0f172a] underline-offset-4 hover:underline"
                             >
-                              Sblocca contatti e richieste
+                              Sblocca operatività completa
                             </Link>
                           </div>
                           <div className="text-xs text-[#64748b]">
-                            Contatti sfocati fino all’attivazione dell’accesso completo.
+                            Contatti sfocati fino all’attivazione dell’accesso operativo completo.
                           </div>
                           <div className="space-y-1 text-xs text-[#475569]">
                             <div className="blur-[1px]">{request.contactName ?? "Referente nascosto"}</div>

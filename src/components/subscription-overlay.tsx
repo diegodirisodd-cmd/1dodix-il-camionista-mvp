@@ -17,8 +17,8 @@ export function SubscriptionOverlay({
 
   const description =
     role === "TRANSPORTER"
-      ? "Con l’accesso completo puoi contattare subito le aziende e rispondere alle richieste reali."
-      : "Con l’accesso completo pubblichi richieste illimitate e ricevi risposte prioritarie.";
+      ? "Con l’accesso operativo completo contatti subito le aziende e rispondi alle richieste reali."
+      : "Con l’accesso operativo completo pubblichi richieste illimitate e ricevi risposte prioritarie.";
 
   const bullets =
     role === "TRANSPORTER"
@@ -39,12 +39,12 @@ export function SubscriptionOverlay({
     <div className="space-y-4">
       <div className="pointer-events-none blur-[1px] opacity-70">{children}</div>
       <div className="relative overflow-hidden rounded-2xl border border-[#f5c76a] bg-white p-6 shadow-sm">
-        <div className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full bg-[#fff8ed] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#92400e] ring-1 ring-[#f5c76a]">
+        <div className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full bg-[#f8fafc] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#334155] ring-1 ring-[#f5c76a]">
           <span className="text-[13px]">⚠️</span> Accesso limitato
         </div>
         <div className="space-y-2 pr-12">
           <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Funzionalità premium</p>
-          <h3 className="text-2xl font-semibold text-[#0f172a]">Sblocca l’accesso completo</h3>
+          <h3 className="text-2xl font-semibold text-[#0f172a]">Sblocca l’accesso operativo completo</h3>
           <p className="text-sm leading-relaxed text-[#475569]">{description}</p>
           <ul className="mt-2 space-y-2 text-sm leading-relaxed text-[#475569]">
             {bullets.map((item) => (
@@ -60,7 +60,7 @@ export function SubscriptionOverlay({
             href={billingPath}
             className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-[#f5c76a] to-[#f29f58] px-5 py-3 text-sm font-semibold text-[#0f172a] shadow-sm transition hover:brightness-95 sm:w-auto"
           >
-            Attiva accesso completo
+            Sblocca operatività
           </Link>
           <Link
             href={billingPath}
@@ -69,10 +69,21 @@ export function SubscriptionOverlay({
             Scopri cosa sblocchi
           </Link>
         </div>
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-medium text-[#64748b]">
-          <span>Pagamenti sicuri con Stripe</span>
-          <span>Disdici quando vuoi</span>
-          <span>Accesso immediato</span>
+        <div className="mt-3 space-y-1 text-[12px] font-semibold text-[#0f172a]">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-[#0f172a]">
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#f8fafc] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#334155] ring-1 ring-[#f5c76a]">Accesso limitato</span>
+            <span className="text-[11px] font-medium text-[#475569]">Puoi esplorare la piattaforma, ma per lavorare davvero serve l’accesso operativo completo.</span>
+          </div>
+          <div className="mt-2 space-y-1 text-sm font-medium text-[#475569]">
+            <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Contatti diretti verificati</div>
+            <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Nessuna intermediazione</div>
+            <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Priorità nelle richieste</div>
+            <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Disdici quando vuoi</div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium text-[#64748b]">
+            <span>Pagamenti sicuri con Stripe</span>
+            <span>Accesso immediato</span>
+          </div>
         </div>
       </div>
     </div>

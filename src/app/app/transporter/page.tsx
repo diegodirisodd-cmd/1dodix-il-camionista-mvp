@@ -57,16 +57,22 @@ export default async function TransporterAppPage() {
           </div>
 
           <div className="rounded-lg border border-[#e2e8f0] bg-white p-5 shadow-sm">
-            <p className="text-sm font-semibold text-[#0f172a]">Abbonamento</p>
+            <p className="text-sm font-semibold text-[#0f172a]">Piano professionale</p>
             <p className="mt-2 text-sm leading-relaxed text-[#475569]">
-              Sblocca i contatti aziendali e lavora senza intermediari.
+              Sblocca i contatti aziendali e lavora senza intermediari con l’accesso operativo completo.
             </p>
             <Link
               href={billingPathForRole(user.role)}
               className="btn-primary mt-3 inline-flex w-full justify-center"
             >
-              Attiva accesso completo
+              Sblocca operatività
             </Link>
+            <div className="mt-3 space-y-1 text-xs font-medium text-[#475569]">
+              <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Contatti diretti verificati</div>
+              <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Nessuna intermediazione</div>
+              <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Priorità nelle richieste</div>
+              <div className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Disdici quando vuoi</div>
+            </div>
           </div>
         </div>
       </div>

@@ -45,7 +45,7 @@ export default async function CompanyNewRequestPage() {
         <SubscriptionOverlay show role={user.role}>
           <div className="card space-y-4">
             <div className="space-y-1 text-sm leading-relaxed text-[#475569]">
-              <p>La prima richiesta è inclusa. Per pubblicarne di più, sblocca l’accesso completo.</p>
+              <p>La prima richiesta è inclusa. Per pubblicarne di più, sblocca l’accesso operativo completo.</p>
               <p className="text-xs text-[#64748b]">Il modulo resta visibile per capire cosa verrà inviato.</p>
             </div>
             <RequestForm onSuccessRedirect="/dashboard/company/requests?created=1" />
@@ -58,7 +58,7 @@ export default async function CompanyNewRequestPage() {
               <span className="mt-0.5 text-[#f5a524]">•</span>
               <div className="space-y-1">
                 <p className="font-semibold text-[#0f172a]">La tua prima richiesta è gratuita</p>
-                <p className="text-xs text-[#64748b]">Per le successive avrai bisogno dell’accesso completo.</p>
+                <p className="text-xs text-[#64748b]">Per le successive avrai bisogno dell’accesso operativo completo.</p>
               </div>
             </div>
           )}
