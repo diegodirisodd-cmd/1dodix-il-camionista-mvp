@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 import { LogoutButton } from "@/components/logout-button";
 import { SubscriptionBadge } from "@/components/subscription-badge";
+import { type Role } from "@/lib/roles";
 
-import { SidebarNav } from "./sidebar-nav";
-
-type Role = "COMPANY" | "TRANSPORTER" | "ADMIN";
+import { SidebarNav, navByRole } from "./sidebar-nav";
 
 type DashboardShellProps = {
   user: {
@@ -22,15 +22,21 @@ type DashboardShellProps = {
 
 export function DashboardShell({ user, children }: DashboardShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+
+  const pageLabel = useMemo(() => {
+    const items = navByRole[user.role] ?? [];
+    const activeItem = items.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
+    return activeItem?.label ?? "Panoramica operativa";
+  }, [pathname, user.role]);
 
   return (
     <div className="min-h-screen bg-[#f5f7fa] text-[#0f172a]">
       <div className="border-b border-[#e2e8f0] bg-white px-4 py-3 shadow-sm md:hidden">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#64748b]">Area utente</p>
-            <p className="text-sm font-semibold text-[#0f172a]">{user.email}</p>
-            <p className="text-xs text-[#475569]">Ruolo: {user.role}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#64748b]">Area privata</p>
+            <p className="text-sm font-semibold text-[#0f172a]">{pageLabel}</p>
           </div>
           <button
             type="button"
@@ -44,8 +50,9 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
             </svg>
           </button>
         </div>
-        <div className="mt-3">
+        <div className="mt-3 flex items-center justify-between text-sm text-[#475569]">
           <SubscriptionBadge active={user.subscriptionActive} size="sm" />
+          <LogoutButton variant="light" />
         </div>
       </div>
 
@@ -76,7 +83,19 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
         </aside>
 
         <main className="min-h-screen w-full px-4 py-6 sm:px-6 md:ml-64 md:px-6 md:py-8">
-          <div className="mx-auto flex max-w-6xl flex-col space-y-6">{children}</div>
+          <div className="mx-auto flex max-w-6xl flex-col space-y-6">
+            <div className="hidden items-center justify-between rounded-lg border border-[#e2e8f0] bg-white px-4 py-3 text-sm text-[#475569] shadow-sm md:flex">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#64748b]">Area privata</p>
+                <p className="text-base font-semibold text-[#0f172a]">{pageLabel}</p>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-[#475569]">
+                <SubscriptionBadge active={user.subscriptionActive} size="sm" />
+                <LogoutButton variant="light" />
+              </div>
+            </div>
+            {children}
+          </div>
         </main>
       </div>
 

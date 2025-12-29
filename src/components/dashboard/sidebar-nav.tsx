@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
-type Role = "COMPANY" | "TRANSPORTER" | "ADMIN";
+import { type Role } from "@/lib/roles";
 
-const navByRole: Record<Role, { href: string; label: string }[]> = {
+export const navByRole: Record<Role, { href: string; label: string }[]> = {
   COMPANY: [
     { href: "/dashboard/company", label: "Dashboard" },
     { href: "/dashboard/requests/new", label: "Crea richiesta" },
@@ -50,7 +50,7 @@ export function SidebarNav({
               "flex items-center justify-between rounded-lg px-3 py-3 transition-colors",
               active
                 ? "bg-[#e2e8f0] text-[#0f172a] shadow-inner"
-                : "text-[#475569] hover:bg-slate-100 hover:text-[#0f172a]"
+                : "text-[#475569] hover:bg-slate-100 hover:text-[#0f172a]",
             )}
           >
             <span className="font-medium text-[#0f172a]">{item.label}</span>
