@@ -46,13 +46,15 @@ export default async function CompanyAppPage() {
               Inserisci tratta, carico e contatti per ricevere disponibilità mirate.
             </p>
             <Link
-              href={subscriptionActive ? "/app/company/requests/new" : billingPathForRole(user.role)}
+              href={subscriptionActive ? "/app/company/requests/new" : "/dashboard/billing"}
               className="btn-primary mt-3 inline-flex w-full justify-center"
             >
               Crea nuova richiesta di spedizione
             </Link>
             {!subscriptionActive && (
-              <p className="mt-2 text-xs font-semibold text-amber-700">Questa funzione richiede un abbonamento attivo.</p>
+              <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#fff8ed] px-3 py-1 text-[11px] font-semibold text-[#92400e] ring-1 ring-[#f5c76a]">
+                Accesso limitato · sblocca per pubblicare
+              </div>
             )}
           </div>
 

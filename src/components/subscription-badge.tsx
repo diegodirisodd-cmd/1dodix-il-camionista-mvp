@@ -49,8 +49,8 @@ export function SubscriptionBadge({
     label: string;
     color: string;
     icon: ReactNode;
-    cta?: ReactNode;
     helper?: ReactNode;
+    cta?: ReactNode;
   } = active
     ? {
         label: "Accesso completo",
@@ -59,39 +59,32 @@ export function SubscriptionBadge({
       }
     : {
         label: "Accesso limitato",
-        color: "bg-amber-100 text-amber-800 ring-1 ring-amber-200",
+        color: "bg-[#fff8ed] text-[#92400e] ring-1 ring-[#f5c76a]",
         icon: <IconLightning />,
-        cta: (
-          <div className="flex flex-col gap-1 text-left text-[11px] font-semibold text-[#0f172a]">
-            <Link
-              href={billingPathForRole(role)}
-              className="inline-flex items-center justify-center rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-[#0f172a] shadow-sm ring-1 ring-amber-200 transition hover:bg-[#fff7ed]"
-            >
-              Sblocca contatti e richieste
-            </Link>
-            <div className="flex flex-wrap gap-2 text-[10px] font-medium text-[#64748b]">
-              <span>Pagamenti sicuri con Stripe</span>
-              <span>Disdici quando vuoi</span>
-              <span>Accesso immediato</span>
-            </div>
-          </div>
-        ),
         helper: (
           <span className="text-[11px] font-medium text-[#475569]">
-            Stai utilizzando la versione gratuita. Sblocca l’accesso completo alle funzionalità premium.
+            Stai utilizzando l’accesso limitato. Sblocca i contatti e le richieste premium.
           </span>
+        ),
+        cta: (
+          <Link
+            href={billingPathForRole(role)}
+            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#f5c76a] to-[#f29f58] px-3 py-1 text-[11px] font-semibold text-[#0f172a] shadow-sm transition hover:brightness-95"
+          >
+            Attiva accesso completo
+          </Link>
         ),
       };
 
   return (
     <div
-      className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wide ${content.color} ${className}`.trim()}
+      className={`inline-flex items-center gap-3 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wide ${content.color} ${className}`.trim()}
     >
-      <span className="inline-flex items-center justify-center rounded-full bg-white/60 p-1 text-current">
+      <span className="inline-flex items-center justify-center rounded-full bg-white/70 p-1 text-current">
         {content.icon}
       </span>
-      <div className="flex flex-col gap-1">
-        <span className="flex items-center gap-2">{content.label}</span>
+      <div className="flex flex-col gap-1 text-left">
+        <span className="flex items-center gap-2 text-[#0f172a]">{content.label}</span>
         {!active && content.helper}
       </div>
       {!active && content.cta}

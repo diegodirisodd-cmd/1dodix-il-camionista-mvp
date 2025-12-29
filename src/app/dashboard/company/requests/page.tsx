@@ -45,14 +45,16 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Link
-            href={isSubscribed ? "/dashboard/company/new-request" : billingPathForRole(user.role)}
+            href={isSubscribed ? "/dashboard/company/new-request" : "/dashboard/billing"}
             className="btn btn-primary"
           >
             Pubblica una nuova spedizione
           </Link>
           <p className="text-xs text-[#64748b]">Le richieste sono visibili solo a trasportatori registrati.</p>
           {!isSubscribed && (
-            <p className="text-xs font-semibold text-amber-700">Questa funzione richiede un abbonamento attivo.</p>
+            <div className="inline-flex items-center gap-2 rounded-full bg-[#fff8ed] px-3 py-1 text-[11px] font-semibold text-[#92400e] ring-1 ring-[#f5c76a]">
+              Accesso limitato · sblocca per pubblicare
+            </div>
           )}
         </div>
       </div>

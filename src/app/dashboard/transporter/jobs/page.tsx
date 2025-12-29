@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { Request as RequestModel } from "@prisma/client";
 
@@ -7,7 +6,7 @@ import { SubscriptionBadge } from "@/components/subscription-badge";
 import { SubscriptionOverlay } from "@/components/subscription-overlay";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { billingPathForRole, hasActiveSubscription } from "@/lib/subscription";
+import { hasActiveSubscription } from "@/lib/subscription";
 
 type RequestWithCompany = RequestModel & { company: { email: string } };
 
@@ -50,20 +49,9 @@ export default async function TransporterJobsPage() {
           </div>
           <SubscriptionBadge active={subscriptionActive} className="self-start" role={user.role} />
         </div>
-        {!subscriptionActive && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-slate-800 shadow-sm">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="leading-relaxed text-slate-800">Stai utilizzando la versione gratuita. Sblocca i contatti diretti delle aziende.</p>
-              <Link className="btn-primary w-full justify-center sm:w-auto" href={billingPathForRole(user.role)}>
-                Sblocca contatti e richieste
-              </Link>
-            </div>
-            <p className="mt-2 text-xs font-medium text-[#475569]">Pagamenti sicuri con Stripe · Disdici quando vuoi · Accesso immediato</p>
-          </div>
-        )}
       </div>
 
-      <SubscriptionOverlay show={!subscriptionActive}>
+      <SubscriptionOverlay show={!subscriptionActive} role={user.role}>
         <SectionCard
           title="Elenco incarichi"
           description="Percorso, dettagli del carico e recapiti"

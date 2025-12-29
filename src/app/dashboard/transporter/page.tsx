@@ -33,17 +33,36 @@ export default async function TransporterDashboardPage() {
       </div>
 
       {!subscriptionActive && (
-        <div className="card space-y-3 border-amber-200 bg-amber-50/60 text-sm leading-relaxed text-[#0f172a]">
-          <p className="font-semibold">Accesso limitato</p>
-          <p className="text-[#475569]">Stai utilizzando la versione gratuita. Sblocca l’accesso completo per contattare direttamente le aziende.</p>
-          <div className="flex flex-wrap gap-3">
+        <div className="card relative space-y-3 border border-[#f5c76a] bg-white text-sm leading-relaxed text-[#0f172a]">
+          <div className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full bg-[#fff8ed] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#92400e] ring-1 ring-[#f5c76a]">
+            Accesso limitato
+          </div>
+          <p className="text-lg font-semibold text-[#0f172a]">Sblocca l’accesso completo</p>
+          <p className="text-[#475569]">
+            Per contattare direttamente le aziende e rispondere alle richieste serve un abbonamento attivo.
+          </p>
+          <ul className="space-y-2 text-sm text-[#475569]">
+            <li className="flex items-start gap-2">
+              <span className="mt-0.5 text-[#f5a524]">•</span>
+              <span>Contatti diretti con i referenti aziendali</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-0.5 text-[#f5a524]">•</span>
+              <span>Richieste illimitate e prioritarie</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-0.5 text-[#f5a524]">•</span>
+              <span>Visibilità aumentata sul network</span>
+            </li>
+          </ul>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
             <Link
-              className="btn btn-primary"
-              href={billingPathForRole(user.role)}
+              className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-[#f5c76a] to-[#f29f58] px-4 py-2 text-sm font-semibold text-[#0f172a] shadow-sm transition hover:brightness-95 sm:w-auto"
+              href="/dashboard/billing"
             >
-              Sblocca contatti e richieste
+              Attiva accesso completo
             </Link>
-            <p className="text-xs text-[#64748b]">Pagamenti sicuri con Stripe · Disdici quando vuoi · Accesso immediato</p>
+            <p className="text-xs font-medium text-[#64748b]">Pagamenti sicuri con Stripe · Disdici quando vuoi · Accesso immediato</p>
           </div>
         </div>
       )}
@@ -66,7 +85,7 @@ export default async function TransporterDashboardPage() {
             <p className="text-sm leading-relaxed text-[#475569]">Gestisci il tuo accesso e verifica lo stato dei contatti.</p>
           </div>
           <Link
-            href={billingPathForRole(user.role)}
+            href="/dashboard/billing"
             className="btn btn-secondary"
           >
             {subscriptionActive ? "Vedi piano attivo" : "Passa alla versione completa"}

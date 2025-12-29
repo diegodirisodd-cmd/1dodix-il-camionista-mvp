@@ -35,7 +35,7 @@ export default async function CompanyNewRequestPage() {
         <p className="text-xs text-[#64748b]">Nessun intermediario. Contatto diretto.</p>
       </div>
 
-      <SubscriptionOverlay show={!isSubscribed}>
+      <SubscriptionOverlay show={!isSubscribed} role={user.role}>
         <div className="card space-y-4">
           <RequestForm onSuccessRedirect="/dashboard/company/requests?created=1" />
           <div className="flex flex-wrap items-center gap-3 text-xs text-[#64748b]">
