@@ -46,12 +46,10 @@ export default async function CompanyDashboardPage() {
             href={isSubscribed ? "/dashboard/company/new-request" : billingPathForRole(user.role)}
             className="btn btn-primary"
           >
-            Crea una nuova richiesta di trasporto
+            {isSubscribed ? "Crea una nuova richiesta di trasporto" : "Sblocca contatti e richieste"}
           </Link>
           <p className="text-xs text-[#64748b]">Nessun intermediario. Contatto diretto.</p>
-          {!isSubscribed && (
-            <p className="text-xs font-semibold text-amber-700">Questa funzione richiede un abbonamento attivo.</p>
-          )}
+          <p className="text-xs font-semibold text-[#475569]">Pagamenti sicuri con Stripe · Disdici quando vuoi · Accesso immediato</p>
         </div>
 
         <div className="card space-y-3">

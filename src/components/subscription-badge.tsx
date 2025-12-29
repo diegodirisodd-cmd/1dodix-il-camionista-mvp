@@ -53,7 +53,7 @@ export function SubscriptionBadge({
     helper?: ReactNode;
   } = active
     ? {
-        label: "Abbonamento attivo",
+        label: "Accesso completo",
         color: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
         icon: icon === "lightning" ? <IconLightning /> : <IconCheck />,
       }
@@ -62,16 +62,23 @@ export function SubscriptionBadge({
         color: "bg-amber-100 text-amber-800 ring-1 ring-amber-200",
         icon: <IconLightning />,
         cta: (
-          <Link
-            href={billingPathForRole(role)}
-            className="inline-flex items-center rounded-full bg-white/80 px-3 py-1 text-[11px] font-semibold text-[#0b3c5d] shadow-sm ring-1 ring-amber-200 transition hover:bg-white"
-          >
-            Attiva accesso completo
-          </Link>
+          <div className="flex flex-col gap-1 text-left text-[11px] font-semibold text-[#0f172a]">
+            <Link
+              href={billingPathForRole(role)}
+              className="inline-flex items-center justify-center rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-[#0f172a] shadow-sm ring-1 ring-amber-200 transition hover:bg-[#fff7ed]"
+            >
+              Sblocca contatti e richieste
+            </Link>
+            <div className="flex flex-wrap gap-2 text-[10px] font-medium text-[#64748b]">
+              <span>Pagamenti sicuri con Stripe</span>
+              <span>Disdici quando vuoi</span>
+              <span>Accesso immediato</span>
+            </div>
+          </div>
         ),
         helper: (
           <span className="text-[11px] font-medium text-[#475569]">
-            Funzionalità premium: sblocca contatti diretti e richieste illimitate
+            Stai utilizzando la versione gratuita. Sblocca l’accesso completo alle funzionalità premium.
           </span>
         ),
       };

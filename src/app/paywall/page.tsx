@@ -47,7 +47,7 @@ export default async function PaywallPage() {
             </div>
             <div className="space-y-2">
               <PaywallActions />
-              <p className="text-xs text-[#64748b]">Abbonamento annuale. Disdici quando vuoi.</p>
+              <p className="text-xs text-[#64748b]">Pagamenti sicuri con Stripe · Disdici quando vuoi · Accesso immediato</p>
             </div>
           </div>
         </div>

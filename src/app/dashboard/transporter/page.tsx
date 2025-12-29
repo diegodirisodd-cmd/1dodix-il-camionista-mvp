@@ -25,7 +25,7 @@ export default async function TransporterDashboardPage() {
           <div className="space-y-2">
             <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Dashboard Trasportatore</p>
             <h1 className="text-3xl font-semibold text-[#0f172a]">Nuovi trasporti pronti per te</h1>
-            <p className="text-sm leading-relaxed text-[#475569]">Accedi alle richieste delle aziende registrate.</p>
+            <p className="text-sm leading-relaxed text-[#475569]">Accedi alle richieste delle aziende registrate e contatta i referenti quando sblocchi l’accesso completo.</p>
           </div>
           <SubscriptionBadge active={subscriptionActive} className="self-start" role={user.role} />
         </div>
@@ -35,15 +35,15 @@ export default async function TransporterDashboardPage() {
       {!subscriptionActive && (
         <div className="card space-y-3 border-amber-200 bg-amber-50/60 text-sm leading-relaxed text-[#0f172a]">
           <p className="font-semibold">Accesso limitato</p>
-          <p className="text-[#475569]">Sblocca l&apos;accesso completo per contattare direttamente le aziende e vedere i referenti.</p>
+          <p className="text-[#475569]">Stai utilizzando la versione gratuita. Sblocca l’accesso completo per contattare direttamente le aziende.</p>
           <div className="flex flex-wrap gap-3">
             <Link
               className="btn btn-primary"
               href={billingPathForRole(user.role)}
             >
-              Attiva accesso completo
+              Sblocca contatti e richieste
             </Link>
-            <p className="text-xs text-[#64748b]">Accesso diretto ai referenti aziendali senza intermediari.</p>
+            <p className="text-xs text-[#64748b]">Pagamenti sicuri con Stripe · Disdici quando vuoi · Accesso immediato</p>
           </div>
         </div>
       )}
@@ -69,7 +69,7 @@ export default async function TransporterDashboardPage() {
             href={billingPathForRole(user.role)}
             className="btn btn-secondary"
           >
-            {subscriptionActive ? "Stato abbonamento" : "Attiva abbonamento"}
+            {subscriptionActive ? "Vedi piano attivo" : "Passa alla versione completa"}
           </Link>
           <p className="text-xs text-[#64748b]">Sblocca contatti diretti e opportunità costanti.</p>
         </div>

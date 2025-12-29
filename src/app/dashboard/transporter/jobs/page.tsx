@@ -4,6 +4,7 @@ import type { Request as RequestModel } from "@prisma/client";
 
 import { SectionCard } from "@/components/dashboard/section-card";
 import { SubscriptionBadge } from "@/components/subscription-badge";
+import { SubscriptionOverlay } from "@/components/subscription-overlay";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { billingPathForRole, hasActiveSubscription } from "@/lib/subscription";
@@ -52,67 +53,69 @@ export default async function TransporterJobsPage() {
         {!subscriptionActive && (
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-slate-800 shadow-sm">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="leading-relaxed text-slate-800">Questa funzione richiede un abbonamento attivo. Sblocca i contatti delle aziende.</p>
+              <p className="leading-relaxed text-slate-800">Stai utilizzando la versione gratuita. Sblocca i contatti diretti delle aziende.</p>
               <Link className="btn-primary w-full justify-center sm:w-auto" href={billingPathForRole(user.role)}>
-                Attiva accesso completo
+                Sblocca contatti e richieste
               </Link>
             </div>
-            <p className="mt-2 text-xs font-medium text-[#475569]">Funzionalità premium: contatti diretti e richieste illimitate.</p>
+            <p className="mt-2 text-xs font-medium text-[#475569]">Pagamenti sicuri con Stripe · Disdici quando vuoi · Accesso immediato</p>
           </div>
         )}
       </div>
 
-      <SectionCard
-        title="Elenco incarichi"
-        description="Percorso, dettagli del carico e recapiti"
-        actions={<span className="badge">{displayRequests.length} richieste</span>}
-      >
-        {displayRequests.length === 0 ? (
-          <p className="text-sm leading-relaxed text-[#475569]">Nessuna richiesta presente. Torna a controllare più tardi.</p>
-        ) : (
-          <div className="table-shell overflow-x-auto">
-            <table className="min-w-[960px]">
-              <thead>
-                <tr>
-                  <th>Percorso</th>
-                  <th>Carico</th>
-                  <th>Budget</th>
-                  <th>Contatti</th>
-                  <th>Pubblicata</th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayRequests.map((request) => (
-                  <tr key={request.id}>
-                    <td className="text-[#475569]">
-                      <span className="font-semibold text-[#0f172a]">{request.pickup}</span> → {request.dropoff}
-                    </td>
-                    <td className="text-[#475569]">{request.cargo ?? "—"}</td>
-                    <td className="text-[#475569]">{request.budget ?? "—"}</td>
-                    <td className="text-[#475569]">
-                      {request.contactName ? (
-                        <div className="space-y-1">
-                          <div className="font-semibold text-[#0f172a]">{request.contactName}</div>
-                          <div className="text-xs text-[#64748b]">{request.contactEmail}</div>
-                          <div className="text-xs text-[#64748b]">{request.contactPhone}</div>
-                        </div>
-                      ) : (
-                        <div className="space-y-1 text-sm text-[#475569]">
-                          <span className="table-chip warning inline-flex items-center gap-2">
-                            <span className="text-base leading-none">🔒</span> Contatti bloccati
-                          </span>
-                          <p className="text-xs text-[#64748b]">Attiva l’abbonamento per vedere i referenti.</p>
-                        </div>
-                      )}
-                    </td>
-                    <td className="text-[#475569]">{new Date(request.createdAt).toLocaleDateString("it-IT")}</td>
+      <SubscriptionOverlay show={!subscriptionActive}>
+        <SectionCard
+          title="Elenco incarichi"
+          description="Percorso, dettagli del carico e recapiti"
+          actions={<span className="badge">{displayRequests.length} richieste</span>}
+        >
+          {displayRequests.length === 0 ? (
+            <p className="text-sm leading-relaxed text-[#475569]">Nessuna richiesta presente. Torna a controllare più tardi.</p>
+          ) : (
+            <div className="table-shell overflow-x-auto">
+              <table className="min-w-[960px]">
+                <thead>
+                  <tr>
+                    <th>Percorso</th>
+                    <th>Carico</th>
+                    <th>Budget</th>
+                    <th>Contatti</th>
+                    <th>Pubblicata</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </SectionCard>
+                </thead>
+                <tbody>
+                  {displayRequests.map((request) => (
+                    <tr key={request.id}>
+                      <td className="text-[#475569]">
+                        <span className="font-semibold text-[#0f172a]">{request.pickup}</span> → {request.dropoff}
+                      </td>
+                      <td className="text-[#475569]">{request.cargo ?? "—"}</td>
+                      <td className="text-[#475569]">{request.budget ?? "—"}</td>
+                      <td className="text-[#475569]">
+                        {request.contactName ? (
+                          <div className="space-y-1">
+                            <div className="font-semibold text-[#0f172a]">{request.contactName}</div>
+                            <div className="text-xs text-[#64748b]">{request.contactEmail}</div>
+                            <div className="text-xs text-[#64748b]">{request.contactPhone}</div>
+                          </div>
+                        ) : (
+                          <div className="space-y-1 text-sm text-[#475569]">
+                            <span className="table-chip warning inline-flex items-center gap-2">
+                              <span className="text-base leading-none">🔒</span> Contatti bloccati
+                            </span>
+                            <p className="text-xs text-[#64748b]">Sblocca l’accesso completo per vedere i referenti.</p>
+                          </div>
+                        )}
+                      </td>
+                      <td className="text-[#475569]">{new Date(request.createdAt).toLocaleDateString("it-IT")}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </SectionCard>
+      </SubscriptionOverlay>
     </section>
   );
 }
