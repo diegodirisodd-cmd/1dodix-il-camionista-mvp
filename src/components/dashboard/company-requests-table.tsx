@@ -30,6 +30,7 @@ export function CompanyRequestsTable({
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [activeRequestId, setActiveRequestId] = useState<number | null>(null);
   const [unlocking, setUnlocking] = useState(false);
+  const activeRequest = items.find((request) => request.id === activeRequestId);
 
   async function handleUnlock() {
     if (!activeRequestId) return;
@@ -139,6 +140,7 @@ export function CompanyRequestsTable({
         onClose={() => setPaywallOpen(false)}
         onConfirm={handleUnlock}
         loading={unlocking}
+        budget={activeRequest?.budget ?? null}
         role={role}
       />
     </div>

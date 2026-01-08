@@ -9,12 +9,14 @@ export function PaywallModal({
   onClose,
   onConfirm,
   loading = false,
+  budget,
   role = "COMPANY",
 }: {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
   loading?: boolean;
+  budget?: string | null;
   role?: Role;
 }) {
   const roleHeadline = useMemo(
@@ -32,6 +34,23 @@ export function PaywallModal({
         : "Per garantire contatti qualificati e ridurre perdite di tempo, lo sblocco dei contatti prevede una commissione del 2% + IVA calcolata sul valore del trasporto.",
     [role],
   );
+
+  const parsedAmount = useMemo(() => {
+    if (!budget) return null;
+    const normalized = budget.replace(/[^\d,.-]/g, "");
+    if (!normalized) return null;
+    const withDecimal = normalized.includes(",")
+      ? normalized.replace(/\./g, "").replace(",", ".")
+      : normalized;
+    const value = Number.parseFloat(withDecimal);
+    return Number.isFinite(value) ? value : null;
+  }, [budget]);
+
+  const commission = parsedAmount ? parsedAmount * 0.02 : null;
+  const vat = commission ? commission * 0.22 : null;
+  const total = commission && vat ? commission + vat : null;
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(value);
 
   if (!open) return null;
 
@@ -64,6 +83,39 @@ export function PaywallModal({
             </ul>
           </div>
 
+          <div className="space-y-2 rounded-xl border border-[#E5E7EB] bg-white p-4">
+            <p className="text-sm font-semibold text-[#0f172a]">Riepilogo commissione</p>
+            <div className="space-y-2 text-sm text-[#475569]">
+              <div className="flex items-center justify-between">
+                <span>Valore trasporto</span>
+                <span className="font-semibold text-[#0f172a]">
+                  {parsedAmount ? formatCurrency(parsedAmount) : "Importo non specificato"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Commissione 2%</span>
+                <span className="font-semibold text-[#0f172a]">
+                  {commission ? formatCurrency(commission) : "—"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>IVA (22%)</span>
+                <span className="font-semibold text-[#0f172a]">
+                  {vat ? formatCurrency(vat) : "—"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between border-t border-[#E5E7EB] pt-2">
+                <span className="font-semibold text-[#0f172a]">Totale commissione</span>
+                <span className="font-semibold text-[#0f172a]">
+                  {total ? formatCurrency(total) : "—"}
+                </span>
+              </div>
+            </div>
+            <p className="text-xs text-[#64748b]">
+              Questa commissione viene applicata una sola volta solo per questa richiesta.
+            </p>
+          </div>
+
           <div className="space-y-2">
             <button
               type="button"
@@ -71,7 +123,7 @@ export function PaywallModal({
               disabled={loading}
               className="w-full rounded-full bg-[#0f172a] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {loading ? "Sblocco in corso..." : "Conferma e sblocca"}
+              {loading ? "Sblocco in corso..." : "Conferma e sblocca contatti"}
             </button>
             <button
               type="button"
@@ -81,8 +133,15 @@ export function PaywallModal({
               Annulla
             </button>
             <p className="text-xs font-medium text-[#64748b]">
-              Commissione 2% + IVA applicata solo su questa richiesta. La commissione è calcolata sull’importo indicato nella richiesta.
+              {total
+                ? `Totale commissione: ${formatCurrency(total)} (2% + IVA)`
+                : "La commissione verrà calcolata sull’importo concordato."}
             </p>
+            {parsedAmount && (
+              <p className="text-[11px] text-[#64748b]">
+                La commissione è calcolata sull’importo indicato nella richiesta.
+              </p>
+            )}
           </div>
         </div>
       </div>
