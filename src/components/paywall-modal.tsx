@@ -28,8 +28,8 @@ export function PaywallModal({
   const roleMicrocopy = useMemo(
     () =>
       role === "TRANSPORTER"
-        ? "Per garantire contatti qualificati e ridurre perdite di tempo, lo sblocco prevede una commissione del 2% sul valore del trasporto."
-        : "Per garantire contatti qualificati e ridurre perdite di tempo, lo sblocco prevede una commissione del 2% sul valore del trasporto.",
+        ? "Per garantire contatti qualificati e ridurre perdite di tempo, lo sblocco dei contatti prevede una commissione del 2% + IVA calcolata sul valore del trasporto."
+        : "Per garantire contatti qualificati e ridurre perdite di tempo, lo sblocco dei contatti prevede una commissione del 2% + IVA calcolata sul valore del trasporto.",
     [role],
   );
 
@@ -59,8 +59,8 @@ export function PaywallModal({
             <p className="text-sm font-semibold text-[#0f172a]">Informazioni principali</p>
             <ul className="space-y-2 text-sm text-[#475569]">
               <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Nessun abbonamento</li>
-              <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Paghi solo se lavori</li>
-              <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Commissione una tantum</li>
+              <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Paghi solo quando lavori</li>
+              <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Commissione una tantum per questa richiesta</li>
             </ul>
           </div>
 
@@ -80,7 +80,9 @@ export function PaywallModal({
             >
               Annulla
             </button>
-            <p className="text-xs font-medium text-[#64748b]">Commissione 2% applicata solo su questa richiesta.</p>
+            <p className="text-xs font-medium text-[#64748b]">
+              Commissione 2% + IVA applicata solo su questa richiesta. La commissione è calcolata sull’importo indicato nella richiesta.
+            </p>
           </div>
         </div>
       </div>

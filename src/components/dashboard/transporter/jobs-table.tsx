@@ -91,7 +91,7 @@ export function TransporterJobsTable({
                         <div className="text-xs text-[#64748b]">{request.contactEmail ?? "—"}</div>
                         <div className="text-xs text-[#64748b]">{request.contactPhone ?? "—"}</div>
                         <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
-                          Contatti sbloccati
+                          Contatti sbloccati – commissione applicata: 2% + IVA
                         </span>
                       </div>
                     ) : (
@@ -114,7 +114,7 @@ export function TransporterJobsTable({
                         <div className="text-xs text-[#64748b]">
                           I contatti sono visibili solo dopo lo sblocco.
                         </div>
-                        <p className="text-[11px] text-[#64748b]">Commissione 2% applicata solo su questa richiesta.</p>
+                        <p className="text-[11px] text-[#64748b]">Commissione 2% + IVA applicata solo su questa richiesta.</p>
                         <div className="space-y-1 text-xs text-[#475569]">
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-[#64748b]">🔒</span>
