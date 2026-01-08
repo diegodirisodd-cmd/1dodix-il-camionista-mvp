@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
-import { billingPathForRole, hasActiveSubscription } from "@/lib/subscription";
+import { hasActiveSubscription } from "@/lib/subscription";
 
 export default async function TransporterDashboardPage() {
   const user = await getSessionUser();
@@ -25,7 +25,7 @@ export default async function TransporterDashboardPage() {
           <div className="space-y-2">
             <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Dashboard Trasportatore</p>
             <h1 className="text-3xl font-semibold text-[#0f172a]">Nuovi trasporti pronti per te</h1>
-            <p className="text-sm leading-relaxed text-[#475569]">Accedi alle richieste delle aziende registrate e contatta i referenti quando sblocchi l’accesso operativo completo.</p>
+            <p className="text-sm leading-relaxed text-[#475569]">Accedi alle richieste delle aziende registrate e contatta i referenti quando sblocchi i contatti della richiesta.</p>
           </div>
           <SubscriptionBadge active={subscriptionActive} className="self-start" role={user.role} />
         </div>
@@ -35,26 +35,26 @@ export default async function TransporterDashboardPage() {
       {!subscriptionActive && (
         <div className="card relative space-y-3 border border-[#f5c76a] bg-white text-sm leading-relaxed text-[#0f172a]">
           <div className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full bg-[#fff8ed] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#92400e] ring-1 ring-[#f5c76a]">
-            Accesso limitato
+            Commissione 2% – una tantum
           </div>
-          <p className="text-lg font-semibold text-[#0f172a]">Sblocca l’accesso operativo completo</p>
+          <p className="text-lg font-semibold text-[#0f172a]">Sblocca i contatti quando serve</p>
           <p className="text-[#475569]">
-            Per contattare direttamente le aziende e rispondere alle richieste serve il piano professionale attivo.
+            Per contattare direttamente le aziende e rispondere alle richieste sblocca i contatti della singola richiesta.
           </p>
           <ul className="space-y-2 text-sm text-[#475569]">
             <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Contatti diretti verificati</li>
             <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Nessuna intermediazione</li>
             <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Priorità nelle richieste</li>
-            <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Disdici quando vuoi</li>
+            <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Paghi solo quando sblocchi</li>
           </ul>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
             <Link
               className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-[#f5c76a] to-[#f29f58] px-4 py-2 text-sm font-semibold text-[#0f172a] shadow-sm transition hover:brightness-95 sm:w-auto"
               href="/dashboard/billing"
             >
-              Sblocca operatività
+              Sblocca contatti (commissione 2%)
             </Link>
-            <p className="text-xs font-medium text-[#64748b]">Pagamenti sicuri con Stripe · Disdici quando vuoi · Accesso immediato</p>
+            <p className="text-xs font-medium text-[#64748b]">Paghi solo quando sblocchi i contatti.</p>
           </div>
         </div>
       )}
@@ -68,21 +68,21 @@ export default async function TransporterDashboardPage() {
           <Link href="/dashboard/transporter/jobs" className="btn btn-primary">
             Vedi richieste
           </Link>
-          <p className="text-xs text-[#64748b]">Contatti visibili solo con l’accesso operativo completo attivo.</p>
+          <p className="text-xs text-[#64748b]">Contatti visibili solo dopo lo sblocco con commissione.</p>
         </div>
 
         <div className="card space-y-3">
           <div className="space-y-1">
-            <h2 className="text-lg font-semibold text-[#0f172a]">Piano professionale</h2>
-            <p className="text-sm leading-relaxed text-[#475569]">Gestisci il tuo accesso operativo e verifica lo stato dei contatti.</p>
+            <h2 className="text-lg font-semibold text-[#0f172a]">Commissione per richiesta</h2>
+            <p className="text-sm leading-relaxed text-[#475569]">Scopri come funziona lo sblocco dei contatti per richiesta.</p>
           </div>
           <Link
             href="/dashboard/billing"
             className="btn btn-secondary"
           >
-            {subscriptionActive ? "Vedi piano attivo" : "Sblocca operatività"}
+            Dettagli commissioni
           </Link>
-          <p className="text-xs text-[#64748b]">Sblocca contatti diretti e opportunità costanti.</p>
+          <p className="text-xs text-[#64748b]">Paghi solo quando sblocchi i contatti.</p>
         </div>
 
         <div className="card space-y-3">

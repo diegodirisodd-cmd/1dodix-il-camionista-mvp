@@ -20,7 +20,7 @@ const navByRole: Record<Role, NavItem[]> = {
   TRANSPORTER: [
     { href: "/app/transporter", label: "Panoramica operativa" },
     { href: "/app/transporter/requests", label: "Richieste disponibili" },
-    { href: "/app/transporter/subscription", label: "Abbonamento" },
+  { href: "/app/transporter/subscription", label: "Commissioni" },
     { href: "/app/transporter/profile", label: "Profilo" },
   ],
   ADMIN: [
@@ -74,7 +74,7 @@ export function AppSidebar({
 
       <div className="rounded-lg border border-[#e2e8f0] bg-white px-3 py-3 text-xs text-[#475569] shadow-sm">
         <p className="font-semibold text-[#0f172a]">Supporto</p>
-        <p className="mt-1 leading-relaxed">Gestisci profilo, richieste e abbonamento dalle sezioni dedicate.</p>
+        <p className="mt-1 leading-relaxed">Gestisci profilo, richieste e contatti dalle sezioni dedicate.</p>
       </div>
 
       <div className="mt-auto space-y-3 text-sm text-[#475569]">

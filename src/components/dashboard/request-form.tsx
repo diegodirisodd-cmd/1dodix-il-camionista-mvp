@@ -36,9 +36,11 @@ export function RequestForm({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [paywallOpen, setPaywallOpen] = useState(false);
+  const [unlockConfirmed, setUnlockConfirmed] = useState(false);
+  const [unlockLoading, setUnlockLoading] = useState(false);
   const router = useRouter();
 
-  const canPublish = subscriptionActive || hasFreeQuota;
+  const canPublish = subscriptionActive || hasFreeQuota || unlockConfirmed;
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -48,13 +50,17 @@ export function RequestForm({
 
     if (!canPublish) {
       setPaywallOpen(true);
+      setLoading(false);
       return;
     }
 
     const response = await fetch("/api/requests", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        ...form,
+        contactsUnlockedByCompany: unlockConfirmed,
+      }),
     });
 
     setLoading(false);
@@ -67,6 +73,7 @@ export function RequestForm({
 
     setSuccess("Richiesta pubblicata correttamente");
     setForm(INITIAL_STATE);
+    setUnlockConfirmed(false);
     router.push(onSuccessRedirect ?? "/dashboard/requests?created=1");
   }
 
@@ -170,8 +177,8 @@ export function RequestForm({
 
       {!subscriptionActive && (
         <div className="rounded-lg border border-[#f5c76a] bg-[#fffdf7] p-3 text-xs font-medium text-[#475569]">
-          <p className="text-[#0f172a]">La pubblicazione oltre la prima richiesta richiede il piano professionale.</p>
-          <p className="text-[#64748b]">La prima richiesta è gratuita, poi puoi sbloccare l’accesso operativo completo.</p>
+          <p className="text-[#0f172a]">La pubblicazione oltre la prima richiesta richiede lo sblocco con commissione.</p>
+          <p className="text-[#64748b]">La prima richiesta è gratuita, poi puoi sbloccare i contatti per ogni richiesta.</p>
         </div>
       )}
 
@@ -179,7 +186,18 @@ export function RequestForm({
         {loading ? "Pubblicazione..." : "Pubblica richiesta"}
       </button>
 
-      <PaywallModal open={paywallOpen} onClose={() => setPaywallOpen(false)} role={role} />
+      <PaywallModal
+        open={paywallOpen}
+        onClose={() => setPaywallOpen(false)}
+        onConfirm={async () => {
+          setUnlockLoading(true);
+          setUnlockConfirmed(true);
+          setUnlockLoading(false);
+          setPaywallOpen(false);
+        }}
+        loading={unlockLoading}
+        role={role}
+      />
     </form>
   );
 }

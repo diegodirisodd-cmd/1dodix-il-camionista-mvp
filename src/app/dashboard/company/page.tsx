@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { hasActiveSubscription, billingPathForRole } from "@/lib/subscription";
+import { hasActiveSubscription } from "@/lib/subscription";
 
 export default async function CompanyDashboardPage() {
   const user = await getSessionUser();
@@ -43,13 +43,13 @@ export default async function CompanyDashboardPage() {
             <p className="text-sm leading-relaxed text-[#475569]">Inserisci tratta, carico e referenti per ricevere contatti diretti.</p>
           </div>
           <Link
-            href={isSubscribed ? "/dashboard/company/new-request" : billingPathForRole(user.role)}
+            href="/dashboard/company/new-request"
             className="btn btn-primary"
           >
-            {isSubscribed ? "Crea una nuova richiesta di trasporto" : "Sblocca contatti e richieste"}
+            Crea una nuova richiesta di trasporto
           </Link>
           <p className="text-xs text-[#64748b]">Nessun intermediario. Contatto diretto.</p>
-          <p className="text-xs font-semibold text-[#475569]">Pagamenti sicuri con Stripe · Disdici quando vuoi · Accesso immediato</p>
+          <p className="text-xs font-semibold text-[#475569]">Commissione applicata solo quando sblocchi i contatti.</p>
         </div>
 
         <div className="card space-y-3">

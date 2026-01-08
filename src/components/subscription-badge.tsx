@@ -3,8 +3,6 @@
 import type { ReactNode } from "react";
 
 import { type Role } from "@/lib/roles";
-import { CheckoutButton } from "./checkout-button";
-
 function IconCheck() {
   return (
     <svg
@@ -54,25 +52,23 @@ export function SubscriptionBadge({
     cta?: ReactNode;
   } = active
     ? {
-        label: "Abbonamento attivo",
+        label: "Accesso completo attivo",
         color: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
         icon: icon === "lightning" ? <IconLightning /> : <IconCheck />,
       }
     : {
-        label: "Account base",
+        label: "Accesso limitato",
         color: "bg-[#f8fafc] text-[#334155] ring-1 ring-[#e2e8f0]",
         icon: <IconLightning />,
         helper: (
           <span className="text-[11px] font-medium text-[#475569]">
-            Accesso limitato. Questa azione è disponibile per gli account Professional.
+            Paghi solo quando sblocchi i contatti di una richiesta.
           </span>
         ),
         cta: (
-          <CheckoutButton
-            role={role}
-            label="Passa a Professional"
-            className="px-3 py-2 text-[11px]"
-          />
+          <span className="rounded-full bg-[#fff8ed] px-3 py-1 text-[11px] font-semibold text-[#92400e]">
+            Commissione 2% – una tantum
+          </span>
         ),
       };
 

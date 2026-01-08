@@ -23,6 +23,7 @@ type RequestPayload = {
   contactName?: string;
   contactPhone?: string;
   contactEmail?: string;
+  contactsUnlockedByCompany?: boolean;
 };
 
 function sanitizeRequestOutput(request: RequestModel, includeContact: boolean) {
@@ -52,8 +53,13 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
   }
 
-  const includeContact =
-    isAdmin || (user.role === "COMPANY" && requestRecord.companyId === user.id) || user.subscriptionActive;
+  const includeContact = Boolean(
+    isAdmin ||
+      (user.role === "COMPANY" &&
+        requestRecord.companyId === user.id &&
+        requestRecord.contactsUnlockedByCompany) ||
+      (user.role === "TRANSPORTER" && requestRecord.contactsUnlockedByTransporter),
+  );
 
   return NextResponse.json(sanitizeRequestOutput(requestRecord, includeContact));
 }
@@ -63,10 +69,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
   if (!user) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
-
-  if (!user.subscriptionActive) {
-    return NextResponse.json({ error: "Abbonamento richiesto per aggiornare la richiesta" }, { status: 402 });
   }
 
   const existing = await prisma.request.findUnique({ where: { id: Number(params.id) } });
@@ -105,6 +107,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       contactName: data.contactName!,
       contactPhone: data.contactPhone!,
       contactEmail: data.contactEmail!,
+      contactsUnlockedByCompany: Boolean(data.contactsUnlockedByCompany),
     },
   });
 
@@ -116,10 +119,6 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
 
   if (!user) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
-
-  if (!user.subscriptionActive) {
-    return NextResponse.json({ error: "Abbonamento richiesto per eliminare la richiesta" }, { status: 402 });
   }
 
   const existing = await prisma.request.findUnique({ where: { id: Number(params.id) } });
@@ -139,4 +138,49 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
   await prisma.request.delete({ where: { id: existing.id } });
 
   return NextResponse.json({ success: true });
+}
+
+export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+  const user = await getSessionUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
+  }
+
+  const payload = (await request.json().catch(() => null)) as { unlock?: "company" | "transporter" } | null;
+  const unlockTarget = payload?.unlock;
+
+  if (!unlockTarget) {
+    return NextResponse.json({ error: "Parametro unlock mancante" }, { status: 400 });
+  }
+
+  const existing = await prisma.request.findUnique({ where: { id: Number(params.id) } });
+
+  if (!existing) {
+    return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
+  }
+
+  if (user.role === "ADMIN") {
+    return NextResponse.json({ error: "Gli admin non possono sbloccare contatti" }, { status: 403 });
+  }
+
+  if (unlockTarget === "company") {
+    if (user.role !== "COMPANY" || existing.companyId !== user.id) {
+      return NextResponse.json({ error: "Non autorizzato a sbloccare questi contatti" }, { status: 403 });
+    }
+  }
+
+  if (unlockTarget === "transporter" && user.role !== "TRANSPORTER") {
+    return NextResponse.json({ error: "Non autorizzato a sbloccare questi contatti" }, { status: 403 });
+  }
+
+  const updated = await prisma.request.update({
+    where: { id: existing.id },
+    data:
+      unlockTarget === "company"
+        ? { contactsUnlockedByCompany: true }
+        : { contactsUnlockedByTransporter: true },
+  });
+
+  return NextResponse.json(updated);
 }

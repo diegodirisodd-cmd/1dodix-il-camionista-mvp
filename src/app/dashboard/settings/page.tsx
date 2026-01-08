@@ -18,7 +18,7 @@ export default async function SettingsPage() {
         </div>
 
         <div className="card text-sm text-[#475569]">
-          <p className="leading-relaxed text-[#475569]">Non ci sono ancora impostazioni modificabili. Continua a usare il profilo, le richieste e l’abbonamento dalle sezioni dedicate.</p>
+          <p className="leading-relaxed text-[#475569]">Non ci sono ancora impostazioni modificabili. Continua a usare il profilo e le richieste dalle sezioni dedicate.</p>
         </div>
       </section>
     );

@@ -6,7 +6,7 @@ import { billingDestinationForRole } from "@/lib/subscription";
 import { type Role } from "@/lib/roles";
 
 export function CheckoutButton({
-  label = "Attiva abbonamento",
+  label = "Sblocca contatti",
   className = "",
   variant = "primary",
   role = "COMPANY",
@@ -62,7 +62,7 @@ export function CheckoutButton({
       </button>
       {variant === "primary" && (
         <p className="text-xs font-medium text-[#64748b]">
-          Pagamenti sicuri con Stripe • Disdici quando vuoi
+          Pagamenti sicuri con Stripe • Commissione applicata solo allo sblocco
         </p>
       )}
       {error && (

@@ -36,7 +36,7 @@ export default async function AdminPage() {
                 <th className="px-4 py-3">Email</th>
                 <th className="px-4 py-3">Ruolo</th>
                 <th className="px-4 py-3">Onboarding</th>
-                <th className="px-4 py-3">Abbonamento</th>
+                <th className="px-4 py-3">Commissione</th>
                 <th className="px-4 py-3">Creato</th>
               </tr>
             </thead>
@@ -46,7 +46,7 @@ export default async function AdminPage() {
                   <td className="px-4 py-3 font-medium">{item.email}</td>
                   <td className="px-4 py-3 text-[#475569]">{item.role}</td>
                   <td className="px-4 py-3 text-[#475569]">{item.onboardingCompleted ? "Completo" : "Da completare"}</td>
-                  <td className="px-4 py-3 text-[#475569]">{item.subscriptionActive ? "Attivo" : "Non attivo"}</td>
+                  <td className="px-4 py-3 text-[#475569]">{item.subscriptionActive ? "Accesso completo" : "Pay per contatto"}</td>
                   <td className="px-4 py-3 text-[#475569]">{new Date(item.createdAt).toLocaleDateString("it-IT")}</td>
                 </tr>
               ))}

@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { SubscriptionBadge } from "@/components/subscription-badge";
+import { CompanyRequestsTable } from "@/components/dashboard/company-requests-table";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { hasActiveSubscription, billingPathForRole } from "@/lib/subscription";
 
 export default async function CompanyRequestsPage({ searchParams }: { searchParams?: { created?: string } }) {
   const user = await getSessionUser();
@@ -18,7 +17,6 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
   }
 
   const showCreated = searchParams?.created === "1";
-  const isSubscribed = hasActiveSubscription(user);
   const companyRequests = await prisma.request.findMany({
     where: { companyId: user.id },
     orderBy: { createdAt: "desc" },
@@ -41,21 +39,18 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
               Tutte le tue richieste di trasporto in un unico posto, pronte per contattare trasportatori verificati.
             </p>
           </div>
-          <SubscriptionBadge active={isSubscribed} className="self-start" role={user.role} />
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Link
-            href={isSubscribed ? "/dashboard/company/new-request" : "/dashboard/billing"}
+            href="/dashboard/company/new-request"
             className="btn btn-primary"
           >
             Pubblica una nuova spedizione
           </Link>
           <p className="text-xs text-[#64748b]">Le richieste sono visibili solo a trasportatori registrati.</p>
-          {!isSubscribed && (
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#fff8ed] px-3 py-1 text-[11px] font-semibold text-[#92400e] ring-1 ring-[#f5c76a]">
-              Accesso limitato · sblocca per pubblicare
-            </div>
-          )}
+          <div className="inline-flex items-center gap-2 rounded-full bg-[#fff8ed] px-3 py-1 text-[11px] font-semibold text-[#92400e] ring-1 ring-[#f5c76a]">
+            Commissione 2% – una tantum
+          </div>
         </div>
       </div>
 
@@ -64,40 +59,13 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
           Nessuna richiesta presente. Pubblica la prima per ricevere contatti diretti.
         </div>
       ) : (
-        <div className="card space-y-3">
-          <div className="table-shell overflow-x-auto">
-            <table className="min-w-[980px]">
-              <thead>
-                <tr>
-                  <th>Titolo</th>
-                  <th>Percorso</th>
-                  <th>Carico</th>
-                  <th>Budget</th>
-                  <th>Contatto</th>
-                  <th>Pubblicata</th>
-                </tr>
-              </thead>
-              <tbody>
-                {companyRequests.map((request) => (
-                  <tr key={request.id}>
-                    <td className="font-semibold text-[#0f172a]">{request.title}</td>
-                    <td className="text-[#475569]">
-                      {request.pickup} → {request.dropoff}
-                    </td>
-                    <td className="text-[#475569]">{request.cargo ?? "—"}</td>
-                    <td className="text-[#475569]">{request.budget ?? "—"}</td>
-                    <td className="space-y-1 text-[#475569]">
-                      <div className="font-semibold text-[#0f172a]">{request.contactName}</div>
-                      <div className="text-xs text-[#64748b]">{request.contactEmail}</div>
-                      <div className="text-xs text-[#64748b]">{request.contactPhone}</div>
-                    </td>
-                    <td className="text-[#475569]">{new Date(request.createdAt).toLocaleDateString("it-IT")}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <CompanyRequestsTable
+          requests={companyRequests.map((request) => ({
+            ...request,
+            createdAt: request.createdAt.toISOString(),
+          }))}
+          role={user.role}
+        />
       )}
     </section>
   );

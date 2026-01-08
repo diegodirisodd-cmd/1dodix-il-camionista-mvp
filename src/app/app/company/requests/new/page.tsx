@@ -34,7 +34,7 @@ export default async function NewCompanyRequestPage() {
       <div className="card">
         {!subscriptionActive && (
           <div className="mb-3 rounded-lg border border-dashed border-[#f5c76a] bg-[#fffaf2] p-3 text-xs font-medium text-[#475569]">
-            <p className="text-[#0f172a]">La prima richiesta è inclusa. Per le successive serve il piano professionale.</p>
+              <p className="text-[#0f172a]">La prima richiesta è inclusa. Per le successive sblocchi i contatti con la commissione 2%.</p>
             <p className="text-[#64748b]">Nessuna intermediazione, contatti diretti.</p>
           </div>
         )}

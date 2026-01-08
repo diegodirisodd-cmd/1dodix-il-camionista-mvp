@@ -72,7 +72,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
 
             <div className="rounded-lg border border-[#e2e8f0] bg-white px-3 py-3 text-xs text-[#475569] shadow-sm">
               <p className="font-semibold text-[#0f172a]">Supporto</p>
-              <p className="mt-1 leading-relaxed">Gestisci profilo, richieste e abbonamento dalle sezioni dedicate.</p>
+              <p className="mt-1 leading-relaxed">Gestisci profilo, richieste e contatti dalle sezioni dedicate.</p>
             </div>
 
             <div className="mt-auto flex items-center justify-between text-sm text-[#0f172a]">

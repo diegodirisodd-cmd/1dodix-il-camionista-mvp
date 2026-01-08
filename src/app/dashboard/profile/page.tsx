@@ -46,8 +46,8 @@ export default async function ProfilePage() {
             <p className="text-base font-semibold text-slate-900">{new Date(user.createdAt).toLocaleString("it-IT")}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">Stato abbonamento</p>
-            <p className="text-base font-semibold text-slate-900">{subscriptionActive ? "Attivo" : "Accesso limitato"}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">Commissione contatti</p>
+            <p className="text-base font-semibold text-slate-900">{subscriptionActive ? "Accesso completo attivo" : "Paghi solo quando sblocchi"}</p>
           </div>
         </div>
 

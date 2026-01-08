@@ -44,7 +44,7 @@ export default async function CompanyNewRequestPage() {
             <span className="mt-0.5 text-[#f5a524]">•</span>
             <div className="space-y-1">
               <p className="font-semibold text-[#0f172a]">La prima richiesta è inclusa</p>
-              <p className="text-xs text-[#64748b]">Per le successive avrai bisogno del piano professionale.</p>
+              <p className="text-xs text-[#64748b]">Per le successive potrai sbloccare i contatti con la commissione 2%.</p>
             </div>
           </div>
         )}
@@ -56,7 +56,7 @@ export default async function CompanyNewRequestPage() {
         />
         <div className="flex flex-wrap items-center gap-3 text-xs text-[#64748b]">
           <span>Le richieste saranno visibili ai trasportatori registrati.</span>
-          <span className="font-semibold text-[#475569]">Pagamenti sicuri con Stripe · Disdici quando vuoi</span>
+          <span className="font-semibold text-[#475569]">Commissione applicata solo quando sblocchi i contatti.</span>
         </div>
       </div>
     </section>

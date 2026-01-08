@@ -5,7 +5,7 @@ import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { routeForUser } from "@/lib/navigation";
 import { prisma } from "@/lib/prisma";
-import { billingPathForRole, hasActiveSubscription } from "@/lib/subscription";
+import { hasActiveSubscription } from "@/lib/subscription";
 
 export default async function CompanyAppPage() {
   const user = await getSessionUser();
@@ -46,16 +46,14 @@ export default async function CompanyAppPage() {
               Inserisci tratta, carico e contatti per ricevere disponibilità mirate.
             </p>
             <Link
-              href={subscriptionActive ? "/app/company/requests/new" : "/dashboard/billing"}
+              href="/app/company/requests/new"
               className="btn-primary mt-3 inline-flex w-full justify-center"
             >
               Crea nuova richiesta di spedizione
             </Link>
-            {!subscriptionActive && (
-              <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#fff8ed] px-3 py-1 text-[11px] font-semibold text-[#92400e] ring-1 ring-[#f5c76a]">
-                Accesso limitato · sblocca per pubblicare
-              </div>
-            )}
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#fff8ed] px-3 py-1 text-[11px] font-semibold text-[#92400e] ring-1 ring-[#f5c76a]">
+              Commissione 2% – una tantum
+            </div>
           </div>
 
           <div className="rounded-lg border border-[#e2e8f0] bg-white p-5 shadow-sm">
@@ -112,8 +110,17 @@ export default async function CompanyAppPage() {
                       {request.pickup} → {request.dropoff}
                     </td>
                     <td className="px-4 py-3 text-[#475569]">
-                      <div className="font-medium text-[#0f172a]">{request.contactName}</div>
-                      <div className="text-xs text-[#64748b]">{request.contactEmail}</div>
+                      {request.contactsUnlockedByCompany ? (
+                        <>
+                          <div className="font-medium text-[#0f172a]">{request.contactName}</div>
+                          <div className="text-xs text-[#64748b]">{request.contactEmail}</div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="font-medium text-[#0f172a] blur-[1px]">Referente nascosto</div>
+                          <div className="text-xs text-[#64748b] blur-[1px]">••••@••••</div>
+                        </>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-[#475569]">
                       {new Date(request.createdAt).toLocaleDateString("it-IT")}

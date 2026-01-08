@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { CompanyRequestsTable } from "@/components/dashboard/company-requests-table";
 import { getSessionUser } from "@/lib/auth";
 import { routeForUser } from "@/lib/navigation";
 import { prisma } from "@/lib/prisma";
@@ -51,38 +52,13 @@ export default async function CompanyRequestsPage({
         {requests.length === 0 ? (
           <p className="text-sm leading-relaxed text-[#475569]">Non hai ancora creato richieste.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-[980px] divide-y divide-[#e2e8f0] text-left text-sm text-[#0f172a]">
-              <thead className="bg-[#f8fafc] text-xs font-semibold uppercase tracking-wide text-[#475569]">
-                <tr>
-                  <th className="px-4 py-3">Titolo</th>
-                  <th className="px-4 py-3">Percorso</th>
-                  <th className="px-4 py-3">Carico</th>
-                  <th className="px-4 py-3">Budget</th>
-                  <th className="px-4 py-3">Contatto</th>
-                  <th className="px-4 py-3">Pubblicata</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#e2e8f0] text-sm text-[#0f172a]">
-                {requests.map((request) => (
-                  <tr key={request.id} className="hover:bg-[#f8fafc]">
-                    <td className="px-4 py-3 font-semibold">{request.title}</td>
-                    <td className="px-4 py-3 text-[#475569]">
-                      {request.pickup} → {request.dropoff}
-                    </td>
-                    <td className="px-4 py-3 text-[#475569]">{request.cargo ?? "—"}</td>
-                    <td className="px-4 py-3 text-[#475569]">{request.budget ?? "—"}</td>
-                    <td className="px-4 py-3 text-[#475569]">
-                      <div className="font-medium text-[#0f172a]">{request.contactName}</div>
-                      <div className="text-xs text-[#64748b]">{request.contactEmail}</div>
-                      <div className="text-xs text-[#64748b]">{request.contactPhone}</div>
-                    </td>
-                    <td className="px-4 py-3 text-[#475569]">{new Date(request.createdAt).toLocaleDateString("it-IT")}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <CompanyRequestsTable
+            requests={requests.map((request) => ({
+              ...request,
+              createdAt: request.createdAt.toISOString(),
+            }))}
+            role={user.role}
+          />
         )}
       </div>
     </section>

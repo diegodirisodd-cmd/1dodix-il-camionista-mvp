@@ -23,6 +23,7 @@ type RequestPayload = {
   contactName?: string;
   contactPhone?: string;
   contactEmail?: string;
+  contactsUnlockedByCompany?: boolean;
 };
 
 function sanitizeRequestOutput(request: RequestModel, includeContact: boolean) {
@@ -43,14 +44,23 @@ export async function GET() {
 
   const isCompany = user?.role === "COMPANY";
   const isAdmin = user?.role === "ADMIN";
-  const includeContact = Boolean(isCompany || isAdmin || user?.subscriptionActive);
 
   const requests = await prisma.request.findMany({
     where: isCompany && !isAdmin && user ? { companyId: user.id } : undefined,
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json(requests.map((request) => sanitizeRequestOutput(request, includeContact)));
+  const sanitized = requests.map((request) => {
+    const includeContact = Boolean(
+      isAdmin ||
+        (user?.role === "COMPANY" && request.companyId === user.id && request.contactsUnlockedByCompany) ||
+        (user?.role === "TRANSPORTER" && request.contactsUnlockedByTransporter),
+    );
+
+    return sanitizeRequestOutput(request, includeContact);
+  });
+
+  return NextResponse.json(sanitized);
 }
 
 export async function POST(request: Request) {
@@ -92,6 +102,7 @@ export async function POST(request: Request) {
         contactName: data.contactName!,
         contactPhone: data.contactPhone!,
         contactEmail: data.contactEmail!,
+        contactsUnlockedByCompany: Boolean(data.contactsUnlockedByCompany),
         companyId: user.id,
       },
     });

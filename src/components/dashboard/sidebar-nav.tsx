@@ -11,13 +11,13 @@ export const navByRole: Record<Role, { href: string; label: string }[]> = {
     { href: "/dashboard/company", label: "Panoramica azienda" },
     { href: "/dashboard/company/requests", label: "Richieste inviate" },
     { href: "/dashboard/company/profile", label: "Profilo aziendale" },
-    { href: "/dashboard/company/billing", label: "Piano di accesso" },
+    { href: "/dashboard/company/billing", label: "Commissioni" },
   ],
   TRANSPORTER: [
     { href: "/dashboard/transporter", label: "Panoramica trasportatore" },
     { href: "/dashboard/transporter/jobs", label: "Richieste disponibili" },
     { href: "/dashboard/transporter/profile", label: "Profilo operatore" },
-    { href: "/dashboard/transporter/billing", label: "Piano di accesso" },
+    { href: "/dashboard/transporter/billing", label: "Commissioni" },
   ],
   ADMIN: [
     { href: "/dashboard/admin", label: "Panoramica operativa" },

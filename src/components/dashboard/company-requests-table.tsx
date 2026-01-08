@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 
 import { PaywallModal } from "@/components/paywall-modal";
@@ -13,25 +12,24 @@ type RequestRow = {
   dropoff: string;
   cargo: string | null;
   budget: string | null;
-  description: string | null;
   contactName: string | null;
-  contactPhone: string | null;
   contactEmail: string | null;
-  contactsUnlockedByTransporter: boolean;
+  contactPhone: string | null;
+  contactsUnlockedByCompany: boolean;
   createdAt: string;
 };
 
-export function TransporterJobsTable({
+export function CompanyRequestsTable({
   requests,
   role,
 }: {
   requests: RequestRow[];
   role: Role;
 }) {
+  const [items, setItems] = useState(requests);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [activeRequestId, setActiveRequestId] = useState<number | null>(null);
   const [unlocking, setUnlocking] = useState(false);
-  const [items, setItems] = useState(requests);
 
   async function handleUnlock() {
     if (!activeRequestId) return;
@@ -39,7 +37,7 @@ export function TransporterJobsTable({
     const response = await fetch(`/api/requests/${activeRequestId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ unlock: "transporter" }),
+      body: JSON.stringify({ unlock: "company" }),
     });
 
     setUnlocking(false);
@@ -51,46 +49,44 @@ export function TransporterJobsTable({
 
     setItems((prev) =>
       prev.map((request) =>
-        request.id === activeRequestId ? { ...request, contactsUnlockedByTransporter: true } : request,
+        request.id === activeRequestId ? { ...request, contactsUnlockedByCompany: true } : request,
       ),
     );
     setPaywallOpen(false);
   }
 
   return (
-    <div className="space-y-4">
-      {items.length === 0 ? (
-        <p className="text-sm leading-relaxed text-[#475569]">Nessuna richiesta presente. Torna a controllare più tardi.</p>
-      ) : (
-        <div className="table-shell overflow-x-auto">
-          <table className="min-w-[960px]">
-            <thead>
-              <tr>
-                <th>Percorso</th>
-                <th>Carico</th>
-                <th>Budget</th>
-                <th>Contatti</th>
-                <th>Azione</th>
-                <th>Pubblicata</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((request) => {
-                const unlocked = Boolean(request.contactsUnlockedByTransporter);
-                return (
+    <div className="card space-y-3">
+      <div className="table-shell overflow-x-auto">
+        <table className="min-w-[980px]">
+          <thead>
+            <tr>
+              <th>Titolo</th>
+              <th>Percorso</th>
+              <th>Carico</th>
+              <th>Budget</th>
+              <th>Contatto</th>
+              <th>Pubblicata</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((request) => {
+              const unlocked = Boolean(request.contactsUnlockedByCompany);
+              return (
                 <tr key={request.id} className={!unlocked ? "bg-white/70" : undefined}>
+                  <td className="font-semibold text-[#0f172a]">{request.title}</td>
                   <td className="text-[#475569]">
-                    <span className="font-semibold text-[#0f172a]">{request.pickup}</span> → {request.dropoff}
+                    {request.pickup} → {request.dropoff}
                   </td>
                   <td className="text-[#475569]">{request.cargo ?? "—"}</td>
                   <td className="text-[#475569]">{request.budget ?? "—"}</td>
-                  <td className="text-[#475569]">
+                  <td className="space-y-1 text-[#475569]">
                     {unlocked ? (
-                      <div className="space-y-1">
-                        <div className="font-semibold text-[#0f172a]">{request.contactName ?? "—"}</div>
-                        <div className="text-xs text-[#64748b]">{request.contactEmail ?? "—"}</div>
-                        <div className="text-xs text-[#64748b]">{request.contactPhone ?? "—"}</div>
-                      </div>
+                      <>
+                        <div className="font-semibold text-[#0f172a]">{request.contactName}</div>
+                        <div className="text-xs text-[#64748b]">{request.contactEmail}</div>
+                        <div className="text-xs text-[#64748b]">{request.contactPhone}</div>
+                      </>
                     ) : (
                       <div className="space-y-2 rounded-lg border border-dashed border-[#f5c76a]/80 bg-[#fff8ed] p-3 text-sm text-[#475569]">
                         <div className="flex items-center justify-between gap-2">
@@ -108,9 +104,7 @@ export function TransporterJobsTable({
                             Sblocca contatti (commissione 2%)
                           </button>
                         </div>
-                        <div className="text-xs text-[#64748b]">
-                          Contatti oscurati fino allo sblocco con commissione.
-                        </div>
+                        <div className="text-xs text-[#64748b]">Contatti oscurati fino allo sblocco con commissione.</div>
                         <div className="space-y-1 text-xs text-[#475569]">
                           <div className="blur-[1px]">{request.contactName ?? "Referente nascosto"}</div>
                           <div className="blur-[1px]">{request.contactEmail ?? "••••@••••"}</div>
@@ -119,35 +113,13 @@ export function TransporterJobsTable({
                       </div>
                     )}
                   </td>
-                  <td className="text-[#475569]">
-                    {unlocked && request.contactEmail ? (
-                      <Link
-                        href={`mailto:${request.contactEmail}`}
-                        className="inline-flex items-center justify-center rounded-full bg-[#0f172a] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:brightness-110"
-                      >
-                        Rispondi alla richiesta
-                      </Link>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveRequestId(request.id);
-                          setPaywallOpen(true);
-                        }}
-                        className="inline-flex items-center justify-center rounded-full border border-[#f5c76a] px-3 py-2 text-xs font-semibold text-[#0f172a] shadow-sm transition hover:bg-[#fff5e6]"
-                      >
-                        Sblocca contatti (commissione 2%)
-                      </button>
-                    )}
-                  </td>
                   <td className="text-[#475569]">{new Date(request.createdAt).toLocaleDateString("it-IT")}</td>
                 </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       <PaywallModal
         open={paywallOpen}

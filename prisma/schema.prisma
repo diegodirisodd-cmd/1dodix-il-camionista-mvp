@@ -33,6 +33,8 @@ model Request {
   contactName  String
   contactPhone String
   contactEmail String
+  contactsUnlockedByCompany     Boolean  @default(false)
+  contactsUnlockedByTransporter Boolean  @default(false)
 
   companyId Int
   company   User @relation(fields: [companyId], references: [id])
