@@ -90,12 +90,15 @@ export function TransporterJobsTable({
                         <div className="font-semibold text-[#0f172a]">{request.contactName ?? "—"}</div>
                         <div className="text-xs text-[#64748b]">{request.contactEmail ?? "—"}</div>
                         <div className="text-xs text-[#64748b]">{request.contactPhone ?? "—"}</div>
+                        <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
+                          Contatti sbloccati
+                        </span>
                       </div>
                     ) : (
                       <div className="space-y-2 rounded-lg border border-dashed border-[#f5c76a]/80 bg-[#fff8ed] p-3 text-sm text-[#475569]">
                         <div className="flex items-center justify-between gap-2">
                           <span className="table-chip warning inline-flex items-center gap-2">
-                            <span className="text-base leading-none">🔒</span> Accesso limitato
+                            <span className="text-base leading-none">🔒</span> Contatti bloccati
                           </span>
                           <button
                             type="button"
@@ -103,18 +106,28 @@ export function TransporterJobsTable({
                               setActiveRequestId(request.id);
                               setPaywallOpen(true);
                             }}
-                            className="text-xs font-semibold text-[#0f172a] underline-offset-4 hover:underline"
+                            className="rounded-full border border-[#e2e8f0] px-3 py-1 text-xs font-semibold text-[#0f172a] transition hover:bg-[#f8fafc]"
                           >
-                            Sblocca contatti (commissione 2%)
+                            Sblocca contatti
                           </button>
                         </div>
                         <div className="text-xs text-[#64748b]">
-                          Contatti oscurati fino allo sblocco con commissione.
+                          I contatti sono visibili solo dopo lo sblocco.
                         </div>
+                        <p className="text-[11px] text-[#64748b]">Commissione 2% applicata solo su questa richiesta.</p>
                         <div className="space-y-1 text-xs text-[#475569]">
-                          <div className="blur-[1px]">{request.contactName ?? "Referente nascosto"}</div>
-                          <div className="blur-[1px]">{request.contactEmail ?? "••••@••••"}</div>
-                          <div className="blur-[1px]">{request.contactPhone ?? "••••••"}</div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-[#64748b]">🔒</span>
+                            <span className="blur-[1px]">{request.contactName ?? "Referente nascosto"}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-[#64748b]">🔒</span>
+                            <span className="blur-[1px]">{request.contactEmail ?? "••••@••••"}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-[#64748b]">🔒</span>
+                            <span className="blur-[1px]">{request.contactPhone ?? "••••••"}</span>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -134,9 +147,9 @@ export function TransporterJobsTable({
                           setActiveRequestId(request.id);
                           setPaywallOpen(true);
                         }}
-                        className="inline-flex items-center justify-center rounded-full border border-[#f5c76a] px-3 py-2 text-xs font-semibold text-[#0f172a] shadow-sm transition hover:bg-[#fff5e6]"
+                        className="inline-flex items-center justify-center rounded-full border border-[#e2e8f0] px-3 py-2 text-xs font-semibold text-[#0f172a] shadow-sm transition hover:bg-[#f8fafc]"
                       >
-                        Sblocca contatti (commissione 2%)
+                        Sblocca contatti
                       </button>
                     )}
                   </td>

@@ -119,6 +119,7 @@ export default async function CompanyAppPage() {
                         <>
                           <div className="font-medium text-[#0f172a] blur-[1px]">Referente nascosto</div>
                           <div className="text-xs text-[#64748b] blur-[1px]">••••@••••</div>
+                          <div className="text-[11px] text-[#64748b]">I contatti sono visibili solo dopo lo sblocco.</div>
                         </>
                       )}
                     </td>

@@ -20,16 +20,16 @@ export function PaywallModal({
   const roleHeadline = useMemo(
     () =>
       role === "TRANSPORTER"
-        ? "Con l’accesso completo puoi contattare subito le aziende e rispondere alle richieste reali."
-        : "Con l’accesso completo pubblichi richieste illimitate e ricevi risposte prioritarie.",
+        ? "Contatti diretti con aziende verificate, solo quando necessario."
+        : "Contatti diretti con trasportatori verificati, solo quando necessario.",
     [role],
   );
 
   const roleMicrocopy = useMemo(
     () =>
       role === "TRANSPORTER"
-        ? "Stai per sbloccare i contatti per questa richiesta. In produzione verrà applicata una commissione del 2%."
-        : "Stai per sbloccare i contatti per questa richiesta. In produzione verrà applicata una commissione del 2%.",
+        ? "Per garantire contatti qualificati e ridurre perdite di tempo, lo sblocco prevede una commissione del 2% sul valore del trasporto."
+        : "Per garantire contatti qualificati e ridurre perdite di tempo, lo sblocco prevede una commissione del 2% sul valore del trasporto.",
     [role],
   );
 
@@ -49,19 +49,19 @@ export function PaywallModal({
 
         <div className="space-y-4 p-6">
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#475569]">Sblocca i contatti per questa richiesta</p>
-            <h2 className="text-2xl font-semibold text-[#0f172a]">Paghi solo quando serve. Nessun piano ricorrente.</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#475569]">Sblocco contatti</p>
+            <h2 className="text-2xl font-semibold text-[#0f172a]">Sblocca i contatti di questa richiesta</h2>
             <p className="text-sm font-semibold text-[#0f172a]">{roleHeadline}</p>
             <p className="text-sm text-[#475569]">{roleMicrocopy}</p>
           </div>
 
           <div className="space-y-2 rounded-xl border border-[#E5E7EB] bg-[#F8FAFC] p-4">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#0f172a] ring-1 ring-[#f5c76a]">
-              Commissione 2% – una tantum
-            </div>
-            <p className="text-sm leading-relaxed text-[#475569]">
-              Stai per sbloccare i contatti per questa richiesta. In produzione verrà applicata una commissione del 2%.
-            </p>
+            <p className="text-sm font-semibold text-[#0f172a]">Informazioni principali</p>
+            <ul className="space-y-2 text-sm text-[#475569]">
+              <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Nessun abbonamento</li>
+              <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Paghi solo se lavori</li>
+              <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Commissione una tantum</li>
+            </ul>
           </div>
 
           <div className="space-y-2">
@@ -69,18 +69,18 @@ export function PaywallModal({
               type="button"
               onClick={onConfirm}
               disabled={loading}
-              className="w-full rounded-full bg-gradient-to-r from-[#f5c76a] to-[#f29f58] px-4 py-3 text-sm font-semibold text-[#0f172a] shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-70"
+              className="w-full rounded-full bg-[#0f172a] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {loading ? "Sblocco in corso..." : "Conferma e sblocca (demo)"}
+              {loading ? "Sblocco in corso..." : "Conferma e sblocca"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-full text-sm font-semibold text-[#0f172a] underline-offset-4 hover:underline"
+              className="w-full rounded-full border border-[#e2e8f0] px-4 py-3 text-sm font-semibold text-[#0f172a] transition hover:bg-[#f8fafc]"
             >
-              Continua a esplorare
+              Annulla
             </button>
-            <p className="text-xs font-medium text-[#64748b]">Paghi solo quando serve. Nessun piano ricorrente.</p>
+            <p className="text-xs font-medium text-[#64748b]">Commissione 2% applicata solo su questa richiesta.</p>
           </div>
         </div>
       </div>
