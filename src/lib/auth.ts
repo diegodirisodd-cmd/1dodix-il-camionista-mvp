@@ -68,15 +68,17 @@ export async function getSessionUser() {
       email: true,
       role: true,
       createdAt: true,
-      subscriptionActive: true,
-      subscriptionStatus: true,
-      onboardingCompleted: true,
     },
   });
 
   if (!user) return null;
 
-  return user;
+  return {
+    ...user,
+    subscriptionActive: true,
+    subscriptionStatus: "active",
+    onboardingCompleted: true,
+  };
 }
 
 export function buildSessionCookie(token: string) {

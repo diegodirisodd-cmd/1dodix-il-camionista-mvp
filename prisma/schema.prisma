@@ -8,37 +8,25 @@ datasource db {
 }
 
 model User {
-  id                     Int      @id @default(autoincrement())
-  email                  String   @unique
-  password               String
-  role                   String   @default("COMPANY")
-  subscriptionActive     Boolean  @default(false)
-  stripeCustomerId       String?
-  stripeSubscriptionId   String?
-  subscriptionStatus     String?  @default("inactive")
-  onboardingCompleted    Boolean  @default(false)
-  createdAt              DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      String   @default("COMPANY")
+  createdAt DateTime @default(now())
 
-  requests  Request[]
+  companyRequests     Request[] @relation("CompanyRequests")
+  transporterRequests Request[] @relation("TransporterRequests")
 }
 
 model Request {
-  id           Int      @id @default(autoincrement())
-  title        String
-  pickup       String
-  dropoff      String
-  cargo        String?
-  budget       String?
-  description  String?
-  contactName  String
-  contactPhone String
-  contactEmail String
+  id                          Int      @id @default(autoincrement())
+  companyId                   Int
+  transporterId               Int?
+  price                       Decimal  @db.Decimal(10, 2)
   contactsUnlockedByCompany     Boolean  @default(false)
   contactsUnlockedByTransporter Boolean  @default(false)
+  createdAt                   DateTime @default(now())
 
-  companyId Int
-  company   User @relation(fields: [companyId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  company     User  @relation("CompanyRequests", fields: [companyId], references: [id])
+  transporter User? @relation("TransporterRequests", fields: [transporterId], references: [id])
 }

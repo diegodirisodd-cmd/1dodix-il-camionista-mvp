@@ -7,14 +7,7 @@ import { type Role } from "@/lib/roles";
 
 type RequestRow = {
   id: number;
-  title: string;
-  pickup: string;
-  dropoff: string;
-  cargo: string | null;
-  budget: string | null;
-  contactName: string | null;
-  contactEmail: string | null;
-  contactPhone: string | null;
+  price: string;
   contactsUnlockedByCompany: boolean;
   createdAt: string;
 };
@@ -75,18 +68,16 @@ export function CompanyRequestsTable({
               const unlocked = Boolean(request.contactsUnlockedByCompany);
               return (
                 <tr key={request.id} className={!unlocked ? "bg-white/70" : undefined}>
-                  <td className="font-semibold text-[#0f172a]">{request.title}</td>
-                  <td className="text-[#475569]">
-                    {request.pickup} → {request.dropoff}
-                  </td>
-                  <td className="text-[#475569]">{request.cargo ?? "—"}</td>
-                  <td className="text-[#475569]">{request.budget ?? "—"}</td>
+                  <td className="font-semibold text-[#0f172a]">Richiesta #{request.id}</td>
+                  <td className="text-[#475569]">Dettagli percorso non disponibili</td>
+                  <td className="text-[#475569]">—</td>
+                  <td className="text-[#475569]">{request.price}</td>
                   <td className="space-y-1 text-[#475569]">
                     {unlocked ? (
                       <>
-                        <div className="font-semibold text-[#0f172a]">{request.contactName}</div>
-                        <div className="text-xs text-[#64748b]">{request.contactEmail}</div>
-                        <div className="text-xs text-[#64748b]">{request.contactPhone}</div>
+                        <div className="font-semibold text-[#0f172a]">Referente disponibile</div>
+                        <div className="text-xs text-[#64748b]">Email disponibile</div>
+                        <div className="text-xs text-[#64748b]">Telefono disponibile</div>
                         <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
                           Contatti sbloccati – commissione applicata: 2% + IVA
                         </span>
@@ -113,15 +104,15 @@ export function CompanyRequestsTable({
                         <div className="space-y-1 text-xs text-[#475569]">
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-[#64748b]">🔒</span>
-                            <span className="blur-[1px]">{request.contactName ?? "Referente nascosto"}</span>
+                            <span className="blur-[1px]">Referente nascosto</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-[#64748b]">🔒</span>
-                            <span className="blur-[1px]">{request.contactEmail ?? "••••@••••"}</span>
+                            <span className="blur-[1px]">••••@••••</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-[#64748b]">🔒</span>
-                            <span className="blur-[1px]">{request.contactPhone ?? "••••••"}</span>
+                            <span className="blur-[1px]">••••••</span>
                           </div>
                         </div>
                       </div>
@@ -140,7 +131,7 @@ export function CompanyRequestsTable({
         onClose={() => setPaywallOpen(false)}
         onConfirm={handleUnlock}
         loading={unlocking}
-        budget={activeRequest?.budget ?? null}
+        budget={activeRequest?.price ?? null}
         role={role}
       />
     </div>

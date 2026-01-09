@@ -112,8 +112,8 @@ export default async function AdminDashboardPage() {
           <table>
             <thead>
               <tr>
-                <th>Titolo</th>
-                <th>Percorso</th>
+                <th>Richiesta</th>
+                <th>Valore</th>
                 <th>Azienda</th>
                 <th>Pubblicata</th>
               </tr>
@@ -121,10 +121,8 @@ export default async function AdminDashboardPage() {
             <tbody>
               {requests.map((request) => (
                 <tr key={request.id}>
-                  <td className="font-semibold text-slate-900">{request.title}</td>
-                  <td className="text-slate-800">
-                    {request.pickup} → {request.dropoff}
-                  </td>
+                  <td className="font-semibold text-slate-900">Richiesta #{request.id}</td>
+                  <td className="text-slate-800">{request.price.toString()}</td>
                   <td className="text-slate-800">{request.company.email}</td>
                   <td className="text-slate-800">{new Date(request.createdAt).toLocaleDateString("it-IT")}</td>
                 </tr>

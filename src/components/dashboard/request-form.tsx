@@ -59,6 +59,7 @@ export function RequestForm({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...form,
+        price: form.budget,
         contactsUnlockedByCompany: unlockConfirmed,
       }),
     });

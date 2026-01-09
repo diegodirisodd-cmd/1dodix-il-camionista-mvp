@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { useMemo } from "react";
 
+import { calculateCommission, formatCurrency } from "@/lib/commission";
 import { type Role } from "@/lib/roles";
 export function PaywallModal({
   open,
@@ -46,11 +47,7 @@ export function PaywallModal({
     return Number.isFinite(value) ? value : null;
   }, [budget]);
 
-  const commission = parsedAmount ? parsedAmount * 0.02 : null;
-  const vat = commission ? commission * 0.22 : null;
-  const total = commission && vat ? commission + vat : null;
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(value);
+  const breakdown = parsedAmount ? calculateCommission(parsedAmount) : null;
 
   if (!open) return null;
 
@@ -95,19 +92,19 @@ export function PaywallModal({
               <div className="flex items-center justify-between">
                 <span>Commissione 2%</span>
                 <span className="font-semibold text-[#0f172a]">
-                  {commission ? formatCurrency(commission) : "—"}
+                  {breakdown ? formatCurrency(breakdown.commission) : "—"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span>IVA (22%)</span>
                 <span className="font-semibold text-[#0f172a]">
-                  {vat ? formatCurrency(vat) : "—"}
+                  {breakdown ? formatCurrency(breakdown.vat) : "—"}
                 </span>
               </div>
               <div className="flex items-center justify-between border-t border-[#E5E7EB] pt-2">
                 <span className="font-semibold text-[#0f172a]">Totale commissione</span>
                 <span className="font-semibold text-[#0f172a]">
-                  {total ? formatCurrency(total) : "—"}
+                  {breakdown ? formatCurrency(breakdown.total) : "—"}
                 </span>
               </div>
             </div>
@@ -133,8 +130,8 @@ export function PaywallModal({
               Annulla
             </button>
             <p className="text-xs font-medium text-[#64748b]">
-              {total
-                ? `Totale commissione: ${formatCurrency(total)} (2% + IVA)`
+              {breakdown
+                ? `Totale commissione: ${formatCurrency(breakdown.total)} (2% + IVA)`
                 : "La commissione verrà calcolata sull’importo concordato."}
             </p>
             {parsedAmount && (

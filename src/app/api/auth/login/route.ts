@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     }
 
     const role = user.role as Role;
-    const onboardingCompleted = Boolean(user.onboardingCompleted);
+    const onboardingCompleted = true;
 
     const sessionToken = await createSessionToken({
       sub: String(user.id),

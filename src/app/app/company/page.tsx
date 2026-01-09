@@ -105,15 +105,15 @@ export default async function CompanyAppPage() {
               <tbody className="divide-y divide-[#e2e8f0] text-sm text-[#0f172a]">
                 {companyRequests.map((request) => (
                   <tr key={request.id} className="hover:bg-[#f8fafc]">
-                    <td className="px-4 py-3 font-semibold">{request.title}</td>
+                    <td className="px-4 py-3 font-semibold">Richiesta #{request.id}</td>
                     <td className="px-4 py-3 text-[#475569]">
-                      {request.pickup} → {request.dropoff}
+                      Valore trasporto: {request.price.toString()}
                     </td>
                     <td className="px-4 py-3 text-[#475569]">
                       {request.contactsUnlockedByCompany ? (
                         <>
-                          <div className="font-medium text-[#0f172a]">{request.contactName}</div>
-                          <div className="text-xs text-[#64748b]">{request.contactEmail}</div>
+                          <div className="font-medium text-[#0f172a]">Referente disponibile</div>
+                          <div className="text-xs text-[#64748b]">Email disponibile</div>
                         </>
                       ) : (
                         <>

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-import { prisma } from "@/lib/prisma";
 
 const stripeSecret = process.env.STRIPE_SECRET_KEY;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -38,17 +37,8 @@ export async function POST(req: NextRequest) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
     const customerEmail = session.customer_email;
-
     if (customerEmail) {
-      await prisma.user.updateMany({
-        where: { email: customerEmail },
-        data: {
-          subscriptionActive: true,
-          subscriptionStatus: session.status ?? "active",
-          stripeCustomerId: typeof session.customer === "string" ? session.customer : undefined,
-          stripeSubscriptionId: typeof session.subscription === "string" ? session.subscription : undefined,
-        },
-      });
+      console.info("Webhook ricevuto per", customerEmail);
     }
   }
 

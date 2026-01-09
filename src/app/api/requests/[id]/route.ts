@@ -1,42 +1,24 @@
 import { NextResponse } from "next/server";
 
-import type { Request as RequestModel } from "@prisma/client";
-
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-const REQUIRED_FIELDS = [
-  "pickup",
-  "dropoff",
-  "contactName",
-  "contactPhone",
-  "contactEmail",
-] as const;
-
 type RequestPayload = {
-  title?: string;
-  pickup?: string;
-  dropoff?: string;
-  cargo?: string;
+  price?: number | string;
   budget?: string;
-  description?: string;
-  contactName?: string;
-  contactPhone?: string;
-  contactEmail?: string;
   contactsUnlockedByCompany?: boolean;
 };
 
-function sanitizeRequestOutput(request: RequestModel, includeContact: boolean) {
-  if (includeContact) return request;
-
-  const { contactName, contactPhone, contactEmail, ...rest } = request;
-  return {
-    ...rest,
-    contactName: null,
-    contactPhone: null,
-    contactEmail: null,
-    contactHidden: true,
-  };
+function parsePrice(value?: number | string | null) {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  const normalized = value.replace(/[^\d,.-]/g, "");
+  if (!normalized) return null;
+  const withDecimal = normalized.includes(",")
+    ? normalized.replace(/\./g, "").replace(",", ".")
+    : normalized;
+  const parsed = Number.parseFloat(withDecimal);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 export async function GET(_: Request, { params }: { params: { id: string } }) {
@@ -46,22 +28,13 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
 
-  const isAdmin = user.role === "ADMIN";
   const requestRecord = await prisma.request.findUnique({ where: { id: Number(params.id) } });
 
   if (!requestRecord) {
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
   }
 
-  const includeContact = Boolean(
-    isAdmin ||
-      (user.role === "COMPANY" &&
-        requestRecord.companyId === user.id &&
-        requestRecord.contactsUnlockedByCompany) ||
-      (user.role === "TRANSPORTER" && requestRecord.contactsUnlockedByTransporter),
-  );
-
-  return NextResponse.json(sanitizeRequestOutput(requestRecord, includeContact));
+  return NextResponse.json(requestRecord);
 }
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
@@ -86,27 +59,16 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 
   const data: RequestPayload = await request.json();
-  const missingFields = REQUIRED_FIELDS.filter((field) => !data[field]);
+  const price = parsePrice(data.price ?? data.budget);
 
-  if (missingFields.length > 0) {
-    return NextResponse.json(
-      { error: `Campi obbligatori mancanti: ${missingFields.join(", ")}` },
-      { status: 400 },
-    );
+  if (!price) {
+    return NextResponse.json({ error: "Importo non valido o mancante." }, { status: 400 });
   }
 
   const updated = await prisma.request.update({
     where: { id: existing.id },
     data: {
-      title: data.title?.trim() || `${data.pickup} → ${data.dropoff}`,
-      pickup: data.pickup!,
-      dropoff: data.dropoff!,
-      cargo: data.cargo,
-      budget: data.budget,
-      description: data.description,
-      contactName: data.contactName!,
-      contactPhone: data.contactPhone!,
-      contactEmail: data.contactEmail!,
+      price,
       contactsUnlockedByCompany: Boolean(data.contactsUnlockedByCompany),
     },
   });

@@ -34,9 +34,6 @@ export async function POST(request: Request) {
         email: normalizedEmail,
         password: passwordHash,
         role: selectedRole,
-        subscriptionActive: false,
-        subscriptionStatus: "inactive",
-        onboardingCompleted: false,
       },
     });
 
@@ -51,7 +48,7 @@ export async function POST(request: Request) {
         userId: user.id,
         email: user.email,
         role: user.role,
-        redirectTo: routeForUser({ role: user.role as Role, onboardingCompleted: false }),
+        redirectTo: routeForUser({ role: user.role as Role, onboardingCompleted: true }),
       },
       { status: 201 },
     );

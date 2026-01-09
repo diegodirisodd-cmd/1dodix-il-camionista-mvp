@@ -45,8 +45,8 @@ export default async function AdminPage() {
                 <tr key={item.id} className="hover:bg-[#f8fafc]">
                   <td className="px-4 py-3 font-medium">{item.email}</td>
                   <td className="px-4 py-3 text-[#475569]">{item.role}</td>
-                  <td className="px-4 py-3 text-[#475569]">{item.onboardingCompleted ? "Completo" : "Da completare"}</td>
-                  <td className="px-4 py-3 text-[#475569]">{item.subscriptionActive ? "Accesso completo" : "Pay per contatto"}</td>
+                  <td className="px-4 py-3 text-[#475569]">N/D</td>
+                  <td className="px-4 py-3 text-[#475569]">Commissione per richiesta</td>
                   <td className="px-4 py-3 text-[#475569]">{new Date(item.createdAt).toLocaleDateString("it-IT")}</td>
                 </tr>
               ))}
@@ -61,8 +61,8 @@ export default async function AdminPage() {
           <table className="min-w-[920px] divide-y divide-[#e2e8f0] text-left text-sm text-[#0f172a]">
             <thead className="bg-[#f8fafc] text-xs font-semibold uppercase tracking-wide text-[#475569]">
               <tr>
-                <th className="px-4 py-3">Titolo</th>
-                <th className="px-4 py-3">Percorso</th>
+                <th className="px-4 py-3">Richiesta</th>
+                <th className="px-4 py-3">Valore</th>
                 <th className="px-4 py-3">Azienda</th>
                 <th className="px-4 py-3">Pubblicata</th>
               </tr>
@@ -70,10 +70,8 @@ export default async function AdminPage() {
             <tbody className="divide-y divide-[#e2e8f0] text-sm text-[#0f172a]">
               {requests.map((request) => (
                 <tr key={request.id} className="hover:bg-[#f8fafc]">
-                  <td className="px-4 py-3 font-semibold">{request.title}</td>
-                  <td className="px-4 py-3 text-[#475569]">
-                    {request.pickup} → {request.dropoff}
-                  </td>
+                  <td className="px-4 py-3 font-semibold">Richiesta #{request.id}</td>
+                  <td className="px-4 py-3 text-[#475569]">{request.price.toString()}</td>
                   <td className="px-4 py-3 text-[#475569]">{request.companyId}</td>
                   <td className="px-4 py-3 text-[#475569]">{new Date(request.createdAt).toLocaleDateString("it-IT")}</td>
                 </tr>

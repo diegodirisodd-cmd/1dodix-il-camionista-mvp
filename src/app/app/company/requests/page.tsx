@@ -54,7 +54,9 @@ export default async function CompanyRequestsPage({
         ) : (
           <CompanyRequestsTable
             requests={requests.map((request) => ({
-              ...request,
+              id: request.id,
+              price: request.price.toString(),
+              contactsUnlockedByCompany: request.contactsUnlockedByCompany,
               createdAt: request.createdAt.toISOString(),
             }))}
             role={user.role}

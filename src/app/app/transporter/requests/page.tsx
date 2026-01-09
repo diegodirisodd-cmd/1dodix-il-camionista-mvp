@@ -29,7 +29,9 @@ export default async function TransporterRequestsPage() {
 
       <TransporterJobsTable
         requests={requests.map((request) => ({
-          ...request,
+          id: request.id,
+          price: request.price.toString(),
+          contactsUnlockedByTransporter: request.contactsUnlockedByTransporter,
           createdAt: request.createdAt.toISOString(),
         }))}
         role={user.role}

@@ -1,42 +1,24 @@
 import { NextResponse } from "next/server";
 
-import type { Request as RequestModel } from "@prisma/client";
-
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-const REQUIRED_FIELDS = [
-  "pickup",
-  "dropoff",
-  "contactName",
-  "contactPhone",
-  "contactEmail",
-] as const;
-
 type RequestPayload = {
-  title?: string;
-  pickup?: string;
-  dropoff?: string;
-  cargo?: string;
+  price?: number | string;
   budget?: string;
-  description?: string;
-  contactName?: string;
-  contactPhone?: string;
-  contactEmail?: string;
   contactsUnlockedByCompany?: boolean;
 };
 
-function sanitizeRequestOutput(request: RequestModel, includeContact: boolean) {
-  if (includeContact) return request;
-
-  const { contactName, contactPhone, contactEmail, ...rest } = request;
-  return {
-    ...rest,
-    contactName: null,
-    contactPhone: null,
-    contactEmail: null,
-    contactHidden: true,
-  };
+function parsePrice(value?: number | string | null) {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  const normalized = value.replace(/[^\d,.-]/g, "");
+  if (!normalized) return null;
+  const withDecimal = normalized.includes(",")
+    ? normalized.replace(/\./g, "").replace(",", ".")
+    : normalized;
+  const parsed = Number.parseFloat(withDecimal);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 export async function GET() {
@@ -50,17 +32,7 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
 
-  const sanitized = requests.map((request) => {
-    const includeContact = Boolean(
-      isAdmin ||
-        (user?.role === "COMPANY" && request.companyId === user.id && request.contactsUnlockedByCompany) ||
-        (user?.role === "TRANSPORTER" && request.contactsUnlockedByTransporter),
-    );
-
-    return sanitizeRequestOutput(request, includeContact);
-  });
-
-  return NextResponse.json(sanitized);
+  return NextResponse.json(requests);
 }
 
 export async function POST(request: Request) {
@@ -79,29 +51,16 @@ export async function POST(request: Request) {
   }
 
   const data: RequestPayload = await request.json();
-  const missingFields = REQUIRED_FIELDS.filter((field) => !data[field]);
+  const price = parsePrice(data.price ?? data.budget);
 
-  if (missingFields.length > 0) {
-    return NextResponse.json(
-      { error: `Campi obbligatori mancanti: ${missingFields.join(", ")}` },
-      { status: 400 },
-    );
+  if (!price) {
+    return NextResponse.json({ error: "Importo non valido o mancante." }, { status: 400 });
   }
 
   try {
-    const derivedTitle = data.title?.trim() || `${data.pickup} → ${data.dropoff}`;
-
     const newRequest = await prisma.request.create({
       data: {
-        title: derivedTitle,
-        pickup: data.pickup!,
-        dropoff: data.dropoff!,
-        cargo: data.cargo,
-        budget: data.budget,
-        description: data.description,
-        contactName: data.contactName!,
-        contactPhone: data.contactPhone!,
-        contactEmail: data.contactEmail!,
+        price,
         contactsUnlockedByCompany: Boolean(data.contactsUnlockedByCompany),
         companyId: user.id,
       },
