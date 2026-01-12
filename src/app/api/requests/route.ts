@@ -4,8 +4,13 @@ import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 type RequestPayload = {
-  title?: string;
+  pickup?: string;
+  delivery?: string;
+  cargoType?: string;
   description?: string;
+  contactName?: string;
+  contactPhone?: string;
+  contactEmail?: string;
   price?: number | string;
   contactsUnlockedByCompany?: boolean;
 };
@@ -43,8 +48,8 @@ export async function POST(request: Request) {
 
   console.log("REQUEST BODY:", body);
 
-  if (!body.title || !body.description || !body.price) {
-    return NextResponse.json({ error: "Campi obbligatori mancanti" }, { status: 400 });
+  if (!body.price) {
+    return NextResponse.json({ error: "Prezzo obbligatorio" }, { status: 400 });
   }
 
   const priceNumber = Number(body.price);
@@ -54,12 +59,21 @@ export async function POST(request: Request) {
   }
 
   const priceInCents = Math.round(priceNumber * 100);
+  const pickup = body.pickup?.trim() ?? "";
+  const delivery = body.delivery?.trim() ?? "";
+  const title = pickup && delivery ? `${pickup} → ${delivery}` : "Richiesta di trasporto";
+  const descriptionParts = [
+    body.description?.trim(),
+    pickup && delivery ? `Percorso: ${pickup} → ${delivery}` : null,
+    body.cargoType?.trim() ? `Carico: ${body.cargoType.trim()}` : null,
+  ].filter(Boolean) as string[];
+  const description = descriptionParts.join("\n").trim();
 
   try {
     const newRequest = await prisma.request.create({
       data: {
-        title: body.title.trim(),
-        description: body.description.trim(),
+        title,
+        description,
         price: priceInCents,
         contactsUnlockedByCompany: Boolean(body.contactsUnlockedByCompany),
         companyId: user.id,

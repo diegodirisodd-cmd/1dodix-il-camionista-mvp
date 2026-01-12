@@ -10,7 +10,7 @@ const INITIAL_STATE = {
   pickup: "",
   dropoff: "",
   cargo: "",
-  budget: "",
+  price: "",
   description: "",
   contactName: "",
   contactPhone: "",
@@ -54,22 +54,18 @@ export function RequestForm({
       return;
     }
 
-    const title = `${form.pickup} → ${form.dropoff}`;
-    const descriptionParts = [
-      form.description.trim(),
-      `Percorso: ${form.pickup} → ${form.dropoff}`,
-      form.cargo ? `Carico: ${form.cargo}` : null,
-    ].filter(Boolean) as string[];
-    const description = descriptionParts.join("\n");
-    const price = form.budget.replace(/[^\d,.-]/g, "").replace(",", ".");
-
     const response = await fetch("/api/requests", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        title,
-        description,
-        price,
+        pickup: form.pickup,
+        delivery: form.dropoff,
+        cargoType: form.cargo,
+        description: form.description,
+        contactName: form.contactName,
+        contactPhone: form.contactPhone,
+        contactEmail: form.contactEmail,
+        price: form.price,
       }),
     });
 
@@ -127,13 +123,17 @@ export function RequestForm({
           />
         </label>
         <label className="form-field">
-          <span className="label">Budget (opzionale)</span>
+          <span className="label">Prezzo trasporto (€)</span>
           <input
+            type="number"
             className="input-field"
-            value={form.budget}
-            onChange={(e) => updateField("budget", e.target.value)}
-            placeholder="Es. 750€"
+            value={form.price}
+            onChange={(e) => updateField("price", e.target.value)}
+            placeholder="Es. 750"
           />
+          <span className="text-xs text-[#64748b]">
+            Commissione applicata solo allo sblocco contatti: 2% + IVA
+          </span>
         </label>
       </div>
 
