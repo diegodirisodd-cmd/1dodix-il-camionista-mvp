@@ -55,7 +55,7 @@ export default async function CompanyRequestsPage({
           <CompanyRequestsTable
             requests={requests.map((request) => ({
               id: request.id,
-              priceCents: request.priceCents,
+              priceCents: request.price,
               contactsUnlockedByCompany: request.contactsUnlockedByCompany,
               createdAt: request.createdAt.toISOString(),
             }))}

@@ -4,8 +4,6 @@ import type { Request as RequestModel } from "@prisma/client";
 import { TransporterJobsTable } from "@/components/dashboard/transporter/jobs-table";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-type RequestWithCompany = RequestModel & { company: { email: string } };
-
 export default async function TransporterJobsPage() {
   const user = await getSessionUser();
 
@@ -17,10 +15,18 @@ export default async function TransporterJobsPage() {
     redirect("/dashboard");
   }
 
-  const requests: RequestWithCompany[] = await prisma.request.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { company: { select: { email: true } } },
-  });
+  let requests: RequestModel[] = [];
+  let loadError: string | null = null;
+
+  try {
+    requests = await prisma.request.findMany({
+      where: { transporterId: null },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (error) {
+    console.error("Errore caricamento richieste trasportatori", error);
+    loadError = "Impossibile caricare le richieste. Riprova tra poco.";
+  }
 
   return (
     <section className="space-y-6">
@@ -36,15 +42,19 @@ export default async function TransporterJobsPage() {
         </div>
       </div>
 
-      <TransporterJobsTable
-        requests={requests.map((request) => ({
-          id: request.id,
-          priceCents: request.priceCents,
-          contactsUnlockedByTransporter: request.contactsUnlockedByTransporter,
-          createdAt: request.createdAt.toISOString(),
-        }))}
-        role={user.role}
-      />
+      {loadError ? (
+        <p className="alert-warning">{loadError}</p>
+      ) : (
+        <TransporterJobsTable
+          requests={requests.map((request) => ({
+            id: request.id,
+            priceCents: request.price,
+            contactsUnlockedByTransporter: request.contactsUnlockedByTransporter,
+            createdAt: request.createdAt.toISOString(),
+          }))}
+          role={user.role}
+        />
+      )}
     </section>
   );
 }

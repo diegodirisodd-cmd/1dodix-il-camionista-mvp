@@ -16,7 +16,10 @@ export default async function TransporterRequestsPage() {
     redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
   }
 
-  const requests = await prisma.request.findMany({ orderBy: { createdAt: "desc" } });
+  const requests = await prisma.request.findMany({
+    where: { transporterId: null },
+    orderBy: { createdAt: "desc" },
+  });
 
   return (
     <section className="space-y-4">
@@ -30,7 +33,7 @@ export default async function TransporterRequestsPage() {
       <TransporterJobsTable
         requests={requests.map((request) => ({
           id: request.id,
-          priceCents: request.priceCents,
+          priceCents: request.price,
           contactsUnlockedByTransporter: request.contactsUnlockedByTransporter,
           createdAt: request.createdAt.toISOString(),
         }))}

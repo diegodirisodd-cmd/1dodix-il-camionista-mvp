@@ -4,6 +4,9 @@ import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 type RequestPayload = {
+  title?: string;
+  description?: string;
+  price?: number | string;
   priceCents?: number;
   budget?: string;
   contactsUnlockedByCompany?: boolean;
@@ -59,16 +62,28 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 
   const data: RequestPayload = await request.json();
-  const priceCents = data.priceCents ?? parsePriceToCents(data.budget);
+  const priceCents = data.priceCents ?? parsePriceToCents(data.price ?? data.budget);
+  const title = data.title?.trim();
+  const description = data.description?.trim();
 
-  if (!priceCents) {
+  if (!priceCents || priceCents <= 0) {
     return NextResponse.json({ error: "Importo non valido o mancante." }, { status: 400 });
+  }
+
+  if (!title) {
+    return NextResponse.json({ error: "Titolo mancante." }, { status: 400 });
+  }
+
+  if (!description) {
+    return NextResponse.json({ error: "Descrizione mancante." }, { status: 400 });
   }
 
   const updated = await prisma.request.update({
     where: { id: existing.id },
     data: {
-      priceCents,
+      title,
+      description,
+      price: priceCents,
       contactsUnlockedByCompany: Boolean(data.contactsUnlockedByCompany),
     },
   });

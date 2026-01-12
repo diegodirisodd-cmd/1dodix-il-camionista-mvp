@@ -4,6 +4,12 @@ import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 type RequestPayload = {
+  title?: string;
+  description?: string;
+  pickup?: string;
+  dropoff?: string;
+  cargo?: string;
+  price?: number | string;
   priceCents?: number;
   budget?: string;
   contactsUnlockedByCompany?: boolean;
@@ -51,16 +57,35 @@ export async function POST(request: Request) {
   }
 
   const data: RequestPayload = await request.json();
-  const priceCents = data.priceCents ?? parsePriceToCents(data.budget);
+  const priceCents = data.priceCents ?? parsePriceToCents(data.price ?? data.budget);
+  const pickup = data.pickup?.trim() ?? "";
+  const dropoff = data.dropoff?.trim() ?? "";
+  const title = data.title?.trim() || (pickup && dropoff ? `${pickup} → ${dropoff}` : "");
+  const descriptionParts = [
+    data.description?.trim(),
+    pickup && dropoff ? `Percorso: ${pickup} → ${dropoff}` : null,
+    data.cargo?.trim() ? `Carico: ${data.cargo.trim()}` : null,
+  ].filter(Boolean) as string[];
+  const description = descriptionParts.join("\n").trim();
 
-  if (!priceCents) {
+  if (!title) {
+    return NextResponse.json({ error: "Titolo mancante." }, { status: 400 });
+  }
+
+  if (!description) {
+    return NextResponse.json({ error: "Descrizione mancante." }, { status: 400 });
+  }
+
+  if (!priceCents || priceCents <= 0) {
     return NextResponse.json({ error: "Importo non valido o mancante." }, { status: 400 });
   }
 
   try {
     const newRequest = await prisma.request.create({
       data: {
-        priceCents,
+        title,
+        description,
+        price: priceCents,
         contactsUnlockedByCompany: Boolean(data.contactsUnlockedByCompany),
         companyId: user.id,
       },

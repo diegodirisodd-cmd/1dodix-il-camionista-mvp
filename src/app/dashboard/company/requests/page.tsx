@@ -1,3 +1,4 @@
+import type { Request as RequestModel } from "@prisma/client";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -17,10 +18,18 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
   }
 
   const showCreated = searchParams?.created === "1";
-  const companyRequests = await prisma.request.findMany({
-    where: { companyId: user.id },
-    orderBy: { createdAt: "desc" },
-  });
+  let companyRequests: RequestModel[] = [];
+  let loadError: string | null = null;
+
+  try {
+    companyRequests = await prisma.request.findMany({
+      where: { companyId: user.id },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (error) {
+    console.error("Errore caricamento richieste azienda", error);
+    loadError = "Impossibile caricare le richieste. Riprova tra poco.";
+  }
 
   return (
     <section className="space-y-6">
@@ -54,7 +63,9 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
         </div>
       </div>
 
-      {companyRequests.length === 0 ? (
+      {loadError ? (
+        <p className="alert-warning">{loadError}</p>
+      ) : companyRequests.length === 0 ? (
         <div className="card text-sm leading-relaxed text-[#475569]">
           Nessuna richiesta presente. Pubblica la prima per ricevere contatti diretti.
         </div>
@@ -62,7 +73,7 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
         <CompanyRequestsTable
           requests={companyRequests.map((request) => ({
             id: request.id,
-            priceCents: request.priceCents,
+            priceCents: request.price,
             contactsUnlockedByCompany: request.contactsUnlockedByCompany,
             createdAt: request.createdAt.toISOString(),
           }))}

@@ -108,7 +108,7 @@ export default async function CompanyAppPage() {
                   <tr key={request.id} className="hover:bg-[#f8fafc]">
                     <td className="px-4 py-3 font-semibold">Richiesta #{request.id}</td>
                     <td className="px-4 py-3 text-[#475569]">
-                      Valore trasporto: {formatCurrency(request.priceCents)}
+                      Valore trasporto: {formatCurrency(request.price)}
                     </td>
                     <td className="px-4 py-3 text-[#475569]">
                       {request.contactsUnlockedByCompany ? (

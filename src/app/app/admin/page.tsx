@@ -72,7 +72,7 @@ export default async function AdminPage() {
               {requests.map((request) => (
                 <tr key={request.id} className="hover:bg-[#f8fafc]">
                   <td className="px-4 py-3 font-semibold">Richiesta #{request.id}</td>
-                  <td className="px-4 py-3 text-[#475569]">{formatCurrency(request.priceCents)}</td>
+                  <td className="px-4 py-3 text-[#475569]">{formatCurrency(request.price)}</td>
                   <td className="px-4 py-3 text-[#475569]">{request.companyId}</td>
                   <td className="px-4 py-3 text-[#475569]">{new Date(request.createdAt).toLocaleDateString("it-IT")}</td>
                 </tr>

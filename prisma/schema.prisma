@@ -19,14 +19,16 @@ model User {
 }
 
 model Request {
-  id                          Int      @id @default(autoincrement())
-  companyId                   Int
-  transporterId               Int?
-  /// priceCents rappresenta l’importo in centesimi (es. 10000 = 100,00€).
-  priceCents                  Int
-  contactsUnlockedByCompany     Boolean  @default(false)
-  contactsUnlockedByTransporter Boolean  @default(false)
-  createdAt                   DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  companyId     Int
+  transporterId Int?
+  title         String
+  description   String
+  price         Int
+  createdAt     DateTime @default(now())
+
+  contactsUnlockedByCompany     Boolean @default(false)
+  contactsUnlockedByTransporter Boolean @default(false)
 
   company     User  @relation("CompanyRequests", fields: [companyId], references: [id])
   transporter User? @relation("TransporterRequests", fields: [transporterId], references: [id])

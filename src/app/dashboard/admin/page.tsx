@@ -5,6 +5,20 @@ import { formatCurrency } from "@/lib/commission";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
+type UserSummary = {
+  id: number;
+  email: string;
+  role: string;
+  createdAt: Date;
+};
+
+type RequestSummary = {
+  id: number;
+  price: number;
+  createdAt: Date;
+  company: { email: string; role: string };
+};
+
 function formatRole(role: string) {
   if (role === "COMPANY") return "Azienda";
   if (role === "TRANSPORTER") return "Trasportatore";
@@ -26,21 +40,30 @@ export default async function AdminDashboardPage() {
     redirect("/dashboard");
   }
 
-  const [users, requests] = await Promise.all([
-    prisma.user.findMany({
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      },
-    }),
-    prisma.request.findMany({
-      orderBy: { createdAt: "desc" },
-      include: { company: { select: { email: true, role: true } } },
-    }),
-  ]);
+  let users: UserSummary[] = [];
+  let requests: RequestSummary[] = [];
+  let loadError: string | null = null;
+
+  try {
+    [users, requests] = await Promise.all([
+      prisma.user.findMany({
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          createdAt: true,
+        },
+      }),
+      prisma.request.findMany({
+        orderBy: { createdAt: "desc" },
+        include: { company: { select: { email: true, role: true } } },
+      }),
+    ]);
+  } catch (error) {
+    console.error("Errore caricamento dashboard admin", error);
+    loadError = "Impossibile caricare i dati della dashboard.";
+  }
 
   const companies = users.filter((u) => u.role === "COMPANY").length;
   const transporters = users.filter((u) => u.role === "TRANSPORTER").length;
@@ -58,6 +81,8 @@ export default async function AdminDashboardPage() {
           <SubscriptionBadge active={user.subscriptionActive} className="self-start" />
         </div>
       </div>
+
+      {loadError && <p className="alert-warning">{loadError}</p>}
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="card space-y-2">
@@ -123,7 +148,7 @@ export default async function AdminDashboardPage() {
               {requests.map((request) => (
                 <tr key={request.id}>
                   <td className="font-semibold text-slate-900">Richiesta #{request.id}</td>
-                  <td className="text-slate-800">{formatCurrency(request.priceCents)}</td>
+                  <td className="text-slate-800">{formatCurrency(request.price)}</td>
                   <td className="text-slate-800">{request.company.email}</td>
                   <td className="text-slate-800">{new Date(request.createdAt).toLocaleDateString("it-IT")}</td>
                 </tr>
