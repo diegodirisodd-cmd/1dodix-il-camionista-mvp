@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      String   @default("COMPANY")
+  createdAt DateTime @default(now())
+
+  companyRequests     Request[] @relation("CompanyRequests")
+  transporterRequests Request[] @relation("TransporterRequests")
+}
+
+model Request {
+  id                          Int      @id @default(autoincrement())
+  companyId                   Int
+  transporterId               Int?
+  /// priceCents rappresenta l’importo in centesimi (es. 10000 = 100,00€).
+  priceCents                  Int
+  contactsUnlockedByCompany     Boolean  @default(false)
+  contactsUnlockedByTransporter Boolean  @default(false)
+  createdAt                   DateTime @default(now())
+
+  company     User  @relation("CompanyRequests", fields: [companyId], references: [id])
+  transporter User? @relation("TransporterRequests", fields: [transporterId], references: [id])
+}
