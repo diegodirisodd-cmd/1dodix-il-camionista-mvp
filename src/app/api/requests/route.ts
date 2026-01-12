@@ -6,26 +6,9 @@ import { prisma } from "@/lib/prisma";
 type RequestPayload = {
   title?: string;
   description?: string;
-  pickup?: string;
-  dropoff?: string;
-  cargo?: string;
   price?: number | string;
-  priceCents?: number;
-  budget?: string;
   contactsUnlockedByCompany?: boolean;
 };
-
-function parsePriceToCents(value?: number | string | null) {
-  if (value === null || value === undefined) return null;
-  if (typeof value === "number") return Number.isFinite(value) ? Math.round(value * 100) : null;
-  const normalized = value.replace(/[^\d,.-]/g, "");
-  if (!normalized) return null;
-  const withDecimal = normalized.includes(",")
-    ? normalized.replace(/\./g, "").replace(",", ".")
-    : normalized;
-  const parsed = Number.parseFloat(withDecimal);
-  return Number.isFinite(parsed) ? Math.round(parsed * 100) : null;
-}
 
 export async function GET() {
   const user = await getSessionUser();
@@ -56,44 +39,39 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Solo le aziende possono pubblicare richieste" }, { status: 403 });
   }
 
-  const data: RequestPayload = await request.json();
-  const priceCents = data.priceCents ?? parsePriceToCents(data.price ?? data.budget);
-  const pickup = data.pickup?.trim() ?? "";
-  const dropoff = data.dropoff?.trim() ?? "";
-  const title = data.title?.trim() || (pickup && dropoff ? `${pickup} → ${dropoff}` : "");
-  const descriptionParts = [
-    data.description?.trim(),
-    pickup && dropoff ? `Percorso: ${pickup} → ${dropoff}` : null,
-    data.cargo?.trim() ? `Carico: ${data.cargo.trim()}` : null,
-  ].filter(Boolean) as string[];
-  const description = descriptionParts.join("\n").trim();
+  const body: RequestPayload = await request.json();
 
-  if (!title) {
-    return NextResponse.json({ error: "Titolo mancante." }, { status: 400 });
+  console.log("REQUEST BODY:", body);
+
+  if (!body.title || !body.description || !body.price) {
+    return NextResponse.json({ error: "Campi obbligatori mancanti" }, { status: 400 });
   }
 
-  if (!description) {
-    return NextResponse.json({ error: "Descrizione mancante." }, { status: 400 });
+  const priceNumber = Number(body.price);
+
+  if (Number.isNaN(priceNumber) || priceNumber <= 0) {
+    return NextResponse.json({ error: "Prezzo non valido" }, { status: 400 });
   }
 
-  if (!priceCents || priceCents <= 0) {
-    return NextResponse.json({ error: "Importo non valido o mancante." }, { status: 400 });
-  }
+  const priceInCents = Math.round(priceNumber * 100);
 
   try {
     const newRequest = await prisma.request.create({
       data: {
-        title,
-        description,
-        price: priceCents,
-        contactsUnlockedByCompany: Boolean(data.contactsUnlockedByCompany),
+        title: body.title.trim(),
+        description: body.description.trim(),
+        price: priceInCents,
+        contactsUnlockedByCompany: Boolean(body.contactsUnlockedByCompany),
         companyId: user.id,
       },
     });
 
     return NextResponse.json(newRequest, { status: 201 });
   } catch (error) {
-    console.error("Errore creazione richiesta", error);
-    return NextResponse.json({ error: "Impossibile creare la richiesta" }, { status: 500 });
+    console.error("CREATE REQUEST ERROR:", error);
+    return NextResponse.json(
+      { error: "Impossibile creare la richiesta", details: String(error) },
+      { status: 500 },
+    );
   }
 }

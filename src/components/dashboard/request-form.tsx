@@ -54,15 +54,22 @@ export function RequestForm({
       return;
     }
 
+    const title = `${form.pickup} → ${form.dropoff}`;
+    const descriptionParts = [
+      form.description.trim(),
+      `Percorso: ${form.pickup} → ${form.dropoff}`,
+      form.cargo ? `Carico: ${form.cargo}` : null,
+    ].filter(Boolean) as string[];
+    const description = descriptionParts.join("\n");
+    const price = form.budget.replace(/[^\d,.-]/g, "").replace(",", ".");
+
     const response = await fetch("/api/requests", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        ...form,
-        priceCents: form.budget
-          ? Math.round(Number(form.budget.replace(/[^\d,.-]/g, "").replace(",", ".")) * 100)
-          : undefined,
-        contactsUnlockedByCompany: unlockConfirmed,
+        title,
+        description,
+        price,
       }),
     });
 
