@@ -1,0 +1,18 @@
+import { type Role } from "./roles";
+
+type RouteUser = {
+  role: Role;
+  onboardingCompleted: boolean;
+};
+
+export function getDashboardPath(role: Role) {
+  if (role === "COMPANY") return "/dashboard/company";
+  if (role === "TRANSPORTER") return "/dashboard/transporter";
+  return "/dashboard/admin";
+}
+
+export function routeForUser(user: RouteUser | null | undefined) {
+  if (!user) return "/login";
+  if (!user.onboardingCompleted) return "/onboarding";
+  return getDashboardPath(user.role);
+}
