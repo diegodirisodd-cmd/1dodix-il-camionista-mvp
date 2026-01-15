@@ -15,6 +15,7 @@ type RequestDetailViewProps = {
   priceCents: number;
   createdAt: string;
   contactEmail: string | null;
+  contactPhone: string | null;
   role: Role;
   unlocked: boolean;
   backHref: string;
@@ -29,6 +30,7 @@ export function RequestDetailView({
   priceCents,
   createdAt,
   contactEmail,
+  contactPhone,
   role,
   unlocked,
   backHref,
@@ -167,8 +169,10 @@ export function RequestDetailView({
         {isUnlocked ? (
           <div className="space-y-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
             <p className="font-semibold">{contactHeadline}</p>
-            <p className="text-sm text-[#475569]">{contactEmail ?? "Non disponibile"}</p>
-            <p className="text-sm text-[#475569]">Non disponibile</p>
+            <p className="text-sm text-[#475569]">{contactEmail ?? "Email non disponibile"}</p>
+            <p className="text-sm text-[#475569]">
+              {contactPhone ? contactPhone : "Telefono non disponibile"}
+            </p>
           </div>
         ) : (
           <div className="space-y-2 rounded-xl border border-dashed border-[#f5c76a]/80 bg-[#fff8ed] p-4 text-sm text-[#475569]">

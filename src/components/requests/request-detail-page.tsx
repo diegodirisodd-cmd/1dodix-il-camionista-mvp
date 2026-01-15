@@ -25,6 +25,20 @@ function getContactEmail({
   return companyEmail;
 }
 
+function getContactPhone({
+  role,
+  companyPhone,
+  transporterPhone,
+}: {
+  role: Role;
+  companyPhone: string | null;
+  transporterPhone: string | null;
+}) {
+  if (role === "TRANSPORTER") return companyPhone;
+  if (role === "COMPANY") return transporterPhone;
+  return companyPhone;
+}
+
 export async function RequestDetailPage({ requestId, backHref }: RequestDetailPageProps) {
   const user = await getSessionUser();
 
@@ -77,6 +91,11 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
         role: user.role,
         companyEmail: requestRecord.company.email,
         transporterEmail: requestRecord.transporter?.email ?? null,
+      })}
+      contactPhone={getContactPhone({
+        role: user.role,
+        companyPhone: requestRecord.company.phone ?? null,
+        transporterPhone: requestRecord.transporter?.phone ?? null,
       })}
       role={user.role}
       unlocked={contactVisible}
