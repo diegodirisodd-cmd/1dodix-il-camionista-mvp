@@ -38,6 +38,7 @@ export default async function TransporterRequestsPage() {
           createdAt: request.createdAt.toISOString(),
         }))}
         role={user.role}
+        basePath="/app/transporter/requests"
       />
     </section>
   );

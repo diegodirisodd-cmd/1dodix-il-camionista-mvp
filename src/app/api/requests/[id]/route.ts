@@ -37,6 +37,17 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
   }
 
+  const canAccess =
+    user.role === "ADMIN" ||
+    (user.role === "COMPANY" &&
+      (requestRecord.companyId === user.id || requestRecord.contactsUnlockedByCompany)) ||
+    (user.role === "TRANSPORTER" &&
+      (requestRecord.contactsUnlockedByTransporter || requestRecord.transporterId === user.id));
+
+  if (!canAccess) {
+    return NextResponse.json({ error: "Non autorizzato" }, { status: 403 });
+  }
+
   return NextResponse.json(requestRecord);
 }
 

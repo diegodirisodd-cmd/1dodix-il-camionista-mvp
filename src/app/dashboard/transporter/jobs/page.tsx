@@ -53,6 +53,7 @@ export default async function TransporterJobsPage() {
             createdAt: request.createdAt.toISOString(),
           }))}
           role={user.role}
+          basePath="/dashboard/transporter/requests"
         />
       )}
     </section>

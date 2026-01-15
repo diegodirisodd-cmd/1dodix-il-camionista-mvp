@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { PaywallModal } from "@/components/paywall-modal";
@@ -16,10 +18,13 @@ type RequestRow = {
 export function CompanyRequestsTable({
   requests,
   role,
+  basePath,
 }: {
   requests: RequestRow[];
   role: Role;
+  basePath: string;
 }) {
+  const router = useRouter();
   const [items, setItems] = useState(requests);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [activeRequestId, setActiveRequestId] = useState<number | null>(null);
@@ -48,6 +53,7 @@ export function CompanyRequestsTable({
       ),
     );
     setPaywallOpen(false);
+    router.push(`${basePath}/${activeRequestId}`);
   }
 
   return (
@@ -61,12 +67,14 @@ export function CompanyRequestsTable({
               <th>Carico</th>
               <th>Budget</th>
               <th>Contatto</th>
+              <th>Dettaglio</th>
               <th>Pubblicata</th>
             </tr>
           </thead>
           <tbody>
             {items.map((request) => {
               const unlocked = Boolean(request.contactsUnlockedByCompany);
+              const detailHref = `${basePath}/${request.id}`;
               return (
                 <tr key={request.id} className={!unlocked ? "bg-white/70" : undefined}>
                   <td className="font-semibold text-[#0f172a]">Richiesta #{request.id}</td>
@@ -117,6 +125,18 @@ export function CompanyRequestsTable({
                           </div>
                         </div>
                       </div>
+                    )}
+                  </td>
+                  <td className="text-[#475569]">
+                    {unlocked ? (
+                      <Link
+                        href={detailHref}
+                        className="inline-flex items-center justify-center rounded-full bg-[#0f172a] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:brightness-110"
+                      >
+                        Apri dettaglio
+                      </Link>
+                    ) : (
+                      <span className="text-xs text-[#94a3b8]">Sblocca per aprire</span>
                     )}
                   </td>
                   <td className="text-[#475569]">{new Date(request.createdAt).toLocaleDateString("it-IT")}</td>

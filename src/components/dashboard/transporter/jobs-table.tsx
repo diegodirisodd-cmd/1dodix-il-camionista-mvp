@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { PaywallModal } from "@/components/paywall-modal";
@@ -16,10 +18,13 @@ type RequestRow = {
 export function TransporterJobsTable({
   requests,
   role,
+  basePath,
 }: {
   requests: RequestRow[];
   role: Role;
+  basePath: string;
 }) {
+  const router = useRouter();
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [activeRequestId, setActiveRequestId] = useState<number | null>(null);
   const [unlocking, setUnlocking] = useState(false);
@@ -48,6 +53,7 @@ export function TransporterJobsTable({
       ),
     );
     setPaywallOpen(false);
+    router.push(`${basePath}/${activeRequestId}`);
   }
 
   return (
@@ -70,6 +76,7 @@ export function TransporterJobsTable({
             <tbody>
               {items.map((request) => {
                 const unlocked = Boolean(request.contactsUnlockedByTransporter);
+                const detailHref = `${basePath}/${request.id}`;
                 return (
                 <tr key={request.id} className={!unlocked ? "bg-white/70" : undefined}>
                   <td className="text-[#475569]">
@@ -127,12 +134,12 @@ export function TransporterJobsTable({
                   </td>
                   <td className="text-[#475569]">
                     {unlocked ? (
-                      <button
-                        type="button"
+                      <Link
+                        href={detailHref}
                         className="inline-flex items-center justify-center rounded-full bg-[#0f172a] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:brightness-110"
                       >
-                        Contatta referente
-                      </button>
+                        Apri dettaglio
+                      </Link>
                     ) : (
                       <button
                         type="button"

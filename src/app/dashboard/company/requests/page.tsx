@@ -78,6 +78,7 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
             createdAt: request.createdAt.toISOString(),
           }))}
           role={user.role}
+          basePath="/dashboard/company/requests"
         />
       )}
     </section>

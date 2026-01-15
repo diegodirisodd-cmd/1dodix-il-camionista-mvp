@@ -60,6 +60,7 @@ export default async function CompanyRequestsPage({
               createdAt: request.createdAt.toISOString(),
             }))}
             role={user.role}
+            basePath="/app/company/requests"
           />
         )}
       </div>
