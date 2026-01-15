@@ -18,6 +18,8 @@ type RequestDetailViewProps = {
   role: Role;
   unlocked: boolean;
   backHref: string;
+  status: string;
+  transporterId: number | null;
 };
 
 export function RequestDetailView({
@@ -30,20 +32,32 @@ export function RequestDetailView({
   role,
   unlocked,
   backHref,
+  status,
+  transporterId,
 }: RequestDetailViewProps) {
   const router = useRouter();
   const [isUnlocked, setIsUnlocked] = useState(unlocked);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
-  const [showUnlockNotice, setShowUnlockNotice] = useState(unlocked && !contactEmail);
+  const [showUnlockNotice, setShowUnlockNotice] = useState(
+    unlocked && !contactEmail && role === "TRANSPORTER",
+  );
+  const [accepting, setAccepting] = useState(false);
 
   const canUnlock = role === "COMPANY" || role === "TRANSPORTER";
   const unlockTarget = role === "COMPANY" ? "company" : "transporter";
+  const canAccept = role === "TRANSPORTER" && status === "OPEN" && !transporterId;
 
   const contactHeadline = useMemo(
     () => (role === "TRANSPORTER" ? "Referente aziendale" : "Referente trasportatore"),
     [role],
   );
+
+  const statusLabel = status === "ASSIGNED" ? "Trasporto assegnato" : "In attesa di assegnazione";
+  const statusCopy =
+    status === "ASSIGNED"
+      ? "Trasporto preso in carico da un trasportatore verificato."
+      : "Nessun trasportatore ha ancora preso in carico la richiesta.";
 
   async function handleUnlock() {
     if (!canUnlock) return;
@@ -62,8 +76,21 @@ export function RequestDetailView({
     }
 
     setIsUnlocked(true);
-    setShowUnlockNotice(!contactEmail);
+    setShowUnlockNotice(!contactEmail && role === "TRANSPORTER");
     setPaywallOpen(false);
+    router.refresh();
+  }
+
+  async function handleAcceptTransport() {
+    setAccepting(true);
+    const response = await fetch(`/api/requests/${requestId}/accept`, { method: "POST" });
+    setAccepting(false);
+
+    if (!response.ok) {
+      window.alert("Impossibile accettare la richiesta");
+      return;
+    }
+
     router.refresh();
   }
 
@@ -78,6 +105,22 @@ export function RequestDetailView({
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#64748b]">Dettaglio richiesta</p>
           <h1 className="text-3xl font-semibold text-[#0f172a]">{title}</h1>
           <p className="text-sm leading-relaxed text-[#475569]">{description}</p>
+          <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-[#0f172a]">
+            <span className="rounded-full bg-[#f1f5f9] px-3 py-1 text-[#0f172a]">
+              {statusLabel}
+            </span>
+            {canAccept && (
+              <button
+                type="button"
+                onClick={handleAcceptTransport}
+                disabled={accepting}
+                className="btn-primary text-xs disabled:cursor-not-allowed"
+              >
+                {accepting ? "Accettazione..." : "Accetta trasporto"}
+              </button>
+            )}
+          </div>
+          <p className="text-sm text-[#475569]">{statusCopy}</p>
         </div>
 
         <div className="grid gap-4 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-4 text-sm text-[#475569] md:grid-cols-3">
@@ -124,8 +167,8 @@ export function RequestDetailView({
         {isUnlocked ? (
           <div className="space-y-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
             <p className="font-semibold">{contactHeadline}</p>
-            <p className="text-sm text-[#475569]">{contactEmail ?? "Email non disponibile"}</p>
-            <p className="text-sm text-[#475569]">Telefono non disponibile</p>
+            <p className="text-sm text-[#475569]">{contactEmail ?? "Non disponibile"}</p>
+            <p className="text-sm text-[#475569]">Non disponibile</p>
           </div>
         ) : (
           <div className="space-y-2 rounded-xl border border-dashed border-[#f5c76a]/80 bg-[#fff8ed] p-4 text-sm text-[#475569]">

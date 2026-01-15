@@ -59,11 +59,11 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
     );
   }
 
-  const isUnlocked =
+  const contactVisible =
     user.role === "ADMIN"
       ? true
       : user.role === "COMPANY"
-        ? requestRecord.contactsUnlockedByCompany
+        ? requestRecord.transporterId !== null
         : requestRecord.contactsUnlockedByTransporter;
 
   return (
@@ -79,8 +79,10 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
         transporterEmail: requestRecord.transporter?.email ?? null,
       })}
       role={user.role}
-      unlocked={isUnlocked}
+      unlocked={contactVisible}
       backHref={backHref}
+      status={requestRecord.status}
+      transporterId={requestRecord.transporterId ?? null}
     />
   );
 }
