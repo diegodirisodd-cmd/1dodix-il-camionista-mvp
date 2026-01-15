@@ -59,10 +59,6 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
     );
   }
 
-  if (user.role === "COMPANY" && requestRecord.companyId !== user.id) {
-    redirect(backHref);
-  }
-
   const isUnlocked =
     user.role === "ADMIN"
       ? true

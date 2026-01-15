@@ -78,7 +78,15 @@ export function TransporterJobsTable({
                 const unlocked = Boolean(request.contactsUnlockedByTransporter);
                 const detailHref = `${basePath}/${request.id}`;
                 return (
-                <tr key={request.id} className={!unlocked ? "bg-white/70" : undefined}>
+                <tr
+                  key={request.id}
+                  className={!unlocked ? "bg-white/70" : "cursor-pointer"}
+                  onClick={() => {
+                    if (unlocked) {
+                      router.push(detailHref);
+                    }
+                  }}
+                >
                   <td className="text-[#475569]">
                     <span className="font-semibold text-[#0f172a]">Percorso da definire</span>
                   </td>

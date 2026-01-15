@@ -76,7 +76,15 @@ export function CompanyRequestsTable({
               const unlocked = Boolean(request.contactsUnlockedByCompany);
               const detailHref = `${basePath}/${request.id}`;
               return (
-                <tr key={request.id} className={!unlocked ? "bg-white/70" : undefined}>
+                <tr
+                  key={request.id}
+                  className={!unlocked ? "bg-white/70" : "cursor-pointer"}
+                  onClick={() => {
+                    if (unlocked) {
+                      router.push(detailHref);
+                    }
+                  }}
+                >
                   <td className="font-semibold text-[#0f172a]">Richiesta #{request.id}</td>
                   <td className="text-[#475569]">Dettagli percorso non disponibili</td>
                   <td className="text-[#475569]">—</td>
