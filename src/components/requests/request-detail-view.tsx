@@ -21,7 +21,6 @@ type RequestDetailViewProps = {
   backHref: string;
   status: string;
   transporterId: number | null;
-  acceptedAt: string | null;
   transporterAcceptance: "available" | "accepted_by_self" | "accepted_by_other";
 };
 
@@ -38,7 +37,6 @@ export function RequestDetailView({
   backHref,
   status,
   transporterId,
-  acceptedAt,
   transporterAcceptance,
 }: RequestDetailViewProps) {
   const router = useRouter();
@@ -61,11 +59,18 @@ export function RequestDetailView({
     [role],
   );
 
-  const statusLabel = isAccepted ? "Trasporto assegnato" : "In attesa di assegnazione";
+  const statusLabel =
+    status === "COMPLETED"
+      ? "Trasporto completato"
+      : isAccepted
+        ? "Trasporto accettato"
+        : "In attesa di assegnazione";
   const statusCopy =
-    isAccepted
-      ? "Trasporto preso in carico da un trasportatore verificato."
-      : "Nessun trasportatore ha ancora preso in carico la richiesta.";
+    status === "COMPLETED"
+      ? "Il trasporto è stato completato."
+      : isAccepted
+        ? "Trasporto preso in carico da un trasportatore verificato."
+        : "Nessun trasportatore ha ancora preso in carico la richiesta.";
 
   async function handleUnlock() {
     if (!canUnlock) return;
@@ -162,7 +167,7 @@ export function RequestDetailView({
         </div>
       )}
 
-      {role === "COMPANY" && isAccepted && (
+      {role === "COMPANY" && status === "ACCEPTED" && (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
           <p className="font-semibold">Trasporto accettato</p>
           <p className="text-sm text-[#475569]">
@@ -170,10 +175,6 @@ export function RequestDetailView({
           </p>
           <p className="text-sm text-[#475569]">
             Telefono trasportatore: {contactPhone ?? "Telefono non disponibile"}
-          </p>
-          <p className="text-sm text-[#475569]">
-            Data accettazione:{" "}
-            {acceptedAt ? new Date(acceptedAt).toLocaleString("it-IT") : "Non disponibile"}
           </p>
         </div>
       )}

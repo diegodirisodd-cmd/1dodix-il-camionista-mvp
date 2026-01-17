@@ -111,7 +111,6 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       backHref={backHref}
       status={requestRecord.status}
       transporterId={requestRecord.transporterId ?? null}
-      acceptedAt={requestRecord.acceptedAt ? requestRecord.acceptedAt.toISOString() : null}
       transporterAcceptance={transporterAcceptance}
     />
   );
