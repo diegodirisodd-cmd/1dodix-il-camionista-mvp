@@ -25,16 +25,6 @@ export async function PATCH(_: Request, { params }: { params: { id: string } }) 
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
   }
 
-  if (requestRecord.status !== "OPEN") {
-    if (process.env.NODE_ENV === "development") {
-      console.warn("Tentativo di accettare richiesta con status non OPEN", {
-        requestId,
-        status: requestRecord.status,
-      });
-    }
-    return NextResponse.json({ error: "Questo trasporto è già stato assegnato." }, { status: 400 });
-  }
-
   if (requestRecord.transporterId) {
     if (process.env.NODE_ENV === "development") {
       console.warn("Tentativo di accettare richiesta già assegnata", { requestId });
@@ -46,7 +36,6 @@ export async function PATCH(_: Request, { params }: { params: { id: string } }) 
     where: { id: requestId },
     data: {
       transporterId: user.id,
-      status: "ACCEPTED",
     },
   });
 
