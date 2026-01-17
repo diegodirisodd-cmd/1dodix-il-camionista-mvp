@@ -21,7 +21,8 @@ type RequestDetailViewProps = {
   backHref: string;
   status: string;
   transporterId: number | null;
-  transporterAcceptance: "available" | "accepted_by_self" | "accepted_by_other";
+  assignedToSelf: boolean;
+  assignedToOther: boolean;
 };
 
 export function RequestDetailView({
@@ -37,7 +38,8 @@ export function RequestDetailView({
   backHref,
   status,
   transporterId,
-  transporterAcceptance,
+  assignedToSelf,
+  assignedToOther,
 }: RequestDetailViewProps) {
   const router = useRouter();
   const [isUnlocked, setIsUnlocked] = useState(unlocked);
@@ -140,8 +142,11 @@ export function RequestDetailView({
           {acceptMessage && (
             <p className="text-sm text-[#0f172a]">{acceptMessage}</p>
           )}
-          {role === "TRANSPORTER" && transporterAcceptance !== "available" && (
+          {role === "TRANSPORTER" && assignedToOther && (
             <p className="text-sm text-[#0f172a]">Trasporto già accettato.</p>
+          )}
+          {role === "TRANSPORTER" && assignedToSelf && (
+            <p className="text-sm text-[#0f172a]">Sei il trasportatore assegnato.</p>
           )}
         </div>
 
