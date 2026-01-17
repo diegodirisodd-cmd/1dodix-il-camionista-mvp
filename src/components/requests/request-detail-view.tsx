@@ -22,6 +22,7 @@ type RequestDetailViewProps = {
   status: string;
   transporterId: number | null;
   acceptedAt: string | null;
+  transporterAcceptance: "available" | "accepted_by_self" | "accepted_by_other";
 };
 
 export function RequestDetailView({
@@ -38,6 +39,7 @@ export function RequestDetailView({
   status,
   transporterId,
   acceptedAt,
+  transporterAcceptance,
 }: RequestDetailViewProps) {
   const router = useRouter();
   const [isUnlocked, setIsUnlocked] = useState(unlocked);
@@ -132,6 +134,9 @@ export function RequestDetailView({
           <p className="text-sm text-[#475569]">{statusCopy}</p>
           {acceptMessage && (
             <p className="text-sm text-[#0f172a]">{acceptMessage}</p>
+          )}
+          {role === "TRANSPORTER" && transporterAcceptance !== "available" && (
+            <p className="text-sm text-[#0f172a]">Trasporto già accettato.</p>
           )}
         </div>
 

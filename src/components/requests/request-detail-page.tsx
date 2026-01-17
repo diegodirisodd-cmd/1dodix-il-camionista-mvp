@@ -80,6 +80,15 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
         ? requestRecord.status === "ACCEPTED"
         : requestRecord.contactsUnlockedByTransporter;
 
+  const transporterAcceptance =
+    user.role === "TRANSPORTER"
+      ? requestRecord.transporterId === null
+        ? "available"
+        : requestRecord.transporterId === user.id
+          ? "accepted_by_self"
+          : "accepted_by_other"
+      : "available";
+
   return (
     <RequestDetailView
       requestId={requestRecord.id}
@@ -103,6 +112,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       status={requestRecord.status}
       transporterId={requestRecord.transporterId ?? null}
       acceptedAt={requestRecord.acceptedAt ? requestRecord.acceptedAt.toISOString() : null}
+      transporterAcceptance={transporterAcceptance}
     />
   );
 }
