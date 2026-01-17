@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { RequestsListClient } from "@/components/requests/requests-list-client";
+import { CompanyRequestsTable } from "@/components/dashboard/company-requests-table";
 import { getSessionUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export default async function CompanyRequestsPage({ searchParams }: { searchParams?: { created?: string } }) {
   const user = await getSessionUser();
@@ -16,6 +17,26 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
   }
 
   const showCreated = searchParams?.created === "1";
+  let companyRequests: {
+    id: number;
+    pickup: string;
+    delivery: string;
+    price: number;
+    transporterId: number | null;
+    createdAt: Date;
+  }[] = [];
+  let loadError: string | null = null;
+
+  try {
+    companyRequests = await prisma.request.findMany({
+      where: { companyId: user.id },
+      orderBy: { createdAt: "desc" },
+      include: { transporter: true },
+    });
+  } catch (error) {
+    console.error("Errore caricamento richieste azienda", error);
+    loadError = "Impossibile caricare le richieste. Riprova tra poco.";
+  }
 
   return (
     <section className="space-y-6">
@@ -49,12 +70,26 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
         </div>
       </div>
 
-      <RequestsListClient
-        role={user.role}
-        basePath="/dashboard/company/requests"
-        variant="company"
-        emptyMessage="Nessuna richiesta presente. Pubblica la prima per ricevere contatti diretti."
-      />
+      {loadError ? (
+        <p className="alert-warning">{loadError}</p>
+      ) : companyRequests.length === 0 ? (
+        <div className="card text-sm leading-relaxed text-[#475569]">
+          Nessuna richiesta presente. Pubblica la prima per ricevere contatti diretti.
+        </div>
+      ) : (
+        <CompanyRequestsTable
+          requests={companyRequests.map((request) => ({
+            id: request.id,
+            pickup: request.pickup,
+            delivery: request.delivery,
+            priceCents: request.price,
+            transporterId: request.transporterId,
+            createdAt: request.createdAt.toISOString(),
+          }))}
+          role={user.role}
+          basePath="/dashboard/company/requests"
+        />
+      )}
     </section>
   );
 }
