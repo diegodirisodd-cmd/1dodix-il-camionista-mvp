@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function PATCH(_: Request, { params }: { params: { id: string } }) {
+export async function POST(_: Request, { params }: { params: { id: string } }) {
   const user = await getSessionUser();
 
   if (!user || user.role !== "TRANSPORTER") {
@@ -36,6 +36,7 @@ export async function PATCH(_: Request, { params }: { params: { id: string } }) 
     where: { id: requestId },
     data: {
       transporterId: user.id,
+      acceptedAt: new Date(),
     },
   });
 

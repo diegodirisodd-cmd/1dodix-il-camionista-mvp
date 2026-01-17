@@ -73,13 +73,12 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
     );
   }
 
-  const status = requestRecord.status;
   const contactVisible =
     user.role === "ADMIN"
       ? true
       : user.role === "COMPANY"
-        ? status === "ACCEPTED"
-        : requestRecord.contactsUnlockedByTransporter;
+        ? requestRecord.transporterId !== null
+        : requestRecord.transporterId === user.id;
 
   const assignedToSelf = user.role === "TRANSPORTER" && requestRecord.transporterId === user.id;
   const assignedToOther =
@@ -90,8 +89,8 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
   return (
     <RequestDetailView
       requestId={requestRecord.id}
-      title={requestRecord.title}
-      description={requestRecord.description}
+      title={`${requestRecord.pickup} → ${requestRecord.delivery}`}
+      description={requestRecord.description ?? ""}
       priceCents={requestRecord.price}
       createdAt={requestRecord.createdAt.toISOString()}
       contactEmail={getContactEmail({
@@ -107,7 +106,6 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       role={user.role}
       unlocked={contactVisible}
       backHref={backHref}
-      status={status}
       transporterId={requestRecord.transporterId ?? null}
       assignedToSelf={assignedToSelf}
       assignedToOther={assignedToOther}

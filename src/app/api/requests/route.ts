@@ -6,13 +6,10 @@ import { prisma } from "@/lib/prisma";
 type RequestPayload = {
   pickup?: string;
   delivery?: string;
+  cargo?: string;
   cargoType?: string;
   description?: string;
-  contactName?: string;
-  contactPhone?: string;
-  contactEmail?: string;
   price?: number | string;
-  contactsUnlockedByCompany?: boolean;
 };
 
 export async function GET() {
@@ -29,7 +26,7 @@ export async function GET() {
         : user.role === "TRANSPORTER"
           ? {
               OR: [
-                { status: "OPEN" },
+                { transporterId: null },
                 { transporterId: user.id },
               ],
             }
@@ -40,23 +37,17 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
+        pickup: true,
+        delivery: true,
         price: true,
-        status: true,
         createdAt: true,
-        contactsUnlockedByCompany: true,
-        contactsUnlockedByTransporter: true,
+        transporterId: true,
         company: { select: { email: true, phone: true } },
         transporter: { select: { email: true, phone: true } },
       },
     });
 
-    return NextResponse.json(
-      requests.map((request) => ({
-        ...request,
-        pickup: null,
-        delivery: null,
-      })),
-    );
+    return NextResponse.json(requests);
   } catch (error) {
     console.error("Errore caricamento richieste", error);
     return NextResponse.json({ error: "Impossibile caricare le richieste" }, { status: 500 });
@@ -95,23 +86,22 @@ export async function POST(request: Request) {
   const priceInCents = Math.round(priceNumber * 100);
   const pickup = body.pickup?.trim() ?? "";
   const delivery = body.delivery?.trim() ?? "";
-  const title = pickup && delivery ? `${pickup} → ${delivery}` : "Richiesta di trasporto";
-  const descriptionParts = [
-    body.description?.trim(),
-    pickup && delivery ? `Percorso: ${pickup} → ${delivery}` : null,
-    body.cargoType?.trim() ? `Carico: ${body.cargoType.trim()}` : null,
-  ].filter(Boolean) as string[];
-  const description = descriptionParts.join("\n").trim();
+  const cargo = body.cargo?.trim() ?? body.cargoType?.trim() ?? null;
+  const description = body.description?.trim() || null;
+
+  if (!pickup || !delivery) {
+    return NextResponse.json({ error: "Ritiro e consegna obbligatori." }, { status: 400 });
+  }
 
   try {
     const newRequest = await prisma.request.create({
       data: {
-        title,
+        pickup,
+        delivery,
+        cargo,
         description,
         price: priceInCents,
-        contactsUnlockedByCompany: Boolean(body.contactsUnlockedByCompany),
         companyId: user.id,
-        status: "OPEN",
       },
     });
 

@@ -23,6 +23,14 @@ export default async function CompanyAppPage() {
     where: { companyId: user.id },
     orderBy: { createdAt: "desc" },
     take: 5,
+    select: {
+      id: true,
+      pickup: true,
+      delivery: true,
+      price: true,
+      transporterId: true,
+      createdAt: true,
+    },
   });
   const subscriptionActive = hasActiveSubscription(user);
 
@@ -108,10 +116,10 @@ export default async function CompanyAppPage() {
                   <tr key={request.id} className="hover:bg-[#f8fafc]">
                     <td className="px-4 py-3 font-semibold">Richiesta #{request.id}</td>
                     <td className="px-4 py-3 text-[#475569]">
-                      Valore trasporto: {formatCurrency(request.price)}
+                      {request.pickup} → {request.delivery} · {formatCurrency(request.price)}
                     </td>
                     <td className="px-4 py-3 text-[#475569]">
-                      {request.contactsUnlockedByCompany ? (
+                      {request.transporterId ? (
                         <>
                           <div className="font-medium text-[#0f172a]">Referente disponibile</div>
                           <div className="text-xs text-[#64748b]">Email disponibile</div>

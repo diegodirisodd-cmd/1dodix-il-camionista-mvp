@@ -16,22 +16,21 @@ model User {
   createdAt DateTime @default(now())
 
   companyRequests     Request[] @relation("CompanyRequests")
-  transporterRequests Request[] @relation("TransporterRequests")
+  transporterRequests Request[] @relation("TransporterJobs")
 }
 
 model Request {
   id            Int      @id @default(autoincrement())
+  pickup        String
+  delivery      String
+  cargo         String?
+  description   String?
+  price         Int
   companyId     Int
   transporterId Int?
-  title         String
-  description   String
-  price         Int
-  status        String   @default("OPEN")
+  acceptedAt    DateTime?
   createdAt     DateTime @default(now())
 
-  contactsUnlockedByCompany     Boolean @default(false)
-  contactsUnlockedByTransporter Boolean @default(false)
-
   company     User  @relation("CompanyRequests", fields: [companyId], references: [id])
-  transporter User? @relation("TransporterRequests", fields: [transporterId], references: [id])
+  transporter User? @relation("TransporterJobs", fields: [transporterId], references: [id])
 }

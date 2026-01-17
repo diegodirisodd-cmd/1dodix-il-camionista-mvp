@@ -8,11 +8,11 @@ import { type Role } from "@/lib/roles";
 
 type RequestApiItem = {
   id: number;
+  pickup: string;
+  delivery: string;
   price: number;
-  status: string;
   createdAt: string;
-  contactsUnlockedByCompany: boolean;
-  contactsUnlockedByTransporter: boolean;
+  transporterId: number | null;
 };
 
 type RequestsListClientProps = {
@@ -78,8 +78,10 @@ export function RequestsListClient({ role, basePath, variant, emptyMessage }: Re
       <CompanyRequestsTable
         requests={items.map((request) => ({
           id: request.id,
+          pickup: request.pickup,
+          delivery: request.delivery,
           priceCents: request.price,
-          contactsUnlockedByCompany: request.contactsUnlockedByCompany,
+          transporterId: request.transporterId,
           createdAt: request.createdAt,
         }))}
         role={role}
@@ -92,8 +94,10 @@ export function RequestsListClient({ role, basePath, variant, emptyMessage }: Re
     <TransporterJobsTable
       requests={items.map((request) => ({
         id: request.id,
+        pickup: request.pickup,
+        delivery: request.delivery,
         priceCents: request.price,
-        contactsUnlockedByTransporter: request.contactsUnlockedByTransporter,
+        transporterId: request.transporterId,
         createdAt: request.createdAt,
       }))}
       role={role}

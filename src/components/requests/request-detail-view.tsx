@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
-import { PaywallModal } from "@/components/paywall-modal";
 import { formatCurrency } from "@/lib/commission";
 import { type Role } from "@/lib/roles";
 
@@ -19,7 +18,6 @@ type RequestDetailViewProps = {
   role: Role;
   unlocked: boolean;
   backHref: string;
-  status: string;
   transporterId: number | null;
   assignedToSelf: boolean;
   assignedToOther: boolean;
@@ -36,70 +34,32 @@ export function RequestDetailView({
   role,
   unlocked,
   backHref,
-  status,
   transporterId,
   assignedToSelf,
   assignedToOther,
 }: RequestDetailViewProps) {
   const router = useRouter();
-  const [isUnlocked, setIsUnlocked] = useState(unlocked);
-  const [paywallOpen, setPaywallOpen] = useState(false);
-  const [unlocking, setUnlocking] = useState(false);
-  const [showUnlockNotice, setShowUnlockNotice] = useState(
-    unlocked && !contactEmail && role === "TRANSPORTER",
-  );
+  const isUnlocked = unlocked;
   const [accepting, setAccepting] = useState(false);
   const [acceptMessage, setAcceptMessage] = useState<string | null>(null);
 
-  const canUnlock = role === "COMPANY" || role === "TRANSPORTER";
-  const unlockTarget = role === "COMPANY" ? "company" : "transporter";
   const canAccept = role === "TRANSPORTER" && !transporterId;
-  const isAccepted = status === "ACCEPTED";
+  const isAccepted = Boolean(transporterId);
 
   const contactHeadline = useMemo(
     () => (role === "TRANSPORTER" ? "Referente aziendale" : "Referente trasportatore"),
     [role],
   );
 
-  const statusLabel =
-    status === "COMPLETED"
-      ? "Trasporto completato"
-      : isAccepted
-        ? "Trasporto accettato"
-        : "In attesa di assegnazione";
-  const statusCopy =
-    status === "COMPLETED"
-      ? "Il trasporto è stato completato."
-      : isAccepted
-        ? "Trasporto preso in carico da un trasportatore verificato."
-        : "Nessun trasportatore ha ancora preso in carico la richiesta.";
-
-  async function handleUnlock() {
-    if (!canUnlock) return;
-    setUnlocking(true);
-    const response = await fetch(`/api/requests/${requestId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ unlock: unlockTarget }),
-    });
-
-    setUnlocking(false);
-
-    if (!response.ok) {
-      setPaywallOpen(false);
-      return;
-    }
-
-    setIsUnlocked(true);
-    setShowUnlockNotice(!contactEmail && role === "TRANSPORTER");
-    setPaywallOpen(false);
-    router.refresh();
-  }
+  const statusLabel = isAccepted ? "Trasporto accettato" : "In attesa di assegnazione";
+  const statusCopy = isAccepted
+    ? "Trasporto preso in carico da un trasportatore verificato."
+    : "Nessun trasportatore ha ancora preso in carico la richiesta.";
 
   async function handleAcceptTransport() {
     setAccepting(true);
     setAcceptMessage(null);
-    const response = await fetch(`/api/requests/${requestId}/accept`, { method: "PATCH" });
+    const response = await fetch(`/api/requests/${requestId}/accept`, { method: "POST" });
     setAccepting(false);
 
     if (!response.ok) {
@@ -166,13 +126,7 @@ export function RequestDetailView({
         </div>
       </div>
 
-      {showUnlockNotice && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-[#92400e]">
-          Richiesta sbloccata. Ricarica la pagina se non vedi ancora i dettagli.
-        </div>
-      )}
-
-      {role === "COMPANY" && status === "ACCEPTED" && (
+      {role === "COMPANY" && isAccepted && (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
           <p className="font-semibold">Trasporto accettato</p>
           <p className="text-sm text-[#475569]">
@@ -189,17 +143,13 @@ export function RequestDetailView({
           <div className="space-y-1">
             <h2 className="text-xl font-semibold text-[#0f172a]">Contatti</h2>
             <p className="text-sm text-[#475569]">
-              {isUnlocked ? "Contatti sbloccati per questa richiesta." : "Sblocca per accedere ai contatti completi."}
+              {isUnlocked
+                ? "Contatti disponibili per questa richiesta."
+                : "I contatti completi sono visibili dopo l’accettazione."}
             </p>
           </div>
-          {!isUnlocked && canUnlock && (
-            <button
-              type="button"
-              onClick={() => setPaywallOpen(true)}
-              className="inline-flex items-center justify-center rounded-full bg-[#0f172a] px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:brightness-110"
-            >
-              Sblocca contatti
-            </button>
+          {!isUnlocked && (
+            <p className="text-xs text-[#64748b]">I contatti completi sono visibili dopo l&apos;accettazione.</p>
           )}
         </div>
 
@@ -215,21 +165,21 @@ export function RequestDetailView({
           <div className="space-y-2 rounded-xl border border-dashed border-[#f5c76a]/80 bg-[#fff8ed] p-4 text-sm text-[#475569]">
             <div className="flex items-center justify-between gap-2">
               <span className="table-chip warning inline-flex items-center gap-2">
-                <span className="text-base leading-none">🔒</span> Contatti bloccati
+                <span className="text-base leading-none">⏳</span> Contatti in attesa
               </span>
             </div>
-            <div className="text-xs text-[#64748b]">I contatti completi sono visibili solo dopo lo sblocco.</div>
+            <div className="text-xs text-[#64748b]">I contatti completi sono visibili dopo l&apos;accettazione.</div>
             <div className="space-y-1 text-xs text-[#475569]">
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#64748b]">🔒</span>
+                <span className="text-xs text-[#64748b]">⏳</span>
                 <span className="blur-[1px]">{contactHeadline}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#64748b]">🔒</span>
+                <span className="text-xs text-[#64748b]">⏳</span>
                 <span className="blur-[1px]">••••@••••</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#64748b]">🔒</span>
+                <span className="text-xs text-[#64748b]">⏳</span>
                 <span className="blur-[1px]">••••••</span>
               </div>
             </div>
@@ -237,14 +187,6 @@ export function RequestDetailView({
         )}
       </div>
 
-      <PaywallModal
-        open={paywallOpen}
-        onClose={() => setPaywallOpen(false)}
-        onConfirm={handleUnlock}
-        loading={unlocking}
-        priceCents={priceCents}
-        role={role}
-      />
     </section>
   );
 }
