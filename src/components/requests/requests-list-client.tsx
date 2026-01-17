@@ -26,23 +26,43 @@ export function RequestsListClient({ role, basePath, variant, emptyMessage }: Re
   const [items, setItems] = useState<RequestApiItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadErrorDetails, setLoadErrorDetails] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     async function loadRequests() {
+      const pathname = typeof window !== "undefined" ? window.location.pathname : undefined;
       try {
         const response = await fetch("/api/requests");
         if (!response.ok) {
-          throw new Error("API error");
+          let errorMessage = "API error";
+          try {
+            const body = (await response.json()) as { error?: string };
+            if (body?.error) {
+              errorMessage = body.error;
+            }
+          } catch {
+            // ignore parsing errors
+          }
+          throw new Error(errorMessage);
         }
         const data = (await response.json()) as RequestApiItem[];
         if (!isMounted) return;
         setItems(data);
         setLoadError(null);
+        setLoadErrorDetails(null);
       } catch (error) {
         if (!isMounted) return;
-        console.error("Errore caricamento richieste", error);
+        console.error("[Requests List] load failed", { pathname, error });
+        if (error instanceof Error) {
+          console.error(error.message, error.stack);
+        }
+        if (error instanceof Error) {
+          setLoadErrorDetails(error.message);
+        } else {
+          setLoadErrorDetails(null);
+        }
         setLoadError("Impossibile caricare le richieste. Riprova tra poco.");
       } finally {
         if (isMounted) {
@@ -63,7 +83,14 @@ export function RequestsListClient({ role, basePath, variant, emptyMessage }: Re
   }
 
   if (loadError) {
-    return <p className="alert-warning">{loadError}</p>;
+    return (
+      <div className="space-y-1">
+        <p className="alert-warning">{loadError}</p>
+        {process.env.NODE_ENV !== "production" && loadErrorDetails ? (
+          <p className="text-xs text-slate-600">Dettaglio errore: {loadErrorDetails}</p>
+        ) : null}
+      </div>
+    );
   }
 
   if (variant === "company") {

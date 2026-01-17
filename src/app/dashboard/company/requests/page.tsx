@@ -26,15 +26,33 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
     createdAt: Date;
   }[] = [];
   let loadError: string | null = null;
+  let loadErrorDetails: string | null = null;
+  const pathname = "/dashboard/company/requests";
 
   try {
     companyRequests = await prisma.request.findMany({
       where: { companyId: user.id },
       orderBy: { createdAt: "desc" },
-      include: { transporter: true },
+      select: {
+        id: true,
+        pickup: true,
+        delivery: true,
+        price: true,
+        transporterId: true,
+        createdAt: true,
+      },
     });
   } catch (error) {
-    console.error("Errore caricamento richieste azienda", error);
+    console.error("[Company Requests] load failed", {
+      pathname,
+      userId: user.id,
+      role: user.role,
+      error,
+    });
+    if (error instanceof Error) {
+      console.error(error.message, error.stack);
+      loadErrorDetails = error.message;
+    }
     loadError = "Impossibile caricare le richieste. Riprova tra poco.";
   }
 
@@ -71,7 +89,12 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
       </div>
 
       {loadError ? (
-        <p className="alert-warning">{loadError}</p>
+        <div className="space-y-1">
+          <p className="alert-warning">{loadError}</p>
+          {process.env.NODE_ENV !== "production" && loadErrorDetails ? (
+            <p className="text-xs text-slate-600">Dettaglio errore: {loadErrorDetails}</p>
+          ) : null}
+        </div>
       ) : companyRequests.length === 0 ? (
         <div className="card text-sm leading-relaxed text-[#475569]">
           Nessuna richiesta presente. Pubblica la prima per ricevere contatti diretti.

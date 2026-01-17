@@ -19,7 +19,10 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
     return NextResponse.json({ error: "Richiesta non valida" }, { status: 400 });
   }
 
-  const requestRecord = await prisma.request.findUnique({ where: { id: requestId } });
+  const requestRecord = await prisma.request.findUnique({
+    where: { id: requestId },
+    select: { id: true, transporterId: true },
+  });
 
   if (!requestRecord) {
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });

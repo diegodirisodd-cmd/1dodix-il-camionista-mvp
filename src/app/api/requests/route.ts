@@ -14,6 +14,7 @@ type RequestPayload = {
 
 export async function GET() {
   const user = await getSessionUser();
+  const pathname = "/api/requests";
 
   if (!user) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
@@ -43,7 +44,15 @@ export async function GET() {
 
     return NextResponse.json(requests);
   } catch (error) {
-    console.error("Errore caricamento richieste", error);
+    console.error("[Requests API] load failed", {
+      pathname,
+      userId: user.id,
+      role: user.role,
+      error,
+    });
+    if (error instanceof Error) {
+      console.error(error.message, error.stack);
+    }
     return NextResponse.json({ error: "Impossibile caricare le richieste" }, { status: 500 });
   }
 }

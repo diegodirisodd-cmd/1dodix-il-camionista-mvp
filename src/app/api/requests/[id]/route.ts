@@ -32,7 +32,20 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
 
-  const requestRecord = await prisma.request.findUnique({ where: { id: Number(params.id) } });
+  const requestRecord = await prisma.request.findUnique({
+    where: { id: Number(params.id) },
+    select: {
+      id: true,
+      pickup: true,
+      delivery: true,
+      cargo: true,
+      description: true,
+      price: true,
+      companyId: true,
+      transporterId: true,
+      createdAt: true,
+    },
+  });
 
   if (!requestRecord) {
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
@@ -58,7 +71,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
 
-  const existing = await prisma.request.findUnique({ where: { id: Number(params.id) } });
+  const existing = await prisma.request.findUnique({
+    where: { id: Number(params.id) },
+    select: { id: true, companyId: true },
+  });
 
   if (!existing) {
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
@@ -108,7 +124,10 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
 
-  const existing = await prisma.request.findUnique({ where: { id: Number(params.id) } });
+  const existing = await prisma.request.findUnique({
+    where: { id: Number(params.id) },
+    select: { id: true, companyId: true },
+  });
 
   if (!existing) {
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });

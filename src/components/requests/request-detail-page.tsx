@@ -61,7 +61,17 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
 
   const requestRecord = await prisma.request.findUnique({
     where: { id: requestId },
-    include: { company: true, transporter: true },
+    select: {
+      id: true,
+      pickup: true,
+      delivery: true,
+      description: true,
+      price: true,
+      createdAt: true,
+      transporterId: true,
+      company: { select: { email: true, phone: true } },
+      transporter: { select: { email: true, phone: true } },
+    },
   });
 
   if (!requestRecord) {
