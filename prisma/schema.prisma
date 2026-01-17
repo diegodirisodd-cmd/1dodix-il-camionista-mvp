@@ -28,7 +28,6 @@ model Request {
   price         Int
   companyId     Int
   transporterId Int?
-  acceptedAt    DateTime?
   createdAt     DateTime @default(now())
 
   company     User  @relation("CompanyRequests", fields: [companyId], references: [id])

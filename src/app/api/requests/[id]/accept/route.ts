@@ -36,7 +36,6 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
     where: { id: requestId },
     data: {
       transporterId: user.id,
-      acceptedAt: new Date(),
     },
   });
 

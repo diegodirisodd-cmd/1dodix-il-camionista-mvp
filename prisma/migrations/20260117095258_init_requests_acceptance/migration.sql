@@ -18,7 +18,6 @@ CREATE TABLE "Request" (
     "price" INTEGER NOT NULL,
     "companyId" INTEGER NOT NULL,
     "transporterId" INTEGER,
-    "acceptedAt" DATETIME,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "Request_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "Request_transporterId_fkey" FOREIGN KEY ("transporterId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE

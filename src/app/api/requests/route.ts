@@ -24,12 +24,7 @@ export async function GET() {
       user.role === "COMPANY"
         ? { companyId: user.id }
         : user.role === "TRANSPORTER"
-          ? {
-              OR: [
-                { transporterId: null },
-                { transporterId: user.id },
-              ],
-            }
+          ? { transporterId: null }
           : undefined;
 
     const requests = await prisma.request.findMany({
@@ -43,7 +38,6 @@ export async function GET() {
         createdAt: true,
         transporterId: true,
         company: { select: { email: true, phone: true } },
-        transporter: { select: { email: true, phone: true } },
       },
     });
 
