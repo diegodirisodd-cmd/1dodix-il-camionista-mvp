@@ -25,9 +25,9 @@ export async function PATCH(_: Request, { params }: { params: { id: string } }) 
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
   }
 
-  if (requestRecord.status !== "PUBLISHED") {
+  if (requestRecord.status !== "OPEN") {
     if (process.env.NODE_ENV === "development") {
-      console.warn("Tentativo di accettare richiesta con status non PUBLISHED", {
+      console.warn("Tentativo di accettare richiesta con status non OPEN", {
         requestId,
         status: requestRecord.status,
       });
@@ -35,7 +35,7 @@ export async function PATCH(_: Request, { params }: { params: { id: string } }) 
     return NextResponse.json({ error: "Questo trasporto è già stato assegnato." }, { status: 400 });
   }
 
-  if (requestRecord.acceptedByTransporterId) {
+  if (requestRecord.transporterId) {
     if (process.env.NODE_ENV === "development") {
       console.warn("Tentativo di accettare richiesta già assegnata", { requestId });
     }
@@ -45,10 +45,8 @@ export async function PATCH(_: Request, { params }: { params: { id: string } }) 
   const updated = await prisma.request.update({
     where: { id: requestId },
     data: {
-      acceptedByTransporterId: user.id,
       transporterId: user.id,
       status: "ACCEPTED",
-      acceptedAt: new Date(),
     },
   });
 

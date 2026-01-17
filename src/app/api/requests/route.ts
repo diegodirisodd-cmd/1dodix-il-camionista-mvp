@@ -30,7 +30,6 @@ export async function GET() {
           ? {
               OR: [
                 { status: "OPEN" },
-                { status: "PUBLISHED" },
                 { transporterId: user.id },
               ],
             }
@@ -112,7 +111,7 @@ export async function POST(request: Request) {
         price: priceInCents,
         contactsUnlockedByCompany: Boolean(body.contactsUnlockedByCompany),
         companyId: user.id,
-        status: "PUBLISHED",
+        status: "OPEN",
       },
     });
 

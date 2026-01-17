@@ -51,7 +51,7 @@ export function RequestDetailView({
 
   const canUnlock = role === "COMPANY" || role === "TRANSPORTER";
   const unlockTarget = role === "COMPANY" ? "company" : "transporter";
-  const canAccept = role === "TRANSPORTER" && status === "PUBLISHED" && !transporterId;
+  const canAccept = role === "TRANSPORTER" && status === "OPEN" && !transporterId;
   const isAccepted = status === "ACCEPTED";
 
   const contactHeadline = useMemo(
