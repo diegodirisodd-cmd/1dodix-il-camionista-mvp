@@ -18,15 +18,50 @@ type RequestPayload = {
 export async function GET() {
   const user = await getSessionUser();
 
-  const isCompany = user?.role === "COMPANY";
-  const isAdmin = user?.role === "ADMIN";
+  if (!user) {
+    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
+  }
 
-  const requests = await prisma.request.findMany({
-    where: isCompany && !isAdmin && user ? { companyId: user.id } : undefined,
-    orderBy: { createdAt: "desc" },
-  });
+  try {
+    const whereClause =
+      user.role === "COMPANY"
+        ? { companyId: user.id }
+        : user.role === "TRANSPORTER"
+          ? {
+              OR: [
+                { status: "OPEN" },
+                { status: "PUBLISHED" },
+                { transporterId: user.id },
+              ],
+            }
+          : undefined;
 
-  return NextResponse.json(requests);
+    const requests = await prisma.request.findMany({
+      where: whereClause,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        price: true,
+        status: true,
+        createdAt: true,
+        contactsUnlockedByCompany: true,
+        contactsUnlockedByTransporter: true,
+        company: { select: { email: true, phone: true } },
+        transporter: { select: { email: true, phone: true } },
+      },
+    });
+
+    return NextResponse.json(
+      requests.map((request) => ({
+        ...request,
+        pickup: null,
+        delivery: null,
+      })),
+    );
+  } catch (error) {
+    console.error("Errore caricamento richieste", error);
+    return NextResponse.json({ error: "Impossibile caricare le richieste" }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {

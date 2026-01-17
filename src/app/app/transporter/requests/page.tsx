@@ -1,9 +1,8 @@
 import { redirect } from "next/navigation";
 
-import { TransporterJobsTable } from "@/components/dashboard/transporter/jobs-table";
+import { RequestsListClient } from "@/components/requests/requests-list-client";
 import { getSessionUser } from "@/lib/auth";
 import { routeForUser } from "@/lib/navigation";
-import { prisma } from "@/lib/prisma";
 
 export default async function TransporterRequestsPage() {
   const user = await getSessionUser();
@@ -16,11 +15,6 @@ export default async function TransporterRequestsPage() {
     redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
   }
 
-  const requests = await prisma.request.findMany({
-    where: { transporterId: null },
-    orderBy: { createdAt: "desc" },
-  });
-
   return (
     <section className="space-y-4">
       <div>
@@ -30,16 +24,7 @@ export default async function TransporterRequestsPage() {
         </p>
       </div>
 
-      <TransporterJobsTable
-        requests={requests.map((request) => ({
-          id: request.id,
-          priceCents: request.price,
-          contactsUnlockedByTransporter: request.contactsUnlockedByTransporter,
-          createdAt: request.createdAt.toISOString(),
-        }))}
-        role={user.role}
-        basePath="/app/transporter/requests"
-      />
+      <RequestsListClient role={user.role} basePath="/app/transporter/requests" variant="transporter" />
     </section>
   );
 }

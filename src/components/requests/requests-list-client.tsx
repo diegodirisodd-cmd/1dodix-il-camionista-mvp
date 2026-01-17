@@ -1,0 +1,103 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+import { CompanyRequestsTable } from "@/components/dashboard/company-requests-table";
+import { TransporterJobsTable } from "@/components/dashboard/transporter/jobs-table";
+import { type Role } from "@/lib/roles";
+
+type RequestApiItem = {
+  id: number;
+  price: number;
+  status: string;
+  createdAt: string;
+  contactsUnlockedByCompany: boolean;
+  contactsUnlockedByTransporter: boolean;
+};
+
+type RequestsListClientProps = {
+  role: Role;
+  basePath: string;
+  variant: "company" | "transporter";
+  emptyMessage?: string;
+};
+
+export function RequestsListClient({ role, basePath, variant, emptyMessage }: RequestsListClientProps) {
+  const [items, setItems] = useState<RequestApiItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadRequests() {
+      try {
+        const response = await fetch("/api/requests");
+        if (!response.ok) {
+          throw new Error("API error");
+        }
+        const data = (await response.json()) as RequestApiItem[];
+        if (!isMounted) return;
+        setItems(data);
+        setLoadError(null);
+      } catch (error) {
+        if (!isMounted) return;
+        console.error("Errore caricamento richieste", error);
+        setLoadError("Impossibile caricare le richieste. Riprova tra poco.");
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadRequests();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (loading) {
+    return <p className="text-sm leading-relaxed text-[#475569]">Caricamento richieste...</p>;
+  }
+
+  if (loadError) {
+    return <p className="alert-warning">{loadError}</p>;
+  }
+
+  if (variant === "company") {
+    if (items.length === 0) {
+      return (
+        <div className="card text-sm leading-relaxed text-[#475569]">
+          {emptyMessage ?? "Nessuna richiesta presente. Pubblica la prima per ricevere contatti diretti."}
+        </div>
+      );
+    }
+    return (
+      <CompanyRequestsTable
+        requests={items.map((request) => ({
+          id: request.id,
+          priceCents: request.price,
+          contactsUnlockedByCompany: request.contactsUnlockedByCompany,
+          createdAt: request.createdAt,
+        }))}
+        role={role}
+        basePath={basePath}
+      />
+    );
+  }
+
+  return (
+    <TransporterJobsTable
+      requests={items.map((request) => ({
+        id: request.id,
+        priceCents: request.price,
+        contactsUnlockedByTransporter: request.contactsUnlockedByTransporter,
+        createdAt: request.createdAt,
+      }))}
+      role={role}
+      basePath={basePath}
+    />
+  );
+}

@@ -1,10 +1,8 @@
-import type { Request as RequestModel } from "@prisma/client";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { CompanyRequestsTable } from "@/components/dashboard/company-requests-table";
+import { RequestsListClient } from "@/components/requests/requests-list-client";
 import { getSessionUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 
 export default async function CompanyRequestsPage({ searchParams }: { searchParams?: { created?: string } }) {
   const user = await getSessionUser();
@@ -18,18 +16,6 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
   }
 
   const showCreated = searchParams?.created === "1";
-  let companyRequests: RequestModel[] = [];
-  let loadError: string | null = null;
-
-  try {
-    companyRequests = await prisma.request.findMany({
-      where: { companyId: user.id },
-      orderBy: { createdAt: "desc" },
-    });
-  } catch (error) {
-    console.error("Errore caricamento richieste azienda", error);
-    loadError = "Impossibile caricare le richieste. Riprova tra poco.";
-  }
 
   return (
     <section className="space-y-6">
@@ -63,24 +49,12 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
         </div>
       </div>
 
-      {loadError ? (
-        <p className="alert-warning">{loadError}</p>
-      ) : companyRequests.length === 0 ? (
-        <div className="card text-sm leading-relaxed text-[#475569]">
-          Nessuna richiesta presente. Pubblica la prima per ricevere contatti diretti.
-        </div>
-      ) : (
-        <CompanyRequestsTable
-          requests={companyRequests.map((request) => ({
-            id: request.id,
-            priceCents: request.price,
-            contactsUnlockedByCompany: request.contactsUnlockedByCompany,
-            createdAt: request.createdAt.toISOString(),
-          }))}
-          role={user.role}
-          basePath="/dashboard/company/requests"
-        />
-      )}
+      <RequestsListClient
+        role={user.role}
+        basePath="/dashboard/company/requests"
+        variant="company"
+        emptyMessage="Nessuna richiesta presente. Pubblica la prima per ricevere contatti diretti."
+      />
     </section>
   );
 }

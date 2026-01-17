@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { CompanyRequestsTable } from "@/components/dashboard/company-requests-table";
+import { RequestsListClient } from "@/components/requests/requests-list-client";
 import { getSessionUser } from "@/lib/auth";
 import { routeForUser } from "@/lib/navigation";
-import { prisma } from "@/lib/prisma";
 
 export default async function CompanyRequestsPage({
   searchParams,
@@ -20,11 +19,6 @@ export default async function CompanyRequestsPage({
   if (user.role !== "COMPANY") {
     redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
   }
-
-  const requests = await prisma.request.findMany({
-    where: { companyId: user.id },
-    orderBy: { createdAt: "desc" },
-  });
 
   const showBanner = searchParams?.created === "1";
 
@@ -49,20 +43,12 @@ export default async function CompanyRequestsPage({
           </Link>
         </div>
 
-        {requests.length === 0 ? (
-          <p className="text-sm leading-relaxed text-[#475569]">Non hai ancora creato richieste.</p>
-        ) : (
-          <CompanyRequestsTable
-            requests={requests.map((request) => ({
-              id: request.id,
-              priceCents: request.price,
-              contactsUnlockedByCompany: request.contactsUnlockedByCompany,
-              createdAt: request.createdAt.toISOString(),
-            }))}
-            role={user.role}
-            basePath="/app/company/requests"
-          />
-        )}
+        <RequestsListClient
+          role={user.role}
+          basePath="/app/company/requests"
+          variant="company"
+          emptyMessage="Non hai ancora creato richieste."
+        />
       </div>
     </section>
   );
