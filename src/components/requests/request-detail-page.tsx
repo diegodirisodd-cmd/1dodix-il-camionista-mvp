@@ -73,11 +73,12 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
     );
   }
 
+  const status = requestRecord.status;
   const contactVisible =
     user.role === "ADMIN"
       ? true
       : user.role === "COMPANY"
-        ? requestRecord.status === "ACCEPTED"
+        ? status === "ACCEPTED"
         : requestRecord.contactsUnlockedByTransporter;
 
   const assignedToSelf = user.role === "TRANSPORTER" && requestRecord.transporterId === user.id;
@@ -106,7 +107,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       role={user.role}
       unlocked={contactVisible}
       backHref={backHref}
-      status={requestRecord.status}
+      status={status}
       transporterId={requestRecord.transporterId ?? null}
       assignedToSelf={assignedToSelf}
       assignedToOther={assignedToOther}
