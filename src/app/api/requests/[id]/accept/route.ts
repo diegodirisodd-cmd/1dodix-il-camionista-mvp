@@ -7,6 +7,9 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
   const user = await getSessionUser();
 
   if (!user || user.role !== "TRANSPORTER") {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Tentativo non autorizzato di accettare richiesta");
+    }
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
 
@@ -22,14 +25,27 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
   }
 
-  if (requestRecord.status !== "OPEN" || requestRecord.transporterId) {
-    return NextResponse.json({ error: "Richiesta non disponibile" }, { status: 400 });
+  if (requestRecord.status !== "OPEN") {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Tentativo di accettare richiesta con status non OPEN", {
+        requestId,
+        status: requestRecord.status,
+      });
+    }
+    return NextResponse.json({ error: "Questo trasporto è già stato assegnato." }, { status: 400 });
   }
 
-  await prisma.request.update({
+  if (requestRecord.transporterId) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Tentativo di accettare richiesta già assegnata", { requestId });
+    }
+    return NextResponse.json({ error: "Questo trasporto è già stato assegnato." }, { status: 400 });
+  }
+
+  const updated = await prisma.request.update({
     where: { id: requestId },
-    data: { transporterId: user.id, status: "ASSIGNED" },
+    data: { transporterId: user.id, status: "ACCEPTED", acceptedAt: new Date() },
   });
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json(updated);
 }

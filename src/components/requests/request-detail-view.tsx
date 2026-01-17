@@ -21,6 +21,7 @@ type RequestDetailViewProps = {
   backHref: string;
   status: string;
   transporterId: number | null;
+  acceptedAt: string | null;
 };
 
 export function RequestDetailView({
@@ -36,6 +37,7 @@ export function RequestDetailView({
   backHref,
   status,
   transporterId,
+  acceptedAt,
 }: RequestDetailViewProps) {
   const router = useRouter();
   const [isUnlocked, setIsUnlocked] = useState(unlocked);
@@ -45,19 +47,21 @@ export function RequestDetailView({
     unlocked && !contactEmail && role === "TRANSPORTER",
   );
   const [accepting, setAccepting] = useState(false);
+  const [acceptMessage, setAcceptMessage] = useState<string | null>(null);
 
   const canUnlock = role === "COMPANY" || role === "TRANSPORTER";
   const unlockTarget = role === "COMPANY" ? "company" : "transporter";
   const canAccept = role === "TRANSPORTER" && status === "OPEN" && !transporterId;
+  const isAccepted = status === "ACCEPTED";
 
   const contactHeadline = useMemo(
     () => (role === "TRANSPORTER" ? "Referente aziendale" : "Referente trasportatore"),
     [role],
   );
 
-  const statusLabel = status === "ASSIGNED" ? "Trasporto assegnato" : "In attesa di assegnazione";
+  const statusLabel = isAccepted ? "Trasporto assegnato" : "In attesa di assegnazione";
   const statusCopy =
-    status === "ASSIGNED"
+    isAccepted
       ? "Trasporto preso in carico da un trasportatore verificato."
       : "Nessun trasportatore ha ancora preso in carico la richiesta.";
 
@@ -85,14 +89,17 @@ export function RequestDetailView({
 
   async function handleAcceptTransport() {
     setAccepting(true);
+    setAcceptMessage(null);
     const response = await fetch(`/api/requests/${requestId}/accept`, { method: "POST" });
     setAccepting(false);
 
     if (!response.ok) {
-      window.alert("Impossibile accettare la richiesta");
+      const data = (await response.json().catch(() => null)) as { error?: string } | null;
+      setAcceptMessage(data?.error ?? "Impossibile accettare la richiesta");
       return;
     }
 
+    setAcceptMessage("Hai accettato questo trasporto. L’azienda può ora contattarti direttamente.");
     router.refresh();
   }
 
@@ -123,6 +130,9 @@ export function RequestDetailView({
             )}
           </div>
           <p className="text-sm text-[#475569]">{statusCopy}</p>
+          {acceptMessage && (
+            <p className="text-sm text-[#0f172a]">{acceptMessage}</p>
+          )}
         </div>
 
         <div className="grid gap-4 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-4 text-sm text-[#475569] md:grid-cols-3">
@@ -144,6 +154,22 @@ export function RequestDetailView({
       {showUnlockNotice && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-[#92400e]">
           Richiesta sbloccata. Ricarica la pagina se non vedi ancora i dettagli.
+        </div>
+      )}
+
+      {role === "COMPANY" && isAccepted && (
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
+          <p className="font-semibold">Trasporto accettato</p>
+          <p className="text-sm text-[#475569]">
+            Email trasportatore: {contactEmail ?? "Email non disponibile"}
+          </p>
+          <p className="text-sm text-[#475569]">
+            Telefono trasportatore: {contactPhone ?? "Telefono non disponibile"}
+          </p>
+          <p className="text-sm text-[#475569]">
+            Data accettazione:{" "}
+            {acceptedAt ? new Date(acceptedAt).toLocaleString("it-IT") : "Non disponibile"}
+          </p>
         </div>
       )}
 

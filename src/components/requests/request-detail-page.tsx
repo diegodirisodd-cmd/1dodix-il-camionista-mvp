@@ -77,7 +77,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
     user.role === "ADMIN"
       ? true
       : user.role === "COMPANY"
-        ? requestRecord.transporterId !== null
+        ? requestRecord.status === "ACCEPTED"
         : requestRecord.contactsUnlockedByTransporter;
 
   return (
@@ -102,6 +102,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       backHref={backHref}
       status={requestRecord.status}
       transporterId={requestRecord.transporterId ?? null}
+      acceptedAt={requestRecord.acceptedAt ? requestRecord.acceptedAt.toISOString() : null}
     />
   );
 }

@@ -27,6 +27,7 @@ model Request {
   description   String
   price         Int
   status        String   @default("OPEN")
+  acceptedAt    DateTime?
   createdAt     DateTime @default(now())
 
   contactsUnlockedByCompany     Boolean @default(false)
