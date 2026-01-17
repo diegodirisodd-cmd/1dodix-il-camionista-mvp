@@ -23,6 +23,7 @@ model Request {
   id            Int      @id @default(autoincrement())
   companyId     Int
   transporterId Int?
+  acceptedByTransporterId Int?
   title         String
   description   String
   price         Int

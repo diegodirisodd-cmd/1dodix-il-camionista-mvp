@@ -51,7 +51,7 @@ export function RequestDetailView({
 
   const canUnlock = role === "COMPANY" || role === "TRANSPORTER";
   const unlockTarget = role === "COMPANY" ? "company" : "transporter";
-  const canAccept = role === "TRANSPORTER" && status === "OPEN" && !transporterId;
+  const canAccept = role === "TRANSPORTER" && status === "PUBLISHED" && !transporterId;
   const isAccepted = status === "ACCEPTED";
 
   const contactHeadline = useMemo(
@@ -90,7 +90,7 @@ export function RequestDetailView({
   async function handleAcceptTransport() {
     setAccepting(true);
     setAcceptMessage(null);
-    const response = await fetch(`/api/requests/${requestId}/accept`, { method: "POST" });
+    const response = await fetch(`/api/requests/${requestId}/accept`, { method: "PATCH" });
     setAccepting(false);
 
     if (!response.ok) {
