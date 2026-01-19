@@ -16,6 +16,7 @@ export const navByRole: Record<Role, { href: string; label: string }[]> = {
   TRANSPORTER: [
     { href: "/dashboard/transporter", label: "Panoramica trasportatore" },
     { href: "/dashboard/transporter/jobs", label: "Richieste disponibili" },
+    { href: "/dashboard/transporter/accepted", label: "Trasporti accettati" },
     { href: "/dashboard/transporter/profile", label: "Profilo operatore" },
     { href: "/dashboard/transporter/billing", label: "Commissioni" },
   ],
