@@ -73,6 +73,22 @@ export function RequestDetailView({
   const iva = commission * 0.22;
   const total = commission + iva;
 
+  async function handleUnlockContacts() {
+    try {
+      const response = await fetch(`/api/requests/${requestId}/unlock`, { method: "POST" });
+      if (!response.ok) {
+        console.error("Errore sblocco contatti", await response.text());
+        alert("Impossibile sbloccare i contatti");
+        return;
+      }
+      alert("Pagamento simulato – funzionalità completa in arrivo");
+      router.refresh();
+    } catch (error) {
+      console.error("Errore sblocco contatti", error);
+      alert("Impossibile sbloccare i contatti");
+    }
+  }
+
   async function handleAcceptTransport() {
     setAccepting(true);
     setAcceptMessage(null);
@@ -150,7 +166,7 @@ export function RequestDetailView({
         </div>
       </div>
 
-      {role === "COMPANY" && isAccepted && (
+      {role === "COMPANY" && isAccepted && isUnlocked && (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
           <p className="font-semibold">Trasporto accettato</p>
           <p className="text-sm text-[#475569]">
@@ -238,9 +254,7 @@ export function RequestDetailView({
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  alert("Pagamento simulato – funzionalità completa in arrivo");
-                }}
+                onClick={handleUnlockContacts}
                 className="btn-primary mt-4 w-full"
               >
                 Sblocca contatti

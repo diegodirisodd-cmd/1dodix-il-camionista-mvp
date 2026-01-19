@@ -28,6 +28,7 @@ model Request {
   price         Int
   companyId     Int
   transporterId Int?
+  contactsUnlocked Boolean @default(false)
   createdAt     DateTime @default(now())
 
   company     User  @relation("CompanyRequests", fields: [companyId], references: [id])

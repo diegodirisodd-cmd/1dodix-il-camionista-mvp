@@ -41,6 +41,7 @@ export async function GET() {
         price: true,
         createdAt: true,
         transporterId: true,
+        contactsUnlocked: true,
         companyId: true,
         company: { select: { email: true, phone: true } },
       },

@@ -14,6 +14,7 @@ type RequestApiItem = {
   price: number;
   createdAt: string;
   transporterId: number | null;
+  contactsUnlocked: boolean;
   companyId: number;
 };
 
@@ -112,6 +113,7 @@ export function RequestsListClient({ role, basePath, variant, emptyMessage }: Re
           cargo: request.cargo,
           priceCents: request.price,
           transporterId: request.transporterId,
+          contactsUnlocked: request.contactsUnlocked,
           createdAt: request.createdAt,
         }))}
         role={role}
@@ -129,6 +131,7 @@ export function RequestsListClient({ role, basePath, variant, emptyMessage }: Re
         cargo: request.cargo,
         priceCents: request.price,
         transporterId: request.transporterId,
+        contactsUnlocked: request.contactsUnlocked,
         createdAt: request.createdAt,
       }))}
       role={role}

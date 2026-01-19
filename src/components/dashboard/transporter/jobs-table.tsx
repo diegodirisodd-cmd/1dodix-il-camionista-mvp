@@ -11,6 +11,7 @@ type RequestRow = {
   id: number;
   priceCents: number;
   transporterId: number | null;
+  contactsUnlocked: boolean;
   createdAt: string;
   pickup: string;
   delivery: string;
@@ -49,6 +50,7 @@ export function TransporterJobsTable({
             <tbody>
               {items.map((request) => {
                 const isAccepted = Boolean(request.transporterId);
+                const contactsUnlocked = request.contactsUnlocked;
                 const detailHref = `${basePath}/${request.id}`;
                 return (
                 <tr
@@ -64,7 +66,7 @@ export function TransporterJobsTable({
                   <td className="text-[#475569]">{request.cargo ?? "—"}</td>
                   <td className="text-[#475569]">{formatCurrency(request.priceCents)}</td>
                   <td className="text-[#475569]">
-                    {isAccepted ? (
+                    {contactsUnlocked ? (
                       <div className="space-y-1">
                         <div className="font-semibold text-[#0f172a]">Referente disponibile</div>
                         <div className="text-xs text-[#64748b]">Email disponibile</div>

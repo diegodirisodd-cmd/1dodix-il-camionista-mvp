@@ -11,6 +11,7 @@ type RequestRow = {
   id: number;
   priceCents: number;
   transporterId: number | null;
+  contactsUnlocked: boolean;
   createdAt: string;
   pickup: string;
   delivery: string;
@@ -46,15 +47,16 @@ export function CompanyRequestsTable({
           </thead>
           <tbody>
             {items.map((request) => {
-              const unlocked = Boolean(request.transporterId);
-              const statusLabel = unlocked ? "Accettata" : "In attesa";
+              const isAccepted = Boolean(request.transporterId);
+              const contactsUnlocked = request.contactsUnlocked;
+              const statusLabel = isAccepted ? "Accettata" : "In attesa";
               const detailHref = `${basePath}/${request.id}`;
               return (
                 <tr
                   key={request.id}
-                  className={!unlocked ? "bg-white/70" : "cursor-pointer"}
+                  className={!isAccepted ? "bg-white/70" : "cursor-pointer"}
                   onClick={() => {
-                    if (unlocked) {
+                    if (isAccepted) {
                       router.push(detailHref);
                     }
                   }}
@@ -64,7 +66,7 @@ export function CompanyRequestsTable({
                   <td className="text-[#475569]">{request.cargo ?? "—"}</td>
                   <td className="text-[#475569]">{formatCurrency(request.priceCents)}</td>
                   <td className="space-y-1 text-[#475569]">
-                    {unlocked ? (
+                    {contactsUnlocked ? (
                       <>
                         <div className="font-semibold text-[#0f172a]">Referente disponibile</div>
                         <div className="text-xs text-[#64748b]">Email disponibile</div>
@@ -99,7 +101,7 @@ export function CompanyRequestsTable({
                     )}
                   </td>
                   <td className="text-[#475569]">
-                    {unlocked ? (
+                    {isAccepted ? (
                       <Link
                         href={detailHref}
                         className="inline-flex items-center justify-center rounded-full bg-[#0f172a] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:brightness-110"
