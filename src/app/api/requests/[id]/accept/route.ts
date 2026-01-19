@@ -39,7 +39,6 @@ export async function PATCH(_: Request, { params }: { params: { id: string } }) 
     where: { id: requestId },
     data: {
       transporterId: user.id,
-      status: "ACCETTATO",
     },
   });
 

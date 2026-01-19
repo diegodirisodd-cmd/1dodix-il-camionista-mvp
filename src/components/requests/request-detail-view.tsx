@@ -21,7 +21,6 @@ type RequestDetailViewProps = {
   priceCents: number;
   createdAt: string;
   companyEmail: string;
-  status: "ACCETTATO" | "IN_CORSO" | "COMPLETATO";
   contactEmail: string | null;
   contactPhone: string | null;
   transporterEmail: string | null;
@@ -41,7 +40,6 @@ export function RequestDetailView({
   priceCents,
   createdAt,
   companyEmail,
-  status,
   contactEmail,
   contactPhone,
   transporterEmail,
@@ -69,8 +67,6 @@ export function RequestDetailView({
   const statusCopy = isAccepted
     ? "Trasporto preso in carico da un trasportatore verificato."
     : "Nessun trasportatore ha ancora preso in carico la richiesta.";
-  const statusText =
-    status === "ACCETTATO" ? "Accettato" : status === "IN_CORSO" ? "In corso" : "Completato";
 
   const transportValue = priceCents / 100;
   const commission = transportValue * 0.02;
@@ -142,11 +138,6 @@ export function RequestDetailView({
               </button>
             )}
           </div>
-          {role === "COMPANY" && (
-            <p className="text-xs font-medium uppercase text-[#64748b]">
-              Stato trasporto: <span className="text-[#0f172a]">{statusText}</span>
-            </p>
-          )}
           <p className="text-sm text-[#475569]">{statusCopy}</p>
           {acceptMessage && (
             <p className="text-sm text-[#0f172a]">{acceptMessage}</p>

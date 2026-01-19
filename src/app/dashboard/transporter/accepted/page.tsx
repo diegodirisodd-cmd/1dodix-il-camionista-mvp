@@ -20,11 +20,9 @@ export default async function TransporterAcceptedPage() {
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
-      pickup: true,
-      delivery: true,
+      cargo: true,
       price: true,
       createdAt: true,
-      status: true,
       company: { select: { email: true } },
     },
   });
