@@ -7,6 +7,12 @@ import { useMemo, useState } from "react";
 import { formatCurrency } from "@/lib/commission";
 import { type Role } from "@/lib/roles";
 
+const euroFormatter = new Intl.NumberFormat("it-IT", {
+  style: "currency",
+  currency: "EUR",
+  minimumFractionDigits: 2,
+});
+
 type RequestDetailViewProps = {
   requestId: number;
   title: string;
@@ -61,6 +67,11 @@ export function RequestDetailView({
   const statusCopy = isAccepted
     ? "Trasporto preso in carico da un trasportatore verificato."
     : "Nessun trasportatore ha ancora preso in carico la richiesta.";
+
+  const transportValue = priceCents / 100;
+  const commission = transportValue * 0.02;
+  const iva = commission * 0.22;
+  const total = commission + iva;
 
   async function handleAcceptTransport() {
     setAccepting(true);
@@ -175,7 +186,7 @@ export function RequestDetailView({
             </p>
           </div>
         ) : (
-          <div className="space-y-2 rounded-xl border border-dashed border-[#f5c76a]/80 bg-[#fff8ed] p-4 text-sm text-[#475569]">
+          <div className="space-y-4 rounded-xl border border-dashed border-[#f5c76a]/80 bg-[#fff8ed] p-4 text-sm text-[#475569]">
             <div className="flex items-center justify-between gap-2">
               <span className="table-chip warning inline-flex items-center gap-2">
                 <span className="text-base leading-none">⏳</span> Contatti in attesa
@@ -195,6 +206,46 @@ export function RequestDetailView({
                 <span className="text-xs text-[#64748b]">⏳</span>
                 <span className="blur-[1px]">••••••</span>
               </div>
+            </div>
+            <div className="rounded-xl border border-[#e2e8f0] bg-white p-4 text-sm text-[#0f172a] shadow-sm">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#64748b]">Sblocca contatti</p>
+                <p className="text-sm text-[#475569]">
+                  Per sbloccare i contatti è richiesta una commissione di servizio. La commissione viene applicata
+                  solo a trasporto concluso.
+                </p>
+                <p className="text-xs font-medium text-[#475569]">
+                  Nessun abbonamento, paghi solo quando lavori. Trasparenza totale, nessun costo nascosto.
+                </p>
+              </div>
+              <div className="mt-4 space-y-2 rounded-lg bg-[#f8fafc] p-3">
+                <div className="flex items-center justify-between text-xs text-[#475569]">
+                  <span>Importo trasporto</span>
+                  <span className="font-semibold text-[#0f172a]">{euroFormatter.format(transportValue)}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-[#475569]">
+                  <span>Commissione DodiX (2%)</span>
+                  <span>{euroFormatter.format(commission)}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-[#475569]">
+                  <span>IVA 22%</span>
+                  <span>{euroFormatter.format(iva)}</span>
+                </div>
+                <div className="mt-2 flex items-center justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-[#0f172a]">
+                  <span>Totale</span>
+                  <span>{euroFormatter.format(total)}</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  alert("Pagamento simulato – funzionalità completa in arrivo");
+                }}
+                className="btn-primary mt-4 w-full"
+              >
+                Sblocca contatti
+              </button>
+              <p className="mt-3 text-xs text-[#64748b]">Commissione applicata solo quando il contatto è utile.</p>
             </div>
           </div>
         )}
