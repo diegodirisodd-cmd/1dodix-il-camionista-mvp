@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { formatCurrency } from "@/lib/commission";
 
@@ -19,6 +19,19 @@ type CompanyHistoryListProps = {
 
 export function CompanyHistoryList({ requests }: CompanyHistoryListProps) {
   const [items] = useState(requests);
+  const [completedIds, setCompletedIds] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem("completedRequests");
+    if (!stored) return;
+    try {
+      const ids = JSON.parse(stored) as number[];
+      setCompletedIds(new Set(ids));
+    } catch {
+      // ignore malformed data
+    }
+  }, []);
 
   if (items.length === 0) {
     return (
@@ -45,6 +58,7 @@ export function CompanyHistoryList({ requests }: CompanyHistoryListProps) {
         <tbody>
           {items.map((request) => {
             const detailHref = `/dashboard/company/requests/${request.id}`;
+            const isCompleted = completedIds.has(request.id);
             return (
               <tr key={request.id} className="cursor-pointer">
                 <td className="text-[#475569]">
@@ -56,9 +70,15 @@ export function CompanyHistoryList({ requests }: CompanyHistoryListProps) {
                 <td className="text-[#475569]">{formatCurrency(request.price)}</td>
                 <td className="text-[#475569]">{request.transporter?.email ?? "—"}</td>
                 <td className="text-[#475569]">
-                  <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
-                    Trasporto accettato
-                  </span>
+                  {isCompleted ? (
+                    <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
+                      Completato
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
+                      Trasporto accettato
+                    </span>
+                  )}
                 </td>
                 <td className="text-[#475569]">{new Date(request.createdAt).toLocaleDateString("it-IT")}</td>
                 <td className="text-[#475569]">

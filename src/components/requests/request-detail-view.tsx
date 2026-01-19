@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { formatCurrency } from "@/lib/commission";
 import { type Role } from "@/lib/roles";
@@ -54,6 +54,7 @@ export function RequestDetailView({
   const isUnlocked = unlocked;
   const [accepting, setAccepting] = useState(false);
   const [acceptMessage, setAcceptMessage] = useState<string | null>(null);
+  const [completed, setCompleted] = useState(false);
 
   const canAccept = role === "TRANSPORTER" && !transporterId;
   const isAccepted = Boolean(transporterId);
@@ -72,6 +73,37 @@ export function RequestDetailView({
   const commission = transportValue * 0.02;
   const iva = commission * 0.22;
   const total = commission + iva;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem("completedRequests");
+    if (!stored) return;
+    try {
+      const ids = JSON.parse(stored) as number[];
+      setCompleted(ids.includes(requestId));
+    } catch {
+      // ignore malformed data
+    }
+  }, [requestId]);
+
+  function handleMarkCompleted() {
+    const confirmed = window.confirm("Confermi di voler segnare il trasporto come completato?");
+    if (!confirmed) return;
+    if (typeof window !== "undefined") {
+      const stored = window.localStorage.getItem("completedRequests");
+      try {
+        const ids = stored ? (JSON.parse(stored) as number[]) : [];
+        if (!ids.includes(requestId)) {
+          const next = [...ids, requestId];
+          window.localStorage.setItem("completedRequests", JSON.stringify(next));
+        }
+      } catch {
+        window.localStorage.setItem("completedRequests", JSON.stringify([requestId]));
+      }
+    }
+    setCompleted(true);
+    setAcceptMessage("Trasporto completato con successo.");
+  }
 
   async function handleUnlockContacts() {
     try {
@@ -138,6 +170,20 @@ export function RequestDetailView({
               </button>
             )}
           </div>
+          {role === "COMPANY" && isAccepted && !completed && (
+            <button
+              type="button"
+              onClick={handleMarkCompleted}
+              className="btn-secondary text-xs"
+            >
+              Segna come completato
+            </button>
+          )}
+          {completed && (
+            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
+              Trasporto completato
+            </span>
+          )}
           <p className="text-sm text-[#475569]">{statusCopy}</p>
           {acceptMessage && (
             <p className="text-sm text-[#0f172a]">{acceptMessage}</p>
