@@ -88,6 +88,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       priceCents={requestRecord.price}
       createdAt={requestRecord.createdAt.toISOString()}
       companyEmail={requestRecord.company.email}
+      status={requestRecord.status}
       contactEmail={getContactEmail({
         role: user.role,
         companyEmail: requestRecord.company.email,

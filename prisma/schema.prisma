@@ -29,6 +29,7 @@ model Request {
   companyId     Int
   transporterId Int?
   contactsUnlocked Boolean @default(false)
+  status        String   @default("ACCETTATO")
   createdAt     DateTime @default(now())
 
   company     User  @relation("CompanyRequests", fields: [companyId], references: [id])
