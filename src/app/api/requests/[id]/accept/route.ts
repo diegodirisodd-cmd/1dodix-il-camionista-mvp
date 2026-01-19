@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(_: Request, { params }: { params: { id: string } }) {
+export async function PATCH(_: Request, { params }: { params: { id: string } }) {
   const user = await getSessionUser();
 
   if (!user || user.role !== "TRANSPORTER") {
@@ -32,7 +32,7 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
     if (process.env.NODE_ENV === "development") {
       console.warn("Tentativo di accettare richiesta già assegnata", { requestId });
     }
-    return NextResponse.json({ error: "Questo trasporto è già stato assegnato." }, { status: 400 });
+    return NextResponse.json({ error: "Già assegnata" }, { status: 409 });
   }
 
   const updated = await prisma.request.update({
@@ -42,5 +42,5 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
     },
   });
 
-  return NextResponse.json(updated);
+  return NextResponse.json({ ok: true, id: updated.id });
 }

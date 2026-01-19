@@ -10,9 +10,11 @@ type RequestApiItem = {
   id: number;
   pickup: string;
   delivery: string;
+  cargo: string | null;
   price: number;
   createdAt: string;
   transporterId: number | null;
+  companyId: number;
 };
 
 type RequestsListClientProps = {
@@ -107,6 +109,7 @@ export function RequestsListClient({ role, basePath, variant, emptyMessage }: Re
           id: request.id,
           pickup: request.pickup,
           delivery: request.delivery,
+          cargo: request.cargo,
           priceCents: request.price,
           transporterId: request.transporterId,
           createdAt: request.createdAt,
@@ -123,6 +126,7 @@ export function RequestsListClient({ role, basePath, variant, emptyMessage }: Re
         id: request.id,
         pickup: request.pickup,
         delivery: request.delivery,
+        cargo: request.cargo,
         priceCents: request.price,
         transporterId: request.transporterId,
         createdAt: request.createdAt,

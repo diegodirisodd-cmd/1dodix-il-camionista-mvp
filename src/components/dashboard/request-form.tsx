@@ -12,9 +12,6 @@ const INITIAL_STATE = {
   cargo: "",
   price: "",
   description: "",
-  contactName: "",
-  contactPhone: "",
-  contactEmail: "",
 };
 
 type RequestFormProps = {
@@ -62,9 +59,6 @@ export function RequestForm({
         delivery: form.dropoff,
         cargoType: form.cargo,
         description: form.description,
-        contactName: form.contactName,
-        contactPhone: form.contactPhone,
-        contactEmail: form.contactEmail,
         price: form.price,
       }),
     });
@@ -147,40 +141,6 @@ export function RequestForm({
           placeholder="Note di accesso, vincoli, orari preferiti, ecc."
         />
       </label>
-
-      <div className="grid gap-4 sm:grid-cols-3">
-        <label className="form-field">
-          <span className="label">Referente*</span>
-          <input
-            required
-            className="input-field"
-            value={form.contactName}
-            onChange={(e) => updateField("contactName", e.target.value)}
-            placeholder="Nome Cognome"
-          />
-        </label>
-        <label className="form-field">
-          <span className="label">Telefono*</span>
-          <input
-            required
-            className="input-field"
-            value={form.contactPhone}
-            onChange={(e) => updateField("contactPhone", e.target.value)}
-            placeholder="+39 333 0000000"
-          />
-        </label>
-        <label className="form-field">
-          <span className="label">Email*</span>
-          <input
-            required
-            type="email"
-            className="input-field"
-            value={form.contactEmail}
-            onChange={(e) => updateField("contactEmail", e.target.value)}
-            placeholder="logistica@azienda.it"
-          />
-        </label>
-      </div>
 
       {error && <p className="alert-warning">{error}</p>}
       {success && <p className="alert-success">{success}</p>}

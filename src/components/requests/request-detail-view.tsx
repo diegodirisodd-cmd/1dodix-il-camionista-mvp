@@ -11,10 +11,13 @@ type RequestDetailViewProps = {
   requestId: number;
   title: string;
   description: string;
+  cargo: string | null;
   priceCents: number;
   createdAt: string;
+  companyEmail: string;
   contactEmail: string | null;
   contactPhone: string | null;
+  transporterEmail: string | null;
   role: Role;
   unlocked: boolean;
   backHref: string;
@@ -27,10 +30,13 @@ export function RequestDetailView({
   requestId,
   title,
   description,
+  cargo,
   priceCents,
   createdAt,
+  companyEmail,
   contactEmail,
   contactPhone,
+  transporterEmail,
   role,
   unlocked,
   backHref,
@@ -59,7 +65,7 @@ export function RequestDetailView({
   async function handleAcceptTransport() {
     setAccepting(true);
     setAcceptMessage(null);
-    const response = await fetch(`/api/requests/${requestId}/accept`, { method: "POST" });
+    const response = await fetch(`/api/requests/${requestId}/accept`, { method: "PATCH" });
     setAccepting(false);
 
     if (!response.ok) {
@@ -83,6 +89,13 @@ export function RequestDetailView({
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#64748b]">Dettaglio richiesta</p>
           <h1 className="text-3xl font-semibold text-[#0f172a]">{title}</h1>
           <p className="text-sm leading-relaxed text-[#475569]">{description}</p>
+          <div className="flex flex-wrap gap-2 text-xs font-semibold text-[#0f172a]">
+            <span className="rounded-full bg-[#f1f5f9] px-3 py-1">Carico: {cargo ?? "—"}</span>
+            <span className="rounded-full bg-[#f1f5f9] px-3 py-1">Email azienda: {companyEmail}</span>
+            {isAccepted && transporterEmail ? (
+              <span className="rounded-full bg-[#f1f5f9] px-3 py-1">Email trasportatore: {transporterEmail}</span>
+            ) : null}
+          </div>
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-[#0f172a]">
             <span className="rounded-full bg-[#f1f5f9] px-3 py-1 text-[#0f172a]">
               {statusLabel}

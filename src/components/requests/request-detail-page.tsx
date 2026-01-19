@@ -61,17 +61,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
 
   const requestRecord = await prisma.request.findUnique({
     where: { id: requestId },
-    select: {
-      id: true,
-      pickup: true,
-      delivery: true,
-      description: true,
-      price: true,
-      createdAt: true,
-      transporterId: true,
-      company: { select: { email: true, phone: true } },
-      transporter: { select: { email: true, phone: true } },
-    },
+    include: { company: true, transporter: true },
   });
 
   if (!requestRecord) {
@@ -101,8 +91,10 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       requestId={requestRecord.id}
       title={`${requestRecord.pickup} → ${requestRecord.delivery}`}
       description={requestRecord.description ?? ""}
+      cargo={requestRecord.cargo ?? null}
       priceCents={requestRecord.price}
       createdAt={requestRecord.createdAt.toISOString()}
+      companyEmail={requestRecord.company.email}
       contactEmail={getContactEmail({
         role: user.role,
         companyEmail: requestRecord.company.email,
@@ -113,6 +105,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
         companyPhone: requestRecord.company.phone ?? null,
         transporterPhone: requestRecord.transporter?.phone ?? null,
       })}
+      transporterEmail={requestRecord.transporter?.email ?? null}
       role={user.role}
       unlocked={contactVisible}
       backHref={backHref}

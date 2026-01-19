@@ -14,6 +14,7 @@ type RequestRow = {
   createdAt: string;
   pickup: string;
   delivery: string;
+  cargo: string | null;
 };
 
 export function CompanyRequestsTable({
@@ -46,6 +47,7 @@ export function CompanyRequestsTable({
           <tbody>
             {items.map((request) => {
               const unlocked = Boolean(request.transporterId);
+              const statusLabel = unlocked ? "Accettata" : "In attesa";
               const detailHref = `${basePath}/${request.id}`;
               return (
                 <tr
@@ -59,7 +61,7 @@ export function CompanyRequestsTable({
                 >
                   <td className="font-semibold text-[#0f172a]">Richiesta #{request.id}</td>
                   <td className="text-[#475569]">{request.pickup} → {request.delivery}</td>
-                  <td className="text-[#475569]">—</td>
+                  <td className="text-[#475569]">{request.cargo ?? "—"}</td>
                   <td className="text-[#475569]">{formatCurrency(request.priceCents)}</td>
                   <td className="space-y-1 text-[#475569]">
                     {unlocked ? (
@@ -108,7 +110,12 @@ export function CompanyRequestsTable({
                       <span className="text-xs text-[#94a3b8]">Sblocca per aprire</span>
                     )}
                   </td>
-                  <td className="text-[#475569]">{new Date(request.createdAt).toLocaleDateString("it-IT")}</td>
+                  <td className="text-[#475569]">
+                    <div className="space-y-1">
+                      <span className="text-xs font-semibold uppercase text-[#64748b]">{statusLabel}</span>
+                      <span>{new Date(request.createdAt).toLocaleDateString("it-IT")}</span>
+                    </div>
+                  </td>
                 </tr>
               );
             })}

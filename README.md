@@ -47,7 +47,7 @@ MVP web per autotrasportatori e aziende costruito con **Next.js**, **React**, **
 I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato per accessi di sola consultazione nell'MVP) compatibili con SQLite.
 
 - `User`: email univoca, password (hash), ruolo testuale e timestamp di creazione.
-- `Request`: richiesta di trasporto pubblicata da un utente `COMPANY` con titolo, origine/destinazione, dati facoltativi su carico/budget/descrizione e riferimenti di contatto.
+- `Request`: richiesta di trasporto pubblicata da un utente `COMPANY` con origine/destinazione, carico opzionale, descrizione e prezzo.
 
 ## Prerequisiti
 - Node.js 18+
@@ -94,8 +94,8 @@ I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato 
 - Documentazione completa in `docs/design-system.md` per palette, scala tipografica, componenti riutilizzabili e regole di layout.
 
 ## Pubblicazione richieste
-- **Company**: compila il form nella pagina `/dashboard/company` oppure invia una `POST /api/requests` con `title`, `pickup`, `dropoff`, `contactName`, `contactPhone`, `contactEmail` (campi facoltativi: `cargo`, `budget`, `description`).
-- **Transporter**: consulta `/dashboard/transporter/jobs` o chiama `GET /api/requests`. I contatti vengono restituiti solo se l'utente ha `subscriptionActive=true`, altrimenti vengono mascherati (`contactHidden`).
+- **Company**: compila il form nella pagina `/dashboard/company` oppure invia una `POST /api/requests` con `pickup`, `delivery`, `price` (campi facoltativi: `cargo`, `description`).
+- **Transporter**: consulta `/dashboard/transporter/jobs` o chiama `GET /api/requests` per le richieste disponibili (non ancora assegnate).
 
 ## Comandi utili
 - `npm run dev` – Avvia il server Next.js in modalità sviluppo.
@@ -107,15 +107,14 @@ I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato 
 - `npm run prisma:studio` – Apre Prisma Studio per ispezionare i dati.
 
 ### Reset database locale (per errori Prisma / colonne mancanti)
-Se l'ambiente locale segnala colonne mancanti (es. `subscriptionActive`), azzera il database di sviluppo e riallinea lo schema:
+Se l'ambiente locale segnala colonne mancanti, riallinea il database locale senza modificare le migrazioni versionate:
 
 ```bash
-rm -f prisma/dev.db prisma/dev.db-journal
+# Ferma il dev server se in esecuzione
+npx prisma migrate reset
 npx prisma generate
-npx prisma migrate dev --name reset_local_db
+npm run dev
 ```
-
-Questo rigenera il client, ricrea `dev.db` coerente con lo schema corrente e mantiene intatte le migrazioni tracciate nel repository.
 
 ### Test manuali abbonamento Stripe
 1. **Eseguire il checkout**

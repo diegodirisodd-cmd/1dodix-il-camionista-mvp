@@ -14,6 +14,7 @@ type RequestRow = {
   createdAt: string;
   pickup: string;
   delivery: string;
+  cargo: string | null;
 };
 
 export function TransporterJobsTable({
@@ -47,25 +48,23 @@ export function TransporterJobsTable({
             </thead>
             <tbody>
               {items.map((request) => {
-                const unlocked = Boolean(request.transporterId);
+                const isAccepted = Boolean(request.transporterId);
                 const detailHref = `${basePath}/${request.id}`;
                 return (
                 <tr
                   key={request.id}
-                  className={!unlocked ? "bg-white/70" : "cursor-pointer"}
+                  className="cursor-pointer"
                   onClick={() => {
-                    if (unlocked) {
-                      router.push(detailHref);
-                    }
+                    router.push(detailHref);
                   }}
                 >
                   <td className="text-[#475569]">
                     <span className="font-semibold text-[#0f172a]">{request.pickup} → {request.delivery}</span>
                   </td>
-                  <td className="text-[#475569]">—</td>
+                  <td className="text-[#475569]">{request.cargo ?? "—"}</td>
                   <td className="text-[#475569]">{formatCurrency(request.priceCents)}</td>
                   <td className="text-[#475569]">
-                    {unlocked ? (
+                    {isAccepted ? (
                       <div className="space-y-1">
                         <div className="font-semibold text-[#0f172a]">Referente disponibile</div>
                         <div className="text-xs text-[#64748b]">Email disponibile</div>
@@ -82,7 +81,7 @@ export function TransporterJobsTable({
                           </span>
                         </div>
                         <div className="text-xs text-[#64748b]">
-                          I contatti completi sono visibili dopo l&apos;accettazione.
+                          Apri il dettaglio per accettare il trasporto.
                         </div>
                         <div className="space-y-1 text-xs text-[#475569]">
                           <div className="flex items-center gap-2">
@@ -102,16 +101,12 @@ export function TransporterJobsTable({
                     )}
                   </td>
                   <td className="text-[#475569]">
-                    {unlocked ? (
-                      <Link
-                        href={detailHref}
-                        className="inline-flex items-center justify-center rounded-full bg-[#0f172a] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:brightness-110"
-                      >
-                        Apri dettaglio
-                      </Link>
-                    ) : (
-                      <span className="text-xs text-[#94a3b8]">Accetta per procedere</span>
-                    )}
+                    <Link
+                      href={detailHref}
+                      className="inline-flex items-center justify-center rounded-full bg-[#0f172a] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:brightness-110"
+                    >
+                      Apri dettaglio
+                    </Link>
                   </td>
                   <td className="text-[#475569]">{new Date(request.createdAt).toLocaleDateString("it-IT")}</td>
                 </tr>

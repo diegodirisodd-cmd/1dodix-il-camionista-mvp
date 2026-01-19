@@ -21,6 +21,7 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
     id: number;
     pickup: string;
     delivery: string;
+    cargo: string | null;
     price: number;
     transporterId: number | null;
     createdAt: Date;
@@ -37,6 +38,7 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
         id: true,
         pickup: true,
         delivery: true,
+        cargo: true,
         price: true,
         transporterId: true,
         createdAt: true,
@@ -105,6 +107,7 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
             id: request.id,
             pickup: request.pickup,
             delivery: request.delivery,
+            cargo: request.cargo,
             priceCents: request.price,
             transporterId: request.transporterId,
             createdAt: request.createdAt.toISOString(),

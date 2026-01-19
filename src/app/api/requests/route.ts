@@ -10,6 +10,8 @@ type RequestPayload = {
   cargoType?: string;
   description?: string;
   price?: number | string;
+  budget?: number | string;
+  priceString?: string;
 };
 
 export async function GET() {
@@ -35,9 +37,11 @@ export async function GET() {
         id: true,
         pickup: true,
         delivery: true,
+        cargo: true,
         price: true,
         createdAt: true,
         transporterId: true,
+        companyId: true,
         company: { select: { email: true, phone: true } },
       },
     });
@@ -76,11 +80,13 @@ export async function POST(request: Request) {
 
   console.log("REQUEST BODY:", body);
 
-  if (!body.price) {
+  const rawPrice = body.price ?? body.budget ?? body.priceString;
+
+  if (!rawPrice) {
     return NextResponse.json({ error: "Prezzo obbligatorio" }, { status: 400 });
   }
 
-  const priceNumber = Number(body.price);
+  const priceNumber = Number(rawPrice);
 
   if (Number.isNaN(priceNumber) || priceNumber <= 0) {
     return NextResponse.json({ error: "Prezzo non valido" }, { status: 400 });
