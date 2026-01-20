@@ -55,6 +55,7 @@ export function RequestDetailView({
   const [accepting, setAccepting] = useState(false);
   const [acceptMessage, setAcceptMessage] = useState<string | null>(null);
   const [completed, setCompleted] = useState(false);
+  const [unlocking, setUnlocking] = useState(false);
 
   const canAccept = role === "TRANSPORTER" && !transporterId;
   const isAccepted = Boolean(transporterId);
@@ -106,18 +107,33 @@ export function RequestDetailView({
   }
 
   async function handleUnlockContacts() {
+    if (unlocking) return;
+    setUnlocking(true);
     try {
-      const response = await fetch(`/api/requests/${requestId}/unlock`, { method: "POST" });
+      const response = await fetch("/api/stripe/unlock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestId,
+          role,
+        }),
+      });
       if (!response.ok) {
         console.error("Errore sblocco contatti", await response.text());
-        alert("Impossibile sbloccare i contatti");
+        alert("Impossibile avviare il pagamento per lo sblocco contatti.");
         return;
       }
-      alert("Pagamento simulato – funzionalità completa in arrivo");
-      router.refresh();
+      const payload = (await response.json()) as { url?: string };
+      if (payload.url) {
+        window.location.href = payload.url;
+        return;
+      }
+      alert("URL pagamento non disponibile.");
     } catch (error) {
       console.error("Errore sblocco contatti", error);
-      alert("Impossibile sbloccare i contatti");
+      alert("Impossibile avviare il pagamento per lo sblocco contatti.");
+    } finally {
+      setUnlocking(false);
     }
   }
 
@@ -246,6 +262,9 @@ export function RequestDetailView({
             <p className="text-sm text-[#475569]">
               {contactPhone ? contactPhone : "Telefono non disponibile"}
             </p>
+            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-700">
+              Contatti sbloccati
+            </span>
           </div>
         ) : (
           <div className="space-y-4 rounded-xl border border-dashed border-[#f5c76a]/80 bg-[#fff8ed] p-4 text-sm text-[#475569]">
@@ -301,9 +320,10 @@ export function RequestDetailView({
               <button
                 type="button"
                 onClick={handleUnlockContacts}
-                className="btn-primary mt-4 w-full"
+                className="btn-primary mt-4 w-full disabled:cursor-not-allowed"
+                disabled={unlocking}
               >
-                Sblocca contatti
+                {unlocking ? "Pagamento..." : "Sblocca contatti"}
               </button>
               <p className="mt-3 text-xs text-[#64748b]">Commissione applicata solo quando il contatto è utile.</p>
             </div>

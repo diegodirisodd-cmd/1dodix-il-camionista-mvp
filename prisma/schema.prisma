@@ -29,6 +29,8 @@ model Request {
   companyId     Int
   transporterId Int?
   contactsUnlocked Boolean @default(false)
+  unlockedByCompany Boolean @default(false)
+  unlockedByTransporter Boolean @default(false)
   status        String   @default("ACCETTATO")
   createdAt     DateTime @default(now())
 

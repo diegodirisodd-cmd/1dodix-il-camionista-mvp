@@ -18,7 +18,13 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
 
   const requestRecord = await prisma.request.findUnique({
     where: { id: requestId },
-    select: { id: true, companyId: true, transporterId: true, contactsUnlocked: true },
+    select: {
+      id: true,
+      companyId: true,
+      transporterId: true,
+      unlockedByCompany: true,
+      unlockedByTransporter: true,
+    },
   });
 
   if (!requestRecord) {
@@ -35,13 +41,27 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 403 });
   }
 
-  if (requestRecord.contactsUnlocked) {
+  if (user.role === "ADMIN") {
+    return NextResponse.json({ ok: true });
+  }
+
+  const shouldUnlockCompany = user.role === "COMPANY";
+  const shouldUnlockTransporter = user.role === "TRANSPORTER";
+
+  if (shouldUnlockCompany && requestRecord.unlockedByCompany) {
+    return NextResponse.json({ ok: true });
+  }
+
+  if (shouldUnlockTransporter && requestRecord.unlockedByTransporter) {
     return NextResponse.json({ ok: true });
   }
 
   await prisma.request.update({
     where: { id: requestId },
-    data: { contactsUnlocked: true },
+    data: {
+      unlockedByCompany: shouldUnlockCompany ? true : undefined,
+      unlockedByTransporter: shouldUnlockTransporter ? true : undefined,
+    },
   });
 
   return NextResponse.json({ ok: true });

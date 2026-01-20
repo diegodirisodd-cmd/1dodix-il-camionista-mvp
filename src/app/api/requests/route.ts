@@ -41,13 +41,24 @@ export async function GET() {
         price: true,
         createdAt: true,
         transporterId: true,
-        contactsUnlocked: true,
+        unlockedByCompany: true,
+        unlockedByTransporter: true,
         companyId: true,
         company: { select: { email: true, phone: true } },
       },
     });
 
-    return NextResponse.json(requests);
+    const payload = requests.map((request) => ({
+      ...request,
+      contactsUnlocked:
+        user.role === "COMPANY"
+          ? request.unlockedByCompany
+          : user.role === "TRANSPORTER"
+            ? request.unlockedByTransporter
+            : true,
+    }));
+
+    return NextResponse.json(payload);
   } catch (error) {
     console.error("[Requests API] load failed", {
       pathname,

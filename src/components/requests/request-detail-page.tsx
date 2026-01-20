@@ -79,6 +79,13 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
     requestRecord.transporterId !== null &&
     requestRecord.transporterId !== user.id;
 
+  const contactsUnlocked =
+    user.role === "ADMIN"
+      ? true
+      : user.role === "COMPANY"
+        ? requestRecord.unlockedByCompany
+        : requestRecord.unlockedByTransporter;
+
   return (
     <RequestDetailView
       requestId={requestRecord.id}
@@ -100,7 +107,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       })}
       transporterEmail={requestRecord.transporter?.email ?? null}
       role={user.role}
-      unlocked={requestRecord.contactsUnlocked}
+      unlocked={contactsUnlocked}
       backHref={backHref}
       transporterId={requestRecord.transporterId ?? null}
       assignedToSelf={assignedToSelf}
