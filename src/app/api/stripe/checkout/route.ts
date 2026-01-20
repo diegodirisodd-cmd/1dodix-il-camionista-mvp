@@ -1,50 +1,58 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-import { getSessionUser } from "@/lib/auth";
-
 const stripeSecret = process.env.STRIPE_SECRET_KEY;
-const priceId = process.env.STRIPE_PRICE_ID;
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 const stripe = stripeSecret
   ? new Stripe(stripeSecret, { apiVersion: "2024-06-20" })
   : null;
 
-export async function POST() {
-  if (!stripe || !stripeSecret || !priceId) {
+type CheckoutPayload = {
+  requestId?: number;
+  userRole?: "company" | "transporter";
+  amount?: number;
+};
+
+export async function POST(request: Request) {
+  if (!stripe || !stripeSecret) {
     return NextResponse.json(
       { error: "Stripe non è configurato correttamente." },
       { status: 500 },
     );
   }
 
-  const user = await getSessionUser();
+  const body = (await request.json()) as CheckoutPayload;
+  const requestId = Number(body.requestId);
+  const userRole = body.userRole;
+  const amount = body.amount;
 
-  if (!user) {
-    return NextResponse.json({ error: "Non autenticato." }, { status: 401 });
+  if (!Number.isFinite(requestId) || (userRole !== "company" && userRole !== "transporter")) {
+    return NextResponse.json({ error: "Parametri non validi." }, { status: 400 });
   }
 
-  if (user.subscriptionActive) {
-    return NextResponse.json({ url: `${appUrl}/dashboard?checkout=active` });
+  if (!Number.isInteger(amount) || amount <= 0) {
+    return NextResponse.json({ error: "Importo non valido." }, { status: 400 });
   }
 
   try {
     const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      customer_email: user.email,
+      payment_method_types: ["card"],
+      mode: "payment",
       line_items: [
         {
-          price: priceId,
+          price_data: {
+            currency: "eur",
+            product_data: {
+              name: "Sblocco contatti",
+              description: "Commissione di servizio Dodix",
+            },
+            unit_amount: amount,
+          },
           quantity: 1,
         },
       ],
-      success_url: `${appUrl}/dashboard?checkout=success`,
-      cancel_url: `${appUrl}/dashboard/billing`,
-      metadata: {
-        userId: String(user.id),
-        role: user.role,
-      },
+      success_url: `http://localhost:3000/dashboard/stripe/success?requestId=${requestId}&role=${userRole}`,
+      cancel_url: `http://localhost:3000/dashboard/stripe/cancel?requestId=${requestId}`,
     });
 
     if (!session.url) {
