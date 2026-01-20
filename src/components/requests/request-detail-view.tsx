@@ -56,9 +56,11 @@ export function RequestDetailView({
   const [acceptMessage, setAcceptMessage] = useState<string | null>(null);
   const [completed, setCompleted] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
+  const [localUnlocked, setLocalUnlocked] = useState(false);
 
   const canAccept = role === "TRANSPORTER" && !transporterId;
   const isAccepted = Boolean(transporterId);
+  const isUnlockedFinal = isUnlocked || localUnlocked;
 
   const contactHeadline = useMemo(
     () => (role === "TRANSPORTER" ? "Referente aziendale" : "Referente trasportatore"),
@@ -77,6 +79,18 @@ export function RequestDetailView({
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const unlockStored = window.localStorage.getItem("unlockedRequests");
+    if (unlockStored) {
+      try {
+        const parsed = JSON.parse(unlockStored) as { COMPANY?: number[]; TRANSPORTER?: number[] };
+        const list = role === "COMPANY" ? parsed.COMPANY ?? [] : parsed.TRANSPORTER ?? [];
+        if (list.includes(requestId)) {
+          setLocalUnlocked(true);
+        }
+      } catch {
+        // ignore malformed data
+      }
+    }
     const stored = window.localStorage.getItem("completedRequests");
     if (!stored) return;
     try {
@@ -110,12 +124,28 @@ export function RequestDetailView({
     if (unlocking) return;
     setUnlocking(true);
     try {
-      const response = await fetch("/api/stripe/unlock", {
+      const price = priceCents / 100;
+      const commission = price * 0.02;
+      const vat = commission * 0.22;
+      const totalCents = Math.round((commission + vat) * 100);
+      const totalEuro = new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(
+        totalCents / 100,
+      );
+
+      const confirmed = window.confirm(
+        `Sbloccando i contatti pagherai una commissione del 2% + IVA.\nImporto totale: ${totalEuro}`,
+      );
+      if (!confirmed) {
+        return;
+      }
+
+      const response = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           requestId,
-          role,
+          userRole: role === "COMPANY" ? "company" : "transporter",
+          amount: totalCents,
         }),
       });
       if (!response.ok) {
@@ -228,7 +258,7 @@ export function RequestDetailView({
         </div>
       </div>
 
-      {role === "COMPANY" && isAccepted && isUnlocked && (
+      {role === "COMPANY" && isAccepted && isUnlockedFinal && (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
           <p className="font-semibold">Trasporto accettato</p>
           <p className="text-sm text-[#475569]">
@@ -245,17 +275,17 @@ export function RequestDetailView({
           <div className="space-y-1">
             <h2 className="text-xl font-semibold text-[#0f172a]">Contatti</h2>
             <p className="text-sm text-[#475569]">
-              {isUnlocked
+              {isUnlockedFinal
                 ? "Contatti disponibili per questa richiesta."
                 : "I contatti completi sono visibili dopo l’accettazione."}
             </p>
           </div>
-          {!isUnlocked && (
+          {!isUnlockedFinal && (
             <p className="text-xs text-[#64748b]">I contatti completi sono visibili dopo l&apos;accettazione.</p>
           )}
         </div>
 
-        {isUnlocked ? (
+        {isUnlockedFinal ? (
           <div className="space-y-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
             <p className="font-semibold">{contactHeadline}</p>
             <p className="text-sm text-[#475569]">{contactEmail ?? "Email non disponibile"}</p>
