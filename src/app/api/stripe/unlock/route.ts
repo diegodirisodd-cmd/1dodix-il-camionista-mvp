@@ -1,15 +1,20 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-export async function POST(req: Request) {
+export async function POST() {
   try {
-    console.log("🚀 Stripe unlock API HIT");
+    console.log("🚀 [STRIPE] unlock API HIT");
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error("❌ STRIPE_SECRET_KEY mancante");
+      return NextResponse.json({ error: "Stripe key missing" }, { status: 500 });
+    }
+
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: "2023-10-16",
     });
 
-    const amountCents = 70; // 0,70 € test reale
+    console.log("🔑 Stripe inizializzato");
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -21,7 +26,7 @@ export async function POST(req: Request) {
             product_data: {
               name: "Sblocco contatti",
             },
-            unit_amount: amountCents,
+            unit_amount: 70, // 0,70 €
           },
           quantity: 1,
         },
@@ -30,13 +35,14 @@ export async function POST(req: Request) {
       cancel_url: "http://localhost:3000/stripe/cancel",
     });
 
-    console.log("✅ Stripe session creata:", session.id);
+    console.log("✅ Session creata:", session.id);
+    console.log("➡️ Redirect URL:", session.url);
 
     return NextResponse.json({ url: session.url });
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ STRIPE ERROR:", error);
     return NextResponse.json(
-      { error: "Errore Stripe" },
+      { error: error.message ?? "Stripe error" },
       { status: 500 }
     );
   }
