@@ -83,7 +83,7 @@ I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato 
 - **Login**: la pagina `/login` invia le credenziali a `POST /api/auth/login`, verifica l'hash, imposta il cookie di sessione JWT (`dodix_session`) e restituisce il reindirizzamento corretto in base al ruolo.
 - **Logout**: `POST /api/auth/logout` invalida il cookie di sessione.
 - **Protezione pagine/API**: `middleware.ts` richiede un token valido per tutte le rotte `/dashboard`. `getSessionUser` recupera l'utente nei server component per applicare redirect server-side coerenti.
-- **Checkout**: la pagina `/paywall` e i CTA premium chiamano `POST /api/stripe/checkout`, che crea una sessione Stripe Checkout in modalità subscription e reindirizza all'URL restituito. Al ritorno, `success_url` punta a `/dashboard?checkout=success`.
+- **Checkout**: la pagina `/paywall` e i CTA premium chiamano `POST /api/stripe/unlock`, che crea una sessione Stripe Checkout in modalità subscription e reindirizza all'URL restituito. Al ritorno, `success_url` punta a `/dashboard?checkout=success`.
 - **Webhook Stripe**: `POST /api/stripe/webhook` valida la firma (`STRIPE_WEBHOOK_SECRET`) e, su `checkout.session.completed`, imposta `subscriptionActive=true` e aggiorna i riferimenti Stripe sull'utente (email usata come chiave).
 - **Admin (solo lettura)**: il ruolo `ADMIN` accede a `/dashboard/admin` per visualizzare elenco utenti e richieste in modalità di sola consultazione; non sono previste azioni di modifica o moderazione nell'MVP.
 
@@ -119,7 +119,7 @@ npm run dev
 ### Test manuali abbonamento Stripe
 1. **Eseguire il checkout**
    - Avvia l'app: `npm run dev`
-   - Accedi come utente non abbonato e clicca su "Attiva abbonamento" (es. da /paywall o dalla pagina billing): il client chiama `POST /api/stripe/checkout` e ti reindirizza a Stripe.
+   - Accedi come utente non abbonato e clicca su "Attiva abbonamento" (es. da /paywall o dalla pagina billing): il client chiama `POST /api/stripe/unlock` e ti reindirizza a Stripe.
 2. **Configurare il webhook in locale**
    - Installa Stripe CLI e autenticati.
    - Avvia il forwarding: `stripe listen --forward-to localhost:3000/api/stripe/webhook`
