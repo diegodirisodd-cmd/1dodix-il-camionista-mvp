@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
+const COMMISSION_RATE = 0.02;
+const VAT_RATE = 0.22;
+const TRANSPORT_VALUE_EUR = 28.69;
+
 export async function POST() {
   try {
     console.log("🚀 [STRIPE] unlock API HIT");
@@ -16,6 +20,13 @@ export async function POST() {
 
     console.log("🔑 Stripe inizializzato");
 
+    const commission = TRANSPORT_VALUE_EUR * COMMISSION_RATE;
+    const vat = commission * VAT_RATE;
+    const total = commission + vat;
+    const amountCents = Math.round(total * 100);
+
+    console.log("💶 Importo finale in cent:", amountCents);
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -26,7 +37,7 @@ export async function POST() {
             product_data: {
               name: "Sblocco contatti",
             },
-            unit_amount: 70, // 0,70 €
+            unit_amount: amountCents,
           },
           quantity: 1,
         },
