@@ -25,7 +25,8 @@ type RequestDetailViewProps = {
   contactPhone: string | null;
   transporterEmail: string | null;
   role: Role;
-  unlocked: boolean;
+  companyUnlocked: boolean;
+  transporterUnlocked: boolean;
   backHref: string;
   transporterId: number | null;
   assignedToSelf: boolean;
@@ -44,23 +45,24 @@ export function RequestDetailView({
   contactPhone,
   transporterEmail,
   role,
-  unlocked,
+  companyUnlocked,
+  transporterUnlocked,
   backHref,
   transporterId,
   assignedToSelf,
   assignedToOther,
 }: RequestDetailViewProps) {
   const router = useRouter();
-  const isUnlocked = unlocked;
   const [accepting, setAccepting] = useState(false);
   const [acceptMessage, setAcceptMessage] = useState<string | null>(null);
   const [completed, setCompleted] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
-  const [localUnlocked, setLocalUnlocked] = useState(false);
 
   const canAccept = role === "TRANSPORTER" && !transporterId;
   const isAccepted = Boolean(transporterId);
-  const isUnlockedFinal = isUnlocked || localUnlocked;
+  const bothUnlocked = companyUnlocked && transporterUnlocked;
+  const awaitingCompany = !companyUnlocked && transporterUnlocked;
+  const awaitingTransporter = companyUnlocked && !transporterUnlocked;
 
   const contactHeadline = useMemo(
     () => (role === "TRANSPORTER" ? "Referente aziendale" : "Referente trasportatore"),
@@ -79,18 +81,6 @@ export function RequestDetailView({
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const unlockStored = window.localStorage.getItem("unlockedRequests");
-    if (unlockStored) {
-      try {
-        const parsed = JSON.parse(unlockStored) as { COMPANY?: number[]; TRANSPORTER?: number[] };
-        const list = role === "COMPANY" ? parsed.COMPANY ?? [] : parsed.TRANSPORTER ?? [];
-        if (list.includes(requestId)) {
-          setLocalUnlocked(true);
-        }
-      } catch {
-        // ignore malformed data
-      }
-    }
     const stored = window.localStorage.getItem("completedRequests");
     if (!stored) return;
     try {
@@ -254,7 +244,7 @@ export function RequestDetailView({
         </div>
       </div>
 
-      {role === "COMPANY" && isAccepted && isUnlockedFinal && (
+      {role === "COMPANY" && isAccepted && bothUnlocked && (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
           <p className="font-semibold">Trasporto accettato</p>
           <p className="text-sm text-[#475569]">
@@ -271,17 +261,19 @@ export function RequestDetailView({
           <div className="space-y-1">
             <h2 className="text-xl font-semibold text-[#0f172a]">Contatti</h2>
             <p className="text-sm text-[#475569]">
-              {isUnlockedFinal
+              {bothUnlocked
                 ? "Contatti disponibili per questa richiesta."
-                : "I contatti completi sono visibili dopo l’accettazione."}
+                : "I contatti saranno visibili solo dopo il pagamento di entrambe le parti."}
             </p>
           </div>
-          {!isUnlockedFinal && (
-            <p className="text-xs text-[#64748b]">I contatti completi sono visibili dopo l&apos;accettazione.</p>
+          {!bothUnlocked && (
+            <p className="text-xs text-[#64748b]">
+              I contatti saranno visibili solo dopo il pagamento di entrambe le parti.
+            </p>
           )}
         </div>
 
-        {isUnlockedFinal ? (
+        {bothUnlocked ? (
           <div className="space-y-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
             <p className="font-semibold">{contactHeadline}</p>
             <p className="text-sm text-[#475569]">{contactEmail ?? "Email non disponibile"}</p>
@@ -298,8 +290,25 @@ export function RequestDetailView({
               <span className="table-chip warning inline-flex items-center gap-2">
                 <span className="text-base leading-none">⏳</span> Contatti in attesa
               </span>
+              {awaitingCompany && (
+                <span className="rounded-full bg-white px-2 py-1 text-[11px] font-semibold text-[#0f172a]">
+                  In attesa pagamento azienda
+                </span>
+              )}
+              {awaitingTransporter && (
+                <span className="rounded-full bg-white px-2 py-1 text-[11px] font-semibold text-[#0f172a]">
+                  In attesa pagamento trasportatore
+                </span>
+              )}
+              {!companyUnlocked && !transporterUnlocked && (
+                <span className="rounded-full bg-white px-2 py-1 text-[11px] font-semibold text-[#0f172a]">
+                  Nessun pagamento completato
+                </span>
+              )}
             </div>
-            <div className="text-xs text-[#64748b]">I contatti completi sono visibili dopo l&apos;accettazione.</div>
+            <div className="text-xs text-[#64748b]">
+              I contatti saranno visibili solo dopo il pagamento di entrambe le parti.
+            </div>
             <div className="space-y-1 text-xs text-[#475569]">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-[#64748b]">⏳</span>
@@ -314,7 +323,8 @@ export function RequestDetailView({
                 <span className="blur-[1px]">••••••</span>
               </div>
             </div>
-            <div className="rounded-xl border border-[#e2e8f0] bg-white p-4 text-sm text-[#0f172a] shadow-sm">
+            {!companyUnlocked && !transporterUnlocked && (
+              <div className="rounded-xl border border-[#e2e8f0] bg-white p-4 text-sm text-[#0f172a] shadow-sm">
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide text-[#64748b]">Sblocca contatti</p>
                 <p className="text-sm text-[#475569]">
@@ -349,10 +359,14 @@ export function RequestDetailView({
                 className="btn-primary mt-4 w-full disabled:cursor-not-allowed"
                 disabled={unlocking}
               >
-                {unlocking ? "Pagamento..." : "Sblocca contatti"}
+                {unlocking ? "Pagamento..." : "Sblocca contatti (2% + IVA)"}
               </button>
               <p className="mt-3 text-xs text-[#64748b]">Commissione applicata solo quando il contatto è utile.</p>
-            </div>
+              </div>
+            )}
+            {(companyUnlocked || transporterUnlocked) && (
+              <p className="text-xs text-[#475569]">Pagamento completato. In attesa dell’altra parte.</p>
+            )}
           </div>
         )}
       </div>
