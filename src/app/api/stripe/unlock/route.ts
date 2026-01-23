@@ -34,15 +34,14 @@ export async function POST(req: Request) {
 
     const commission = request.price * 0.02;
     const iva = commission * 0.22;
-    const total = commission + iva;
-    const amountCents = Math.round(total * 100);
+    const totale = commission + iva;
+    const unitAmount = Math.round(totale * 100);
 
-    console.log("requestId:", requestId);
-    console.log("price:", request.price);
-    console.log("commission:", commission);
-    console.log("iva:", iva);
-    console.log("total:", total);
-    console.log("amountCents:", amountCents);
+    console.log("REQUEST PRICE:", request.price);
+    console.log("COMMISSION:", commission);
+    console.log("IVA:", iva);
+    console.log("TOTALE €:", totale);
+    console.log("UNIT AMOUNT CENTS:", unitAmount);
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -54,13 +53,13 @@ export async function POST(req: Request) {
             product_data: {
               name: "Sblocco contatti",
             },
-            unit_amount: amountCents,
+            unit_amount: unitAmount,
           },
           quantity: 1,
         },
       ],
-      success_url: "http://localhost:3000/stripe/success",
-      cancel_url: "http://localhost:3000/stripe/cancel",
+      success_url: `http://localhost:3000/stripe/success?requestId=${requestId}`,
+      cancel_url: `http://localhost:3000/stripe/cancel?requestId=${requestId}`,
     });
 
     console.log("✅ Session creata:", session.id);
