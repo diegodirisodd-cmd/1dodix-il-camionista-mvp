@@ -139,7 +139,11 @@ export function RequestDetailView({
         return;
       }
 
-      const response = await fetch("/api/stripe/unlock", { method: "POST" });
+      const response = await fetch("/api/stripe/unlock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId }),
+      });
       if (!response.ok) {
         console.error("Errore sblocco contatti", await response.text());
         alert("Impossibile avviare il pagamento per lo sblocco contatti.");

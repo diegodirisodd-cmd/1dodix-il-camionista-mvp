@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const COMMISSION_RATE = 0.02;
-const VAT_RATE = 0.22;
-const TRANSPORT_VALUE_EUR = 28.69;
+import { prisma } from "@/lib/prisma";
 
-export async function POST() {
+export async function POST(req: Request) {
   try {
     console.log("🚀 [STRIPE] unlock API HIT");
 
@@ -14,18 +12,37 @@ export async function POST() {
       return NextResponse.json({ error: "Stripe key missing" }, { status: 500 });
     }
 
+    const { requestId } = (await req.json()) as { requestId?: number };
+
+    if (!Number.isFinite(requestId)) {
+      return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
+    }
+
+    const request = await prisma.request.findUnique({
+      where: { id: requestId },
+    });
+
+    if (!request || typeof request.price !== "number") {
+      return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
+    }
+
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: "2023-10-16",
     });
 
     console.log("🔑 Stripe inizializzato");
 
-    const commission = TRANSPORT_VALUE_EUR * COMMISSION_RATE;
-    const vat = commission * VAT_RATE;
-    const total = commission + vat;
+    const commission = request.price * 0.02;
+    const iva = commission * 0.22;
+    const total = commission + iva;
     const amountCents = Math.round(total * 100);
 
-    console.log("💶 Importo finale in cent:", amountCents);
+    console.log("requestId:", requestId);
+    console.log("price:", request.price);
+    console.log("commission:", commission);
+    console.log("iva:", iva);
+    console.log("total:", total);
+    console.log("amountCents:", amountCents);
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
