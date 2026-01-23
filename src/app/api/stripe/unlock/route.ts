@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
+import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
@@ -32,6 +33,12 @@ export async function POST(req: Request) {
 
     console.log("🔑 Stripe inizializzato");
 
+    const user = await getSessionUser();
+    if (!user) {
+      return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
+    }
+    const role = user.role.toLowerCase();
+
     const priceEuro = request.price / 100;
     const commission = priceEuro * 0.02;
     const iva = commission * 0.22;
@@ -59,8 +66,10 @@ export async function POST(req: Request) {
           quantity: 1,
         },
       ],
-      success_url: `http://localhost:3000/stripe/success?requestId=${requestId}`,
-      cancel_url: `http://localhost:3000/stripe/cancel?requestId=${requestId}`,
+      success_url:
+        `http://localhost:3000/stripe/success?session_id={CHECKOUT_SESSION_ID}` +
+        `&requestId=${requestId}&role=${role}`,
+      cancel_url: `http://localhost:3000/stripe/cancel?requestId=${requestId}&role=${role}`,
     });
 
     console.log("✅ Session creata:", session.id);
