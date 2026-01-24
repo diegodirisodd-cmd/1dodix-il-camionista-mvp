@@ -63,6 +63,10 @@ export function RequestDetailView({
   const bothUnlocked = companyUnlocked && transporterUnlocked;
   const awaitingCompany = !companyUnlocked && transporterUnlocked;
   const awaitingTransporter = companyUnlocked && !transporterUnlocked;
+  const hasPaid =
+    role === "COMPANY" ? companyUnlocked : role === "TRANSPORTER" ? transporterUnlocked : true;
+  const shouldShowCta =
+    role === "COMPANY" ? !companyUnlocked : role === "TRANSPORTER" ? !transporterUnlocked : false;
 
   const contactHeadline = useMemo(
     () => (role === "TRANSPORTER" ? "Referente aziendale" : "Referente trasportatore"),
@@ -323,7 +327,7 @@ export function RequestDetailView({
                 <span className="blur-[1px]">••••••</span>
               </div>
             </div>
-            {!companyUnlocked && !transporterUnlocked && (
+            {shouldShowCta && (
               <div className="rounded-xl border border-[#e2e8f0] bg-white p-4 text-sm text-[#0f172a] shadow-sm">
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide text-[#64748b]">Sblocca contatti</p>
@@ -364,8 +368,13 @@ export function RequestDetailView({
               <p className="mt-3 text-xs text-[#64748b]">Commissione applicata solo quando il contatto è utile.</p>
               </div>
             )}
-            {(companyUnlocked || transporterUnlocked) && (
-              <p className="text-xs text-[#475569]">Pagamento completato. In attesa dell’altra parte.</p>
+            {hasPaid && !bothUnlocked && (
+              <div className="space-y-2">
+                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-700">
+                  Pagamento completato
+                </span>
+                <p className="text-xs text-[#475569]">In attesa del pagamento dell’altra parte</p>
+              </div>
             )}
           </div>
         )}
