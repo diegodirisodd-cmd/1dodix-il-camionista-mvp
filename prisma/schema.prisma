@@ -31,6 +31,7 @@ model Request {
   contactsUnlocked Boolean @default(false)
   unlockedByCompany Boolean @default(false)
   unlockedByTransporter Boolean @default(false)
+  acceptedAt    DateTime?
   status        String   @default("ACCETTATO")
   createdAt     DateTime @default(now())
 

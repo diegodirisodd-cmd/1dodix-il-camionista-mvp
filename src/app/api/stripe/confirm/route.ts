@@ -29,20 +29,35 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false }, { status: 400 });
     }
 
-    const updateData =
-      role === "transporter"
-        ? { unlockedByTransporter: true }
-        : role === "company"
-          ? { unlockedByCompany: true }
-          : null;
+    const request = await prisma.request.findUnique({
+      where: { id: requestId },
+      select: {
+        unlockedByCompany: true,
+        unlockedByTransporter: true,
+        acceptedAt: true,
+      },
+    });
 
-    if (!updateData) {
+    if (!request) {
+      return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
+    }
+
+    if (role !== "transporter" && role !== "company") {
       return NextResponse.json({ error: "Ruolo non valido" }, { status: 400 });
     }
 
+    const nextCompanyUnlocked = request.unlockedByCompany || role === "company";
+    const nextTransporterUnlocked = request.unlockedByTransporter || role === "transporter";
+    const shouldAccept = nextCompanyUnlocked && nextTransporterUnlocked;
+
     await prisma.request.update({
       where: { id: requestId },
-      data: updateData,
+      data: {
+        unlockedByCompany: nextCompanyUnlocked,
+        unlockedByTransporter: nextTransporterUnlocked,
+        acceptedAt: shouldAccept && !request.acceptedAt ? new Date() : undefined,
+        status: shouldAccept ? "ACCEPTED" : undefined,
+      },
     });
 
     return NextResponse.json({ success: true });

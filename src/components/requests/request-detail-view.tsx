@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { formatCurrency } from "@/lib/commission";
@@ -20,6 +19,7 @@ type RequestDetailViewProps = {
   cargo: string | null;
   priceCents: number;
   createdAt: string;
+  acceptedAt: string | null;
   companyEmail: string;
   contactEmail: string | null;
   contactPhone: string | null;
@@ -28,7 +28,6 @@ type RequestDetailViewProps = {
   companyUnlocked: boolean;
   transporterUnlocked: boolean;
   backHref: string;
-  transporterId: number | null;
   assignedToSelf: boolean;
   assignedToOther: boolean;
 };
@@ -40,6 +39,7 @@ export function RequestDetailView({
   cargo,
   priceCents,
   createdAt,
+  acceptedAt,
   companyEmail,
   contactEmail,
   contactPhone,
@@ -48,21 +48,16 @@ export function RequestDetailView({
   companyUnlocked,
   transporterUnlocked,
   backHref,
-  transporterId,
   assignedToSelf,
   assignedToOther,
 }: RequestDetailViewProps) {
-  const router = useRouter();
-  const [accepting, setAccepting] = useState(false);
+  const acceptedAtDate = acceptedAt ? new Date(acceptedAt) : null;
   const [acceptMessage, setAcceptMessage] = useState<string | null>(null);
   const [completed, setCompleted] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
 
-  const canAccept = role === "TRANSPORTER" && !transporterId;
-  const isAccepted = Boolean(transporterId);
+  const isAccepted = Boolean(acceptedAtDate);
   const bothUnlocked = companyUnlocked && transporterUnlocked;
-  const awaitingCompany = !companyUnlocked && transporterUnlocked;
-  const awaitingTransporter = companyUnlocked && !transporterUnlocked;
   const hasPaid =
     role === "COMPANY" ? companyUnlocked : role === "TRANSPORTER" ? transporterUnlocked : true;
   const shouldShowCta =
@@ -157,22 +152,6 @@ export function RequestDetailView({
     }
   }
 
-  async function handleAcceptTransport() {
-    setAccepting(true);
-    setAcceptMessage(null);
-    const response = await fetch(`/api/requests/${requestId}/accept`, { method: "PATCH" });
-    setAccepting(false);
-
-    if (!response.ok) {
-      const data = (await response.json().catch(() => null)) as { error?: string } | null;
-      setAcceptMessage(data?.error ?? "Impossibile accettare la richiesta");
-      return;
-    }
-
-    setAcceptMessage("Hai accettato questo trasporto. L’azienda può ora contattarti direttamente.");
-    router.refresh();
-  }
-
   return (
     <section className="space-y-6">
       <Link href={backHref} className="inline-flex items-center gap-2 text-sm font-semibold text-[#0f172a]">
@@ -186,8 +165,10 @@ export function RequestDetailView({
           <p className="text-sm leading-relaxed text-[#475569]">{description}</p>
           <div className="flex flex-wrap gap-2 text-xs font-semibold text-[#0f172a]">
             <span className="rounded-full bg-[#f1f5f9] px-3 py-1">Carico: {cargo ?? "—"}</span>
-            <span className="rounded-full bg-[#f1f5f9] px-3 py-1">Email azienda: {companyEmail}</span>
-            {isAccepted && transporterEmail ? (
+            {bothUnlocked && (
+              <span className="rounded-full bg-[#f1f5f9] px-3 py-1">Email azienda: {companyEmail}</span>
+            )}
+            {bothUnlocked && isAccepted && transporterEmail ? (
               <span className="rounded-full bg-[#f1f5f9] px-3 py-1">Email trasportatore: {transporterEmail}</span>
             ) : null}
           </div>
@@ -195,15 +176,10 @@ export function RequestDetailView({
             <span className="rounded-full bg-[#f1f5f9] px-3 py-1 text-[#0f172a]">
               {statusLabel}
             </span>
-            {canAccept && (
-              <button
-                type="button"
-                onClick={handleAcceptTransport}
-                disabled={accepting}
-                className="btn-primary text-xs disabled:cursor-not-allowed"
-              >
-                {accepting ? "Accettazione..." : "Accetta trasporto"}
-              </button>
+            {acceptedAtDate && (
+              <span className="rounded-full bg-[#f1f5f9] px-3 py-1 text-[#0f172a]">
+                Accettato il {acceptedAtDate.toLocaleDateString("it-IT")}
+              </span>
             )}
           </div>
           {role === "COMPANY" && isAccepted && !completed && (
@@ -290,42 +266,8 @@ export function RequestDetailView({
           </div>
         ) : (
           <div className="space-y-4 rounded-xl border border-dashed border-[#f5c76a]/80 bg-[#fff8ed] p-4 text-sm text-[#475569]">
-            <div className="flex items-center justify-between gap-2">
-              <span className="table-chip warning inline-flex items-center gap-2">
-                <span className="text-base leading-none">⏳</span> Contatti in attesa
-              </span>
-              {awaitingCompany && (
-                <span className="rounded-full bg-white px-2 py-1 text-[11px] font-semibold text-[#0f172a]">
-                  In attesa pagamento azienda
-                </span>
-              )}
-              {awaitingTransporter && (
-                <span className="rounded-full bg-white px-2 py-1 text-[11px] font-semibold text-[#0f172a]">
-                  In attesa pagamento trasportatore
-                </span>
-              )}
-              {!companyUnlocked && !transporterUnlocked && (
-                <span className="rounded-full bg-white px-2 py-1 text-[11px] font-semibold text-[#0f172a]">
-                  Nessun pagamento completato
-                </span>
-              )}
-            </div>
-            <div className="text-xs text-[#64748b]">
-              I contatti saranno visibili solo dopo il pagamento di entrambe le parti.
-            </div>
-            <div className="space-y-1 text-xs text-[#475569]">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[#64748b]">⏳</span>
-                <span className="blur-[1px]">{contactHeadline}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[#64748b]">⏳</span>
-                <span className="blur-[1px]">••••@••••</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[#64748b]">⏳</span>
-                <span className="blur-[1px]">••••••</span>
-              </div>
+            <div className="text-sm text-[#0f172a]">
+              Contatti disponibili dopo il pagamento della commissione (2% + IVA)
             </div>
             {shouldShowCta && (
               <div className="rounded-xl border border-[#e2e8f0] bg-white p-4 text-sm text-[#0f172a] shadow-sm">

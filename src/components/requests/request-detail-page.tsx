@@ -90,6 +90,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       cargo={requestRecord.cargo ?? null}
       priceCents={requestRecord.price}
       createdAt={requestRecord.createdAt.toISOString()}
+      acceptedAt={requestRecord.acceptedAt ? requestRecord.acceptedAt.toISOString() : null}
       companyEmail={requestRecord.company.email}
       contactEmail={getContactEmail({
         role: user.role,
@@ -106,7 +107,6 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       companyUnlocked={companyUnlocked}
       transporterUnlocked={transporterUnlocked}
       backHref={backHref}
-      transporterId={requestRecord.transporterId ?? null}
       assignedToSelf={assignedToSelf}
       assignedToOther={assignedToOther}
     />
