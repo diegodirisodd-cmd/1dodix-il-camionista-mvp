@@ -35,6 +35,7 @@ export function RequestForm({
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [unlockConfirmed, setUnlockConfirmed] = useState(false);
   const [unlockLoading, setUnlockLoading] = useState(false);
+  const [distanceKm, setDistanceKm] = useState("");
   const router = useRouter();
 
   const canPublish = subscriptionActive || hasFreeQuota || unlockConfirmed;
@@ -81,6 +82,11 @@ export function RequestForm({
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
+  const distanceValue = Number(distanceKm);
+  const hasEstimate = Number.isFinite(distanceValue) && distanceValue > 0;
+  const minBudget = hasEstimate ? distanceValue * 1.2 : 0;
+  const maxBudget = hasEstimate ? distanceValue * 1.5 : 0;
+
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -105,6 +111,30 @@ export function RequestForm({
           />
         </label>
       </div>
+
+      <label className="form-field">
+        <span className="label">Distanza stimata (km)</span>
+        <input
+          type="number"
+          min="0"
+          step="0.1"
+          className="input-field"
+          value={distanceKm}
+          onChange={(e) => setDistanceKm(e.target.value)}
+          placeholder="Es. 320"
+        />
+      </label>
+
+      {hasEstimate && (
+        <div className="rounded-lg bg-slate-100 p-4 text-sm text-slate-700">
+          <p className="font-semibold">💡 Stima budget consigliato</p>
+          <p className="mt-1">In base alla distanza indicata, il budget consigliato è:</p>
+          <p className="mt-2 font-semibold">Da €{minBudget.toFixed(2)} a €{maxBudget.toFixed(2)}</p>
+          <p className="mt-2 text-xs text-slate-600">
+            Indicazione basata su 1,20€–1,50€/km. Puoi inserire qualsiasi budget.
+          </p>
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="form-field">
