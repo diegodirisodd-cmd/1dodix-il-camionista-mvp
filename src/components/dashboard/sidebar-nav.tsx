@@ -38,7 +38,7 @@ export function SidebarNav({
   const navItems = navByRole[role] ?? [];
 
   return (
-    <nav className="space-y-3 text-sm text-[#475569]">
+    <nav className="space-y-3 text-sm text-white/80">
       {navItems.map((item) => {
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
@@ -50,11 +50,11 @@ export function SidebarNav({
             className={clsx(
               "flex items-center justify-between rounded-lg px-3 py-3 transition-colors",
               active
-                ? "bg-[#e2e8f0] text-[#0f172a] shadow-inner"
-                : "text-[#475569] hover:bg-slate-100 hover:text-[#0f172a]",
+                ? "bg-brand-hover text-white"
+                : "text-white/90 hover:bg-brand-hover/90 hover:text-white",
             )}
           >
-            <span className="font-medium text-[#0f172a]">{item.label}</span>
+            <span className="font-medium text-white">{item.label}</span>
           </Link>
         );
       })}

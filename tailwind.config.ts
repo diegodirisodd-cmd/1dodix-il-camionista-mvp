@@ -10,6 +10,8 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
+          DEFAULT: "#0EA5E9",
+          hover: "#0284C7",
           50: "#e8eef8",
           100: "#d4def0",
           200: "#a9bcdc",
@@ -21,6 +23,9 @@ const config: Config = {
           800: "#1a283e",
           900: "#0f1a2a"
         },
+        appBg: "#F8FAFC",
+        card: "#FFFFFF",
+        textStrong: "#0F172A",
         accent: {
           50: "#fff4e6",
           100: "#ffe3bf",
@@ -49,9 +54,9 @@ const config: Config = {
           DEFAULT: "#0c1524",
           muted: "#101d30"
         },
-        success: "#16a34a",
-        warning: "#f59e0b",
-        danger: "#dc2626"
+        success: "#22C55E",
+        warning: "#F59E0B",
+        danger: "#EF4444"
       },
       fontFamily: {
         sans: ["Inter", "Roboto", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],

@@ -104,7 +104,7 @@ export function CompanyRequestsTable({
                     {isAccepted ? (
                       <Link
                         href={detailHref}
-                        className="inline-flex items-center justify-center rounded-full bg-[#0f172a] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:brightness-110"
+                        className="inline-flex items-center justify-center rounded-full bg-brand px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-hover"
                       >
                         Apri dettaglio
                       </Link>
