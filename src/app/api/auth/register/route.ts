@@ -9,9 +9,10 @@ import { type Role, REGISTRABLE_ROLES } from "@/lib/roles";
 
 export async function POST(request: Request) {
   try {
-    const { email, password, role } = await request.json();
+    const { email, password, role, phone } = await request.json();
     const normalizedEmail = (email as string | undefined)?.toLowerCase().trim();
     const normalizedRole = (role as string | undefined)?.toUpperCase() as Role | undefined;
+    const normalizedPhone = (phone as string | undefined)?.trim();
 
     if (!normalizedEmail || !password || !normalizedRole) {
       return NextResponse.json({ error: "Email, password e ruolo sono obbligatori." }, { status: 400 });
@@ -34,6 +35,7 @@ export async function POST(request: Request) {
         email: normalizedEmail,
         password: passwordHash,
         role: selectedRole,
+        phone: normalizedPhone || null,
       },
     });
 
