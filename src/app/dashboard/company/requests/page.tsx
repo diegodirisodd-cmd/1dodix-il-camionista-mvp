@@ -1,4 +1,3 @@
-import type { Request as RequestModel } from "@prisma/client";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -18,16 +17,46 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
   }
 
   const showCreated = searchParams?.created === "1";
-  let companyRequests: RequestModel[] = [];
+  let companyRequests: {
+    id: number;
+    pickup: string;
+    delivery: string;
+    cargo: string | null;
+    price: number;
+    transporterId: number | null;
+    unlockedByCompany: boolean;
+    createdAt: Date;
+  }[] = [];
   let loadError: string | null = null;
+  let loadErrorDetails: string | null = null;
+  const pathname = "/dashboard/company/requests";
 
   try {
     companyRequests = await prisma.request.findMany({
       where: { companyId: user.id },
       orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        pickup: true,
+        delivery: true,
+        cargo: true,
+        price: true,
+        transporterId: true,
+        unlockedByCompany: true,
+        createdAt: true,
+      },
     });
   } catch (error) {
-    console.error("Errore caricamento richieste azienda", error);
+    console.error("[Company Requests] load failed", {
+      pathname,
+      userId: user.id,
+      role: user.role,
+      error,
+    });
+    if (error instanceof Error) {
+      console.error(error.message, error.stack);
+      loadErrorDetails = error.message;
+    }
     loadError = "Impossibile caricare le richieste. Riprova tra poco.";
   }
 
@@ -64,7 +93,12 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
       </div>
 
       {loadError ? (
-        <p className="alert-warning">{loadError}</p>
+        <div className="space-y-1">
+          <p className="alert-warning">{loadError}</p>
+          {process.env.NODE_ENV !== "production" && loadErrorDetails ? (
+            <p className="text-xs text-slate-600">Dettaglio errore: {loadErrorDetails}</p>
+          ) : null}
+        </div>
       ) : companyRequests.length === 0 ? (
         <div className="card text-sm leading-relaxed text-[#475569]">
           Nessuna richiesta presente. Pubblica la prima per ricevere contatti diretti.
@@ -73,11 +107,16 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
         <CompanyRequestsTable
           requests={companyRequests.map((request) => ({
             id: request.id,
+            pickup: request.pickup,
+            delivery: request.delivery,
+            cargo: request.cargo,
             priceCents: request.price,
-            contactsUnlockedByCompany: request.contactsUnlockedByCompany,
+            transporterId: request.transporterId,
+            contactsUnlocked: request.unlockedByCompany,
             createdAt: request.createdAt.toISOString(),
           }))}
           role={user.role}
+          basePath="/dashboard/company/requests"
         />
       )}
     </section>

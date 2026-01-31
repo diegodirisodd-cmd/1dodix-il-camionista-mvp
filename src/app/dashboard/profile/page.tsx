@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
+import { PhoneForm } from "@/components/profile/phone-form";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { LogoutButton } from "@/components/logout-button";
 import { getSessionUser } from "@/lib/auth";
@@ -42,6 +43,10 @@ export default async function ProfilePage() {
             <p className="text-base font-semibold text-slate-900">{user.role}</p>
           </div>
           <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">Telefono</p>
+            <p className="text-base font-semibold text-slate-900">{user.phone ?? "Telefono non disponibile"}</p>
+          </div>
+          <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">Creato il</p>
             <p className="text-base font-semibold text-slate-900">{new Date(user.createdAt).toLocaleString("it-IT")}</p>
           </div>
@@ -50,6 +55,16 @@ export default async function ProfilePage() {
             <p className="text-base font-semibold text-slate-900">{subscriptionActive ? "Accesso completo attivo" : "Paghi solo quando sblocchi"}</p>
           </div>
         </div>
+
+        {user.role === "TRANSPORTER" && (
+          <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">Aggiorna telefono</p>
+              <p className="text-sm text-slate-600">Il numero sarà mostrato alle aziende dopo l&apos;assegnazione.</p>
+            </div>
+            <PhoneForm initialPhone={user.phone} />
+          </div>
+        )}
 
         <div className="pt-2">
           <Suspense fallback={<p>Chiusura sessione...</p>}>
