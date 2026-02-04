@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
 
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
-    select: { role: true, onboardingCompleted: true },
+    select: { role: true },
   });
 
   if (!user) {
@@ -36,19 +36,11 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isOnboarding) {
-    if (user.onboardingCompleted) {
-      return NextResponse.redirect(new URL(routeForUser({ ...user, onboardingCompleted: true }), request.url));
-    }
-
-    return NextResponse.next();
+    return NextResponse.redirect(new URL(routeForUser(user), request.url));
   }
 
   if (isApp) {
     return NextResponse.redirect(new URL(routeForUser(user), request.url));
-  }
-
-  if (!user.onboardingCompleted) {
-    return NextResponse.redirect(new URL("/onboarding", request.url));
   }
 
   return NextResponse.next();
