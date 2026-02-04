@@ -13,7 +13,7 @@ export default async function AdminPage() {
   }
 
   if (user.role !== "ADMIN") {
-    redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
+    redirect(routeForUser(user.role));
   }
 
   const [users, requests] = await Promise.all([

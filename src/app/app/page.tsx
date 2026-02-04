@@ -10,5 +10,5 @@ export default async function AppIndexPage() {
     redirect("/login");
   }
 
-  redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
+  redirect(routeForUser(user.role));
 }

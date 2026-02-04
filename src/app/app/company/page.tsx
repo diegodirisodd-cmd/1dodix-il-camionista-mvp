@@ -16,7 +16,7 @@ export default async function CompanyAppPage() {
   }
 
   if (user.role !== "COMPANY") {
-    redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
+    redirect(routeForUser(user.role));
   }
 
   const companyRequests = await prisma.request.findMany({

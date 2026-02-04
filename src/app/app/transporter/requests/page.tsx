@@ -12,7 +12,7 @@ export default async function TransporterRequestsPage() {
   }
 
   if (user.role !== "TRANSPORTER") {
-    redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
+    redirect(routeForUser(user.role));
   }
 
   return (

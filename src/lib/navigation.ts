@@ -1,8 +1,7 @@
 import { type Role } from "./roles";
 
 type RouteUser = {
-  role: Role;
-  onboardingCompleted: boolean;
+  role: string;
 };
 
 export function getDashboardPath(role: Role) {
@@ -11,8 +10,7 @@ export function getDashboardPath(role: Role) {
   return "/dashboard/admin";
 }
 
-export function routeForUser(user: RouteUser | null | undefined) {
-  if (!user) return "/login";
-  if (!user.onboardingCompleted) return "/onboarding";
-  return getDashboardPath(user.role);
+export function routeForUser(role: string) {
+  if (!role) return "/login";
+  return getDashboardPath(role as Role);
 }

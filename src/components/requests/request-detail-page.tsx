@@ -56,7 +56,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
   }
 
   if (!["COMPANY", "TRANSPORTER", "ADMIN"].includes(user.role)) {
-    redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
+    redirect(routeForUser(user.role));
   }
 
   const requestRecord = await prisma.request.findUnique({

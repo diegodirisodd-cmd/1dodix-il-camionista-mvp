@@ -50,7 +50,7 @@ export async function POST(request: Request) {
         userId: user.id,
         email: user.email,
         role: user.role,
-        redirectTo: routeForUser({ role: user.role as Role, onboardingCompleted: true }),
+        redirectTo: routeForUser(user.role as Role),
       },
       { status: 201 },
     );

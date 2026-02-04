@@ -17,7 +17,7 @@ export default async function CompanyRequestsPage({
   }
 
   if (user.role !== "COMPANY") {
-    redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
+    redirect(routeForUser(user.role));
   }
 
   const showBanner = searchParams?.created === "1";

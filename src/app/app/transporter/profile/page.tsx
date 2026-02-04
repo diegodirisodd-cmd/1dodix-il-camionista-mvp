@@ -14,7 +14,7 @@ export default async function TransporterProfilePage() {
   }
 
   if (user.role !== "TRANSPORTER") {
-    redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
+    redirect(routeForUser(user.role));
   }
 
   const subscriptionActive = hasActiveSubscription(user);

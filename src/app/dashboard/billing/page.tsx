@@ -15,5 +15,5 @@ export default async function BillingRedirectPage() {
     redirect("/onboarding");
   }
 
-  redirect(billingDestinationForRole(user.role) ?? routeForUser(user));
+  redirect(billingDestinationForRole(user.role) ?? routeForUser(user.role));
 }

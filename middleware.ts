@@ -36,11 +36,11 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isOnboarding) {
-    return NextResponse.redirect(new URL(routeForUser(user), request.url));
+    return NextResponse.redirect(new URL(routeForUser(user.role), request.url));
   }
 
   if (isApp) {
-    return NextResponse.redirect(new URL(routeForUser(user), request.url));
+    return NextResponse.redirect(new URL(routeForUser(user.role), request.url));
   }
 
   return NextResponse.next();
