@@ -24,13 +24,13 @@ export async function POST(request: Request) {
   const body = (await request.json()) as CheckoutPayload;
   const requestId = Number(body.requestId);
   const userRole = body.userRole;
-  const amount = body.amount;
+  const amount = Number(body?.amount);
 
   if (!Number.isFinite(requestId) || (userRole !== "company" && userRole !== "transporter")) {
     return NextResponse.json({ error: "Parametri non validi." }, { status: 400 });
   }
 
-  if (!Number.isInteger(amount) || amount <= 0) {
+  if (!amount || !Number.isInteger(amount) || amount <= 0) {
     return NextResponse.json({ error: "Importo non valido." }, { status: 400 });
   }
 
