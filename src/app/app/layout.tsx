@@ -15,5 +15,5 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     redirect("/onboarding");
   }
 
-  return <AppFrame user={user}>{children}</AppFrame>;
+  return <AppFrame user={{ ...user, role: user.role as any }}>{children}</AppFrame>;
 }
