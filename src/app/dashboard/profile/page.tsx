@@ -31,7 +31,7 @@ export default async function ProfilePage() {
             active={subscriptionActive}
             className="self-start"
             icon={subscriptionActive ? "lightning" : "check"}
-            role={user.role}
+            role={user.role as any}
           />
         </div>
       </div>
