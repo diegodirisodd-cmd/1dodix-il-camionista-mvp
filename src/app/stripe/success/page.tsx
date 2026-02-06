@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { Suspense, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function StripeSuccessPage() {
+function StripeSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
@@ -54,5 +54,13 @@ export default function StripeSuccessPage() {
         Torna alla richiesta
       </button>
     </section>
+  );
+}
+
+export default function StripeSuccessPage() {
+  return (
+    <Suspense fallback={null}>
+      <StripeSuccessContent />
+    </Suspense>
   );
 }

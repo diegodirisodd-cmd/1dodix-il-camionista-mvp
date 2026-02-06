@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function StripeCancelPage() {
+function StripeCancelContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestId = searchParams.get("requestId");
@@ -31,5 +31,13 @@ export default function StripeCancelPage() {
         Torna alla richiesta
       </button>
     </section>
+  );
+}
+
+export default function StripeCancelPage() {
+  return (
+    <Suspense fallback={null}>
+      <StripeCancelContent />
+    </Suspense>
   );
 }
