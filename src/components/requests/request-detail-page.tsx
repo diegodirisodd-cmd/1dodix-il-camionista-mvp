@@ -93,17 +93,17 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       acceptedAt={requestRecord.acceptedAt ? requestRecord.acceptedAt.toISOString() : null}
       companyEmail={requestRecord.company.email}
       contactEmail={getContactEmail({
-        role: user.role,
+        role: user.role as Role,
         companyEmail: requestRecord.company.email,
         transporterEmail: requestRecord.transporter?.email ?? null,
       })}
       contactPhone={getContactPhone({
-        role: user.role,
+        role: user.role as Role,
         companyPhone: requestRecord.company.phone ?? null,
         transporterPhone: requestRecord.transporter?.phone ?? null,
       })}
       transporterEmail={requestRecord.transporter?.email ?? null}
-      role={user.role}
+      role={user.role as Role}
       companyUnlocked={companyUnlocked}
       transporterUnlocked={transporterUnlocked}
       backHref={backHref}
