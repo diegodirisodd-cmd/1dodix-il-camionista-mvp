@@ -65,7 +65,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">Area utente</p>
               <p className="text-lg font-semibold leading-tight text-white">{user.email}</p>
               <p className="text-xs text-white/80">Ruolo: {user.role}</p>
-              <SubscriptionBadge active={subscriptionActive} size="sm" role={user.role} className="mt-2" />
+              <SubscriptionBadge active={subscriptionActive} role={user.role} className="mt-2" />
             </div>
 
             <SidebarNav role={user.role} />
