@@ -53,7 +53,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
           </button>
         </div>
         <div className="mt-3 flex items-center justify-between text-sm text-slate-600">
-          <SubscriptionBadge active={subscriptionActive} size="sm" role={user.role} />
+          <SubscriptionBadge active={subscriptionActive} role={user.role as any} />
           <LogoutButton variant="light" />
         </div>
       </div>
@@ -92,7 +92,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
                 <p className="text-base font-semibold text-textStrong">{pageLabel}</p>
               </div>
               <div className="flex items-center gap-3 text-sm text-slate-600">
-                <SubscriptionBadge active={subscriptionActive} size="sm" role={user.role} />
+                <SubscriptionBadge active={subscriptionActive} role={user.role as any} />
                 <LogoutButton variant="light" />
               </div>
             </div>
@@ -110,7 +110,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
             <div className="mb-4 space-y-1">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">Navigazione</p>
               <p className="text-sm font-semibold text-textStrong">{user.email}</p>
-              <SubscriptionBadge active={subscriptionActive} size="sm" role={user.role} />
+              <SubscriptionBadge active={subscriptionActive} role={user.role as any} />
             </div>
             <SidebarNav
               role={user.role}
