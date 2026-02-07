@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { PhoneForm } from "@/components/profile/phone-form";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { routeForUser } from "@/lib/navigation";
@@ -13,7 +14,7 @@ export default async function TransporterProfilePage() {
   }
 
   if (user.role !== "TRANSPORTER") {
-    redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
+    redirect(routeForUser(user.role));
   }
 
   const subscriptionActive = hasActiveSubscription(user);
@@ -34,6 +35,10 @@ export default async function TransporterProfilePage() {
           <p className="text-[#475569]">{user.email}</p>
         </div>
         <div className="flex items-center justify-between">
+          <p className="font-semibold">Telefono</p>
+          <p className="text-[#475569]">{user.phone ?? "Telefono non disponibile"}</p>
+        </div>
+        <div className="flex items-center justify-between">
           <p className="font-semibold">Ruolo</p>
           <p className="text-[#475569]">{user.role}</p>
         </div>
@@ -45,6 +50,14 @@ export default async function TransporterProfilePage() {
           <p className="font-semibold">Onboarding</p>
           <p className="text-[#475569]">{user.onboardingCompleted ? "Completo" : "In corso"}</p>
         </div>
+      </div>
+
+      <div className="card space-y-3 text-sm text-[#0f172a]">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#475569]">Aggiorna telefono</p>
+          <p className="text-sm text-[#475569]">Inserisci un numero valido per essere ricontattato dalle aziende.</p>
+        </div>
+        <PhoneForm initialPhone={user.phone} />
       </div>
     </section>
   );

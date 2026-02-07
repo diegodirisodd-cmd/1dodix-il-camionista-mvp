@@ -47,7 +47,7 @@ MVP web per autotrasportatori e aziende costruito con **Next.js**, **React**, **
 I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato per accessi di sola consultazione nell'MVP) compatibili con SQLite.
 
 - `User`: email univoca, password (hash), ruolo testuale e timestamp di creazione.
-- `Request`: richiesta di trasporto pubblicata da un utente `COMPANY` con titolo, origine/destinazione, dati facoltativi su carico/budget/descrizione e riferimenti di contatto.
+- `Request`: richiesta di trasporto pubblicata da un utente `COMPANY` con origine/destinazione, carico opzionale, descrizione e prezzo.
 
 ## Prerequisiti
 - Node.js 18+
@@ -83,7 +83,7 @@ I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato 
 - **Login**: la pagina `/login` invia le credenziali a `POST /api/auth/login`, verifica l'hash, imposta il cookie di sessione JWT (`dodix_session`) e restituisce il reindirizzamento corretto in base al ruolo.
 - **Logout**: `POST /api/auth/logout` invalida il cookie di sessione.
 - **Protezione pagine/API**: `middleware.ts` richiede un token valido per tutte le rotte `/dashboard`. `getSessionUser` recupera l'utente nei server component per applicare redirect server-side coerenti.
-- **Checkout**: la pagina `/paywall` e i CTA premium chiamano `POST /api/stripe/checkout`, che crea una sessione Stripe Checkout in modalità subscription e reindirizza all'URL restituito. Al ritorno, `success_url` punta a `/dashboard?checkout=success`.
+- **Checkout**: la pagina `/paywall` e i CTA premium chiamano `POST /api/stripe/unlock`, che crea una sessione Stripe Checkout in modalità subscription e reindirizza all'URL restituito. Al ritorno, `success_url` punta a `/dashboard?checkout=success`.
 - **Webhook Stripe**: `POST /api/stripe/webhook` valida la firma (`STRIPE_WEBHOOK_SECRET`) e, su `checkout.session.completed`, imposta `subscriptionActive=true` e aggiorna i riferimenti Stripe sull'utente (email usata come chiave).
 - **Admin (solo lettura)**: il ruolo `ADMIN` accede a `/dashboard/admin` per visualizzare elenco utenti e richieste in modalità di sola consultazione; non sono previste azioni di modifica o moderazione nell'MVP.
 
@@ -94,8 +94,8 @@ I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato 
 - Documentazione completa in `docs/design-system.md` per palette, scala tipografica, componenti riutilizzabili e regole di layout.
 
 ## Pubblicazione richieste
-- **Company**: compila il form nella pagina `/dashboard/company` oppure invia una `POST /api/requests` con `title`, `pickup`, `dropoff`, `contactName`, `contactPhone`, `contactEmail` (campi facoltativi: `cargo`, `budget`, `description`).
-- **Transporter**: consulta `/dashboard/transporter/jobs` o chiama `GET /api/requests`. I contatti vengono restituiti solo se l'utente ha `subscriptionActive=true`, altrimenti vengono mascherati (`contactHidden`).
+- **Company**: compila il form nella pagina `/dashboard/company` oppure invia una `POST /api/requests` con `pickup`, `delivery`, `price` (campi facoltativi: `cargo`, `description`).
+- **Transporter**: consulta `/dashboard/transporter/jobs` o chiama `GET /api/requests` per le richieste disponibili (non ancora assegnate).
 
 ## Comandi utili
 - `npm run dev` – Avvia il server Next.js in modalità sviluppo.
@@ -107,20 +107,19 @@ I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato 
 - `npm run prisma:studio` – Apre Prisma Studio per ispezionare i dati.
 
 ### Reset database locale (per errori Prisma / colonne mancanti)
-Se l'ambiente locale segnala colonne mancanti (es. `subscriptionActive`), azzera il database di sviluppo e riallinea lo schema:
+Se l'ambiente locale segnala colonne mancanti, riallinea il database locale senza modificare le migrazioni versionate:
 
 ```bash
-rm -f prisma/dev.db prisma/dev.db-journal
+# Ferma il dev server se in esecuzione
+npx prisma migrate reset
 npx prisma generate
-npx prisma migrate dev --name reset_local_db
+npm run dev
 ```
-
-Questo rigenera il client, ricrea `dev.db` coerente con lo schema corrente e mantiene intatte le migrazioni tracciate nel repository.
 
 ### Test manuali abbonamento Stripe
 1. **Eseguire il checkout**
    - Avvia l'app: `npm run dev`
-   - Accedi come utente non abbonato e clicca su "Attiva abbonamento" (es. da /paywall o dalla pagina billing): il client chiama `POST /api/stripe/checkout` e ti reindirizza a Stripe.
+   - Accedi come utente non abbonato e clicca su "Attiva abbonamento" (es. da /paywall o dalla pagina billing): il client chiama `POST /api/stripe/unlock` e ti reindirizza a Stripe.
 2. **Configurare il webhook in locale**
    - Installa Stripe CLI e autenticati.
    - Avvia il forwarding: `stripe listen --forward-to localhost:3000/api/stripe/webhook`

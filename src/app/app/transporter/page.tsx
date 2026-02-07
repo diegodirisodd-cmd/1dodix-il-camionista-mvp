@@ -15,7 +15,7 @@ export default async function TransporterAppPage() {
   }
 
   if (user.role !== "TRANSPORTER") {
-    redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
+    redirect(routeForUser(user.role));
   }
 
   const requestsCount = await prisma.request.count();

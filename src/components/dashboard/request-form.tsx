@@ -12,9 +12,6 @@ const INITIAL_STATE = {
   cargo: "",
   price: "",
   description: "",
-  contactName: "",
-  contactPhone: "",
-  contactEmail: "",
 };
 
 type RequestFormProps = {
@@ -38,6 +35,7 @@ export function RequestForm({
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [unlockConfirmed, setUnlockConfirmed] = useState(false);
   const [unlockLoading, setUnlockLoading] = useState(false);
+  const [distanceKm, setDistanceKm] = useState("");
   const router = useRouter();
 
   const canPublish = subscriptionActive || hasFreeQuota || unlockConfirmed;
@@ -62,9 +60,6 @@ export function RequestForm({
         delivery: form.dropoff,
         cargoType: form.cargo,
         description: form.description,
-        contactName: form.contactName,
-        contactPhone: form.contactPhone,
-        contactEmail: form.contactEmail,
         price: form.price,
       }),
     });
@@ -86,6 +81,11 @@ export function RequestForm({
   function updateField(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
+
+  const distanceValue = Number(distanceKm);
+  const hasEstimate = Number.isFinite(distanceValue) && distanceValue > 0;
+  const minBudget = hasEstimate ? distanceValue * 1.2 : 0;
+  const maxBudget = hasEstimate ? distanceValue * 1.5 : 0;
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
@@ -111,6 +111,30 @@ export function RequestForm({
           />
         </label>
       </div>
+
+      <label className="form-field">
+        <span className="label">Distanza stimata (km)</span>
+        <input
+          type="number"
+          min="0"
+          step="0.1"
+          className="input-field"
+          value={distanceKm}
+          onChange={(e) => setDistanceKm(e.target.value)}
+          placeholder="Es. 320"
+        />
+      </label>
+
+      {hasEstimate && (
+        <div className="rounded-lg bg-slate-100 p-4 text-sm text-slate-700">
+          <p className="font-semibold">💡 Stima budget consigliato</p>
+          <p className="mt-1">In base alla distanza indicata, il budget consigliato è:</p>
+          <p className="mt-2 font-semibold">Da €{minBudget.toFixed(2)} a €{maxBudget.toFixed(2)}</p>
+          <p className="mt-2 text-xs text-slate-600">
+            Indicazione basata su 1,20€–1,50€/km. Puoi inserire qualsiasi budget.
+          </p>
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="form-field">
@@ -147,40 +171,6 @@ export function RequestForm({
           placeholder="Note di accesso, vincoli, orari preferiti, ecc."
         />
       </label>
-
-      <div className="grid gap-4 sm:grid-cols-3">
-        <label className="form-field">
-          <span className="label">Referente*</span>
-          <input
-            required
-            className="input-field"
-            value={form.contactName}
-            onChange={(e) => updateField("contactName", e.target.value)}
-            placeholder="Nome Cognome"
-          />
-        </label>
-        <label className="form-field">
-          <span className="label">Telefono*</span>
-          <input
-            required
-            className="input-field"
-            value={form.contactPhone}
-            onChange={(e) => updateField("contactPhone", e.target.value)}
-            placeholder="+39 333 0000000"
-          />
-        </label>
-        <label className="form-field">
-          <span className="label">Email*</span>
-          <input
-            required
-            type="email"
-            className="input-field"
-            value={form.contactEmail}
-            onChange={(e) => updateField("contactEmail", e.target.value)}
-            placeholder="logistica@azienda.it"
-          />
-        </label>
-      </div>
 
       {error && <p className="alert-warning">{error}</p>}
       {success && <p className="alert-success">{success}</p>}

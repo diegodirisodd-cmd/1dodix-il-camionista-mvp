@@ -62,11 +62,11 @@ a {
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg bg-[#f97316] px-4 py-2 text-sm font-semibold text-white shadow-sm transition duration-150 hover:bg-[#ea6a0d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f97316]/20 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:bg-slate-300;
+    @apply inline-flex items-center justify-center rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition duration-150 hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/20 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:bg-slate-300;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-lg border border-[#e2e8f0] bg-[#e2e8f0] px-4 py-2 text-sm font-semibold text-[#0f172a] shadow-sm transition duration-150 hover:bg-white hover:text-[#0f172a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b3c5d]/15 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-500;
+    @apply inline-flex items-center justify-center rounded-lg border border-brand bg-transparent px-4 py-2 text-sm font-semibold text-brand shadow-sm transition duration-150 hover:bg-brand/10 hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/20 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-500;
   }
 
   .btn-ghost {
@@ -74,15 +74,15 @@ a {
   }
 
   .card {
-    @apply rounded-lg border border-[#e2e8f0] bg-white p-6 shadow-sm;
+    @apply rounded-xl border border-slate-200 bg-card p-6 shadow-sm;
   }
 
   .card-contrast {
-    @apply rounded-lg border border-[#e2e8f0] bg-white p-6 shadow-sm;
+    @apply rounded-xl border border-slate-200 bg-card p-6 shadow-sm;
   }
 
   .card-muted {
-    @apply rounded-lg border border-[#e2e8f0] bg-slate-50 p-6 shadow-sm;
+    @apply rounded-xl border border-slate-200 bg-slate-50 p-6 shadow-sm;
   }
 
   .input-field {

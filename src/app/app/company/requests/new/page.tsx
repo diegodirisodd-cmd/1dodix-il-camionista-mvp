@@ -14,7 +14,7 @@ export default async function NewCompanyRequestPage() {
   }
 
   if (user.role !== "COMPANY") {
-    redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
+    redirect(routeForUser(user.role));
   }
 
   const subscriptionActive = hasActiveSubscription(user);

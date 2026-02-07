@@ -10,12 +10,14 @@ export const navByRole: Record<Role, { href: string; label: string }[]> = {
   COMPANY: [
     { href: "/dashboard/company", label: "Panoramica azienda" },
     { href: "/dashboard/company/requests", label: "Richieste inviate" },
+    { href: "/dashboard/company/history", label: "Storico trasporti" },
     { href: "/dashboard/company/profile", label: "Profilo aziendale" },
     { href: "/dashboard/company/billing", label: "Commissioni" },
   ],
   TRANSPORTER: [
     { href: "/dashboard/transporter", label: "Panoramica trasportatore" },
     { href: "/dashboard/transporter/jobs", label: "Richieste disponibili" },
+    { href: "/dashboard/transporter/accepted", label: "Trasporti accettati" },
     { href: "/dashboard/transporter/profile", label: "Profilo operatore" },
     { href: "/dashboard/transporter/billing", label: "Commissioni" },
   ],
@@ -36,7 +38,7 @@ export function SidebarNav({
   const navItems = navByRole[role] ?? [];
 
   return (
-    <nav className="space-y-3 text-sm text-[#475569]">
+    <nav className="space-y-3 text-sm text-white/80">
       {navItems.map((item) => {
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
@@ -48,11 +50,11 @@ export function SidebarNav({
             className={clsx(
               "flex items-center justify-between rounded-lg px-3 py-3 transition-colors",
               active
-                ? "bg-[#e2e8f0] text-[#0f172a] shadow-inner"
-                : "text-[#475569] hover:bg-slate-100 hover:text-[#0f172a]",
+                ? "bg-brand-hover text-white"
+                : "text-white/90 hover:bg-brand-hover/90 hover:text-white",
             )}
           >
-            <span className="font-medium text-[#0f172a]">{item.label}</span>
+            <span className="font-medium text-white">{item.label}</span>
           </Link>
         );
       })}

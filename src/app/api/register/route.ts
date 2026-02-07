@@ -13,12 +13,12 @@ export async function POST(request: Request) {
     const roleRaw = typeof body?.role === "string" ? body.role : undefined;
 
     const email = emailRaw?.trim().toLowerCase();
-    const password = passwordRaw?.trim();
+    const rawPassword = passwordRaw?.trim();
     const normalizedRole = roleRaw?.toUpperCase() as Role | undefined;
     const allowedRoles: Role[] = REGISTRABLE_ROLES;
     const role = normalizedRole && allowedRoles.find((candidate) => candidate === normalizedRole);
 
-    if (!email || !password || !role) {
+    if (!email || !rawPassword || !role) {
       return NextResponse.json(
         { error: "Email, password e ruolo sono obbligatori." },
         { status: 400 }
@@ -33,12 +33,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const passwordHash = await hash(password, 10);
+    const password = await hash(rawPassword, 10);
 
     const user = await prisma.user.create({
       data: {
         email,
-        password: passwordHash,
+        password,
         role,
       },
       select: { id: true },

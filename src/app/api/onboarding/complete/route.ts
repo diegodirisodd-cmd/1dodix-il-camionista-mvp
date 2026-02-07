@@ -11,7 +11,7 @@ export async function POST() {
       return NextResponse.json({ error: "Non autenticato." }, { status: 401 });
     }
 
-    const redirectTo = routeForUser({ role: user.role, onboardingCompleted: true });
+    const redirectTo = routeForUser(user.role);
 
     return NextResponse.json({ success: true, redirectTo });
   } catch (error) {

@@ -6,27 +6,71 @@ import { prisma } from "@/lib/prisma";
 type RequestPayload = {
   pickup?: string;
   delivery?: string;
+  cargo?: string;
   cargoType?: string;
   description?: string;
-  contactName?: string;
-  contactPhone?: string;
-  contactEmail?: string;
   price?: number | string;
-  contactsUnlockedByCompany?: boolean;
+  budget?: number | string;
+  priceString?: string;
 };
 
 export async function GET() {
   const user = await getSessionUser();
+  const pathname = "/api/requests";
 
-  const isCompany = user?.role === "COMPANY";
-  const isAdmin = user?.role === "ADMIN";
+  if (!user) {
+    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
+  }
 
-  const requests = await prisma.request.findMany({
-    where: isCompany && !isAdmin && user ? { companyId: user.id } : undefined,
-    orderBy: { createdAt: "desc" },
-  });
+  try {
+    const whereClause =
+      user.role === "COMPANY"
+        ? { companyId: user.id }
+        : user.role === "TRANSPORTER"
+          ? { transporterId: null }
+          : undefined;
 
-  return NextResponse.json(requests);
+    const requests = await prisma.request.findMany({
+      where: whereClause,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        pickup: true,
+        delivery: true,
+        cargo: true,
+        price: true,
+        createdAt: true,
+        transporterId: true,
+        unlockedByCompany: true,
+        unlockedByTransporter: true,
+        companyId: true,
+        company: { select: { email: true, phone: true } },
+      },
+    });
+
+    const payload = requests.map((request) => ({
+      ...request,
+      contactsUnlocked:
+        user.role === "COMPANY"
+          ? request.unlockedByCompany
+          : user.role === "TRANSPORTER"
+            ? request.unlockedByTransporter
+            : true,
+    }));
+
+    return NextResponse.json(payload);
+  } catch (error) {
+    console.error("[Requests API] load failed", {
+      pathname,
+      userId: user.id,
+      role: user.role,
+      error,
+    });
+    if (error instanceof Error) {
+      console.error(error.message, error.stack);
+    }
+    return NextResponse.json({ error: "Impossibile caricare le richieste" }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {
@@ -48,11 +92,13 @@ export async function POST(request: Request) {
 
   console.log("REQUEST BODY:", body);
 
-  if (!body.price) {
+  const rawPrice = body.price ?? body.budget ?? body.priceString;
+
+  if (!rawPrice) {
     return NextResponse.json({ error: "Prezzo obbligatorio" }, { status: 400 });
   }
 
-  const priceNumber = Number(body.price);
+  const priceNumber = Number(rawPrice);
 
   if (Number.isNaN(priceNumber) || priceNumber <= 0) {
     return NextResponse.json({ error: "Prezzo non valido" }, { status: 400 });
@@ -61,21 +107,21 @@ export async function POST(request: Request) {
   const priceInCents = Math.round(priceNumber * 100);
   const pickup = body.pickup?.trim() ?? "";
   const delivery = body.delivery?.trim() ?? "";
-  const title = pickup && delivery ? `${pickup} → ${delivery}` : "Richiesta di trasporto";
-  const descriptionParts = [
-    body.description?.trim(),
-    pickup && delivery ? `Percorso: ${pickup} → ${delivery}` : null,
-    body.cargoType?.trim() ? `Carico: ${body.cargoType.trim()}` : null,
-  ].filter(Boolean) as string[];
-  const description = descriptionParts.join("\n").trim();
+  const cargo = body.cargo?.trim() ?? body.cargoType?.trim() ?? null;
+  const description = body.description?.trim() || null;
+
+  if (!pickup || !delivery) {
+    return NextResponse.json({ error: "Ritiro e consegna obbligatori." }, { status: 400 });
+  }
 
   try {
     const newRequest = await prisma.request.create({
       data: {
-        title,
+        pickup,
+        delivery,
+        cargo,
         description,
         price: priceInCents,
-        contactsUnlockedByCompany: Boolean(body.contactsUnlockedByCompany),
         companyId: user.id,
       },
     });
