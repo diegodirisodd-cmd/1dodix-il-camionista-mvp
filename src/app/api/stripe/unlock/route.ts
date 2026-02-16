@@ -4,6 +4,10 @@ import Stripe from "stripe";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+const baseUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
 export async function POST(req: Request) {
   try {
     console.log("🚀 [STRIPE] unlock API HIT");
@@ -54,6 +58,10 @@ export async function POST(req: Request) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
+      metadata: {
+        requestId: String(requestId),
+        role: role.toUpperCase(),
+      },
       line_items: [
         {
           price_data: {
@@ -67,9 +75,9 @@ export async function POST(req: Request) {
         },
       ],
       success_url:
-        `http://localhost:3000/stripe/success?session_id={CHECKOUT_SESSION_ID}` +
+        `${baseUrl}/stripe/success?session_id={CHECKOUT_SESSION_ID}` +
         `&requestId=${requestId}&role=${role}`,
-      cancel_url: `http://localhost:3000/stripe/cancel?requestId=${requestId}&role=${role}`,
+      cancel_url: `${baseUrl}/stripe/cancel?requestId=${requestId}&role=${role}`,
     });
 
     console.log("✅ Session creata:", session.id);

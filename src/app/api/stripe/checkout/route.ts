@@ -13,6 +13,10 @@ type CheckoutPayload = {
   amount?: number;
 };
 
+const baseUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
 export async function POST(request: Request) {
   if (!stripe || !stripeSecret) {
     return NextResponse.json(
@@ -38,6 +42,10 @@ export async function POST(request: Request) {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
+      metadata: {
+        requestId: String(requestId),
+        role: userRole.toUpperCase(),
+      },
       line_items: [
         {
           price_data: {
@@ -51,8 +59,8 @@ export async function POST(request: Request) {
           quantity: 1,
         },
       ],
-      success_url: `http://localhost:3000/dashboard/stripe/success?requestId=${requestId}&role=${userRole}`,
-      cancel_url: `http://localhost:3000/dashboard/stripe/cancel?requestId=${requestId}`,
+      success_url: `${baseUrl}/dashboard/stripe/success?requestId=${requestId}&role=${userRole}`,
+      cancel_url: `${baseUrl}/dashboard/stripe/cancel?requestId=${requestId}`,
     });
 
     if (!session.url) {
