@@ -47,7 +47,7 @@ export function AppSidebar({
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#64748b]">Area utente</p>
         <p className="text-lg font-semibold leading-tight text-[#0f172a]">{user.email}</p>
         <p className="text-xs text-[#475569]">Ruolo: {user.role}</p>
-        <SubscriptionBadge active={subscriptionActive} size="sm" role={user.role} className="mt-2" />
+        <SubscriptionBadge active={subscriptionActive} role={user.role as any} className="mt-2" />
       </div>
 
       <nav className="space-y-2 text-sm text-[#475569]">
