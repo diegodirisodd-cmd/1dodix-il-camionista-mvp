@@ -53,20 +53,20 @@ export function SubscriptionBadge({
   } = active
     ? {
         label: "Accesso completo attivo",
-        color: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
+        color: "bg-success/10 text-success ring-1 ring-success/20",
         icon: icon === "lightning" ? <IconLightning /> : <IconCheck />,
       }
     : {
         label: "Accesso limitato",
-        color: "bg-[#f8fafc] text-[#334155] ring-1 ring-[#e2e8f0]",
+        color: "bg-warning/10 text-warning ring-1 ring-warning/20",
         icon: <IconLightning />,
         helper: (
-          <span className="text-[11px] font-medium text-[#475569]">
+          <span className="text-[11px] font-medium text-slate-600">
             Paghi solo quando sblocchi i contatti di una richiesta.
           </span>
         ),
         cta: (
-          <span className="rounded-full bg-[#fff8ed] px-3 py-1 text-[11px] font-semibold text-[#92400e]">
+          <span className="rounded-full bg-warning/20 px-3 py-1 text-[11px] font-semibold text-warning">
             Commissione 2% – una tantum
           </span>
         ),
@@ -80,7 +80,7 @@ export function SubscriptionBadge({
         {content.icon}
       </span>
       <div className="flex flex-col gap-1 text-left">
-        <span className="flex items-center gap-2 text-[#0f172a]">{content.label}</span>
+        <span className="flex items-center gap-2 text-textStrong">{content.label}</span>
         {!active && content.helper}
       </div>
       {!active && content.cta}

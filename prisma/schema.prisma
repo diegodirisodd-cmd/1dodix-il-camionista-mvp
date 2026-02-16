@@ -3,33 +3,38 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   password  String
+  phone     String?
   role      String   @default("COMPANY")
   createdAt DateTime @default(now())
 
   companyRequests     Request[] @relation("CompanyRequests")
-  transporterRequests Request[] @relation("TransporterRequests")
+  transporterRequests Request[] @relation("TransporterJobs")
 }
 
 model Request {
   id            Int      @id @default(autoincrement())
+  pickup        String
+  delivery      String
+  cargo         String?
+  description   String?
+  price         Int
   companyId     Int
   transporterId Int?
-  title         String
-  description   String
-  price         Int
+  contactsUnlocked Boolean @default(false)
+  unlockedByCompany Boolean @default(false)
+  unlockedByTransporter Boolean @default(false)
+  acceptedAt    DateTime?
+  status        String   @default("ACCETTATO")
   createdAt     DateTime @default(now())
 
-  contactsUnlockedByCompany     Boolean @default(false)
-  contactsUnlockedByTransporter Boolean @default(false)
-
   company     User  @relation("CompanyRequests", fields: [companyId], references: [id])
-  transporter User? @relation("TransporterRequests", fields: [transporterId], references: [id])
+  transporter User? @relation("TransporterJobs", fields: [transporterId], references: [id])
 }

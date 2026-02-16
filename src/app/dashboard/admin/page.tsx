@@ -57,7 +57,12 @@ export default async function AdminDashboardPage() {
       }),
       prisma.request.findMany({
         orderBy: { createdAt: "desc" },
-        include: { company: { select: { email: true, role: true } } },
+        select: {
+          id: true,
+          price: true,
+          createdAt: true,
+          company: { select: { email: true, role: true } },
+        },
       }),
     ]);
   } catch (error) {

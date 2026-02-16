@@ -11,7 +11,7 @@ export default async function CompanyProfilePage() {
   }
 
   if (user.role !== "COMPANY") {
-    redirect(routeForUser({ role: user.role, onboardingCompleted: user.onboardingCompleted }));
+    redirect(routeForUser(user.role));
   }
 
   return (

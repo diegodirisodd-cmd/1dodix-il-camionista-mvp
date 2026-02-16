@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       email: user.email,
       role,
     });
-    const redirectTo = routeForUser({ role, onboardingCompleted });
+    const redirectTo = routeForUser(role);
 
     const response = NextResponse.json({
       message: "Accesso eseguito.",

@@ -26,12 +26,12 @@ export function SectionCard({
     >
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="space-y-2">
-          <h2 className="text-xl font-semibold text-[#0f172a]">{title}</h2>
-          {description ? <p className="text-sm leading-relaxed text-[#475569]">{description}</p> : null}
+          <h2 className="text-xl font-semibold text-textStrong">{title}</h2>
+          {description ? <p className="text-sm leading-relaxed text-slate-600">{description}</p> : null}
         </div>
-        {actions ? <div className="flex items-center gap-2 text-sm text-[#475569]">{actions}</div> : null}
+        {actions ? <div className="flex items-center gap-2 text-sm text-slate-600">{actions}</div> : null}
       </div>
-      <div className="mt-4 space-y-4 text-sm leading-relaxed text-[#475569]">{children}</div>
+      <div className="mt-4 space-y-4 text-sm leading-relaxed text-slate-600">{children}</div>
     </section>
   );
 }
