@@ -23,7 +23,7 @@ export function CheckoutButton({
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch("/api/stripe/checkout", { method: "POST" });
+      const response = await fetch("/api/stripe/unlock", { method: "POST" });
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
