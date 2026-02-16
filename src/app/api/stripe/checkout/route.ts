@@ -34,6 +34,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Importo non valido." }, { status: 400 });
   }
 
+ 
+  const baseUrl =
+    process.env.NODE_ENV === "production"
+      ? process.env.NEXT_PUBLIC_SITE_URL
+      : "https://1dodix-il-camionista-mvp.vercel.app";
+
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -51,8 +57,12 @@ export async function POST(request: Request) {
           quantity: 1,
         },
       ],
-      success_url: `http://localhost:3000/dashboard/stripe/success?requestId=${requestId}&role=${userRole}`,
-      cancel_url: `http://localhost:3000/dashboard/stripe/cancel?requestId=${requestId}`,
+      const baseUrl =
+  process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+success_url: `${baseUrl}/dashboard/stripe/success?requestId=${requestId}&role=${userRole}`,
+cancel_url: `${baseUrl}/dashboard/stripe/cancel?requestId=${requestId}`,
+
     });
 
     if (!session.url) {
