@@ -89,7 +89,7 @@ export function OnboardingSteps({ role }: { role: string }) {
       }
 
       window.location.replace(
-        data?.redirectTo ?? routeForUser({ role: role as "COMPANY" | "TRANSPORTER" | "ADMIN", onboardingCompleted: true }),
+        data?.redirectTo ?? routeForUser(role as "COMPANY" | "TRANSPORTER" | "ADMIN"),
       );
     } catch (err) {
       console.error("Errore nel completamento onboarding", err);

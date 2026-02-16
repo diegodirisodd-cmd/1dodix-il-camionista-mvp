@@ -19,5 +19,9 @@ export default async function DashboardLayout({
     redirect("/onboarding");
   }
 
-  return <DashboardShell user={user}>{children}</DashboardShell>;
+  return (
+    <DashboardShell user={{ ...user, role: user.role as any }}>
+      {children}
+    </DashboardShell>
+  );
 }

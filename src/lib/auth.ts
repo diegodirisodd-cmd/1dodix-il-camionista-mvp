@@ -66,6 +66,7 @@ export async function getSessionUser() {
     select: {
       id: true,
       email: true,
+      phone: true,
       role: true,
       createdAt: true,
     },
