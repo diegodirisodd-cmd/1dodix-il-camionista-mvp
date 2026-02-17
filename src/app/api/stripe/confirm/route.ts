@@ -34,7 +34,6 @@ export async function POST(req: Request) {
       select: {
         unlockedByCompany: true,
         unlockedByTransporter: true,
-        acceptedAt: true,
       },
     });
 
@@ -48,15 +47,24 @@ export async function POST(req: Request) {
 
     const nextCompanyUnlocked = request.unlockedByCompany || role === "company";
     const nextTransporterUnlocked = request.unlockedByTransporter || role === "transporter";
-    const shouldAccept = nextCompanyUnlocked && nextTransporterUnlocked;
+    const nextContactsUnlocked = nextCompanyUnlocked && nextTransporterUnlocked;
+
+    const nextStatus =
+      nextCompanyUnlocked && nextTransporterUnlocked
+        ? "COMPLETED"
+        : nextTransporterUnlocked
+          ? "TRANSPORTER_PAID"
+          : nextCompanyUnlocked
+            ? "COMPANY_PAID"
+            : "OPEN";
 
     await prisma.request.update({
       where: { id: requestId },
       data: {
         unlockedByCompany: nextCompanyUnlocked,
         unlockedByTransporter: nextTransporterUnlocked,
-        acceptedAt: shouldAccept && !request.acceptedAt ? new Date() : undefined,
-        status: shouldAccept ? "ACCEPTED" : undefined,
+        contactsUnlocked: nextContactsUnlocked,
+        status: nextStatus,
       },
     });
 

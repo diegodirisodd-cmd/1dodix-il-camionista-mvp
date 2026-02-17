@@ -56,11 +56,26 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
     return NextResponse.json({ ok: true });
   }
 
+  const nextCompanyUnlocked = requestRecord.unlockedByCompany || shouldUnlockCompany;
+  const nextTransporterUnlocked = requestRecord.unlockedByTransporter || shouldUnlockTransporter;
+  const nextContactsUnlocked = nextCompanyUnlocked && nextTransporterUnlocked;
+
+  const nextStatus =
+    nextCompanyUnlocked && nextTransporterUnlocked
+      ? "COMPLETED"
+      : nextTransporterUnlocked
+        ? "TRANSPORTER_PAID"
+        : nextCompanyUnlocked
+          ? "COMPANY_PAID"
+          : "OPEN";
+
   await prisma.request.update({
     where: { id: requestId },
     data: {
-      unlockedByCompany: shouldUnlockCompany ? true : undefined,
-      unlockedByTransporter: shouldUnlockTransporter ? true : undefined,
+      unlockedByCompany: nextCompanyUnlocked,
+      unlockedByTransporter: nextTransporterUnlocked,
+      contactsUnlocked: nextContactsUnlocked,
+      status: nextStatus,
     },
   });
 

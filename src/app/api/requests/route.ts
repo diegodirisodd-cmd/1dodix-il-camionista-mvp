@@ -44,21 +44,12 @@ export async function GET() {
         unlockedByCompany: true,
         unlockedByTransporter: true,
         companyId: true,
+        contactsUnlocked: true,
         company: { select: { email: true, phone: true } },
       },
     });
 
-    const payload = requests.map((request) => ({
-      ...request,
-      contactsUnlocked:
-        user.role === "COMPANY"
-          ? request.unlockedByCompany
-          : user.role === "TRANSPORTER"
-            ? request.unlockedByTransporter
-            : true,
-    }));
-
-    return NextResponse.json(payload);
+    return NextResponse.json(requests);
   } catch (error) {
     console.error("[Requests API] load failed", {
       pathname,

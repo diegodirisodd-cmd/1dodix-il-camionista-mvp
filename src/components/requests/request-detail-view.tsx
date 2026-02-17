@@ -25,6 +25,7 @@ type RequestDetailViewProps = {
   contactPhone: string | null;
   transporterEmail: string | null;
   role: Role;
+  contactsUnlocked: boolean;
   companyUnlocked: boolean;
   transporterUnlocked: boolean;
   backHref: string;
@@ -45,6 +46,7 @@ export function RequestDetailView({
   contactPhone,
   transporterEmail,
   role,
+  contactsUnlocked,
   companyUnlocked,
   transporterUnlocked,
   backHref,
@@ -58,6 +60,7 @@ export function RequestDetailView({
 
   const isAccepted = Boolean(acceptedAtDate);
   const bothUnlocked = companyUnlocked && transporterUnlocked;
+  const contactsVisible = contactsUnlocked;
   const hasPaid =
     role === "COMPANY" ? companyUnlocked : role === "TRANSPORTER" ? transporterUnlocked : true;
   const shouldShowCta =
@@ -224,7 +227,7 @@ export function RequestDetailView({
         </div>
       </div>
 
-      {role === "COMPANY" && isAccepted && bothUnlocked && (
+      {role === "COMPANY" && isAccepted && contactsVisible && (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
           <p className="font-semibold">Trasporto accettato</p>
           <p className="text-sm text-[#475569]">
@@ -241,19 +244,19 @@ export function RequestDetailView({
           <div className="space-y-1">
             <h2 className="text-xl font-semibold text-[#0f172a]">Contatti</h2>
             <p className="text-sm text-[#475569]">
-              {bothUnlocked
+              {contactsVisible
                 ? "Contatti disponibili per questa richiesta."
                 : "I contatti saranno visibili solo dopo il pagamento di entrambe le parti."}
             </p>
           </div>
-          {!bothUnlocked && (
+          {!contactsVisible && (
             <p className="text-xs text-[#64748b]">
               I contatti saranno visibili solo dopo il pagamento di entrambe le parti.
             </p>
           )}
         </div>
 
-        {bothUnlocked ? (
+        {contactsVisible ? (
           <div className="space-y-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
             <p className="font-semibold">{contactHeadline}</p>
             <p className="text-sm text-[#475569]">{contactEmail ?? "Email non disponibile"}</p>
@@ -310,7 +313,7 @@ export function RequestDetailView({
               <p className="mt-3 text-xs text-[#64748b]">Commissione applicata solo quando il contatto è utile.</p>
               </div>
             )}
-            {hasPaid && !bothUnlocked && (
+            {hasPaid && !contactsVisible && (
               <div className="space-y-2">
                 <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-700">
                   Pagamento completato

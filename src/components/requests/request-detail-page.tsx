@@ -104,6 +104,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       })}
       transporterEmail={requestRecord.transporter?.email ?? null}
       role={user.role as Role}
+      contactsUnlocked={requestRecord.contactsUnlocked}
       companyUnlocked={companyUnlocked}
       transporterUnlocked={transporterUnlocked}
       backHref={backHref}

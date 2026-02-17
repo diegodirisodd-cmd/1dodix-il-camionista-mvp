@@ -63,7 +63,6 @@ export async function POST(req: NextRequest) {
       select: {
         unlockedByCompany: true,
         unlockedByTransporter: true,
-        acceptedAt: true,
       },
     });
 
@@ -75,23 +74,28 @@ export async function POST(req: NextRequest) {
       request.unlockedByCompany || normalizedRole === "COMPANY";
     const nextTransporterUnlocked =
       request.unlockedByTransporter || normalizedRole === "TRANSPORTER";
-    const shouldAccept = nextCompanyUnlocked && nextTransporterUnlocked;
+    const nextContactsUnlocked = nextCompanyUnlocked && nextTransporterUnlocked;
+
+    const nextStatus =
+      nextCompanyUnlocked && nextTransporterUnlocked
+        ? "COMPLETED"
+        : nextTransporterUnlocked
+          ? "TRANSPORTER_PAID"
+          : nextCompanyUnlocked
+            ? "COMPANY_PAID"
+            : "OPEN";
 
     await prisma.request.update({
       where: { id: parsedRequestId },
       data: {
         unlockedByCompany: nextCompanyUnlocked,
         unlockedByTransporter: nextTransporterUnlocked,
-        acceptedAt: shouldAccept && !request.acceptedAt ? new Date() : undefined,
-        status: shouldAccept ? "ACCEPTED" : undefined,
+        contactsUnlocked: nextContactsUnlocked,
+        status: nextStatus,
       },
     });
 
-    console.log("[WEBHOOK] contatti sbloccati");
-
-    if (shouldAccept && !request.acceptedAt) {
-      console.log("[WEBHOOK] trasporto accettato");
-    }
+    console.log("[WEBHOOK] stato pagamento aggiornato");
   }
 
   return NextResponse.json({ received: true });
