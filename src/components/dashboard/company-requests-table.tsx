@@ -52,9 +52,8 @@ export function CompanyRequestsTable({
               const isAccepted = Boolean(request.transporterId);
               const contactsUnlocked = request.contactsUnlocked;
               const canCompanyUnlock =
-                request.unlockedByTransporter &&
-                !request.unlockedByCompany &&
-                !request.contactsUnlocked;
+                request.unlockedByTransporter === true &&
+                request.unlockedByCompany === false;
               const statusLabel = isAccepted ? "Accettata" : "In attesa";
               const detailHref = `${basePath}/${request.id}`;
               return (

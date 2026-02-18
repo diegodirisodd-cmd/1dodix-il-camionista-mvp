@@ -64,7 +64,7 @@ export function RequestDetailView({
   const hasPaid =
     role === "COMPANY" ? companyUnlocked : role === "TRANSPORTER" ? transporterUnlocked : true;
   const canCompanyUnlock =
-    role === "COMPANY" && transporterUnlocked && !companyUnlocked && !contactsVisible;
+    role === "COMPANY" && transporterUnlocked === true && companyUnlocked === false;
   const shouldShowCta =
     role === "COMPANY" ? canCompanyUnlock : role === "TRANSPORTER" ? !transporterUnlocked : false;
 
