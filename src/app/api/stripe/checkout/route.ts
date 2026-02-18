@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripeSecret = process.env.STRIPE_SECRET_KEY;
-
 type CheckoutPayload = {
   requestId?: number;
   userRole?: "company" | "transporter";
@@ -11,10 +9,33 @@ type CheckoutPayload = {
 
 export async function POST(request: Request) {
   try {
+    console.log("Stripe unlock called");
+
+    const stripeSecret = process.env.STRIPE_SECRET_KEY;
+
     if (!stripeSecret) {
+      console.error("Missing STRIPE_SECRET_KEY");
       return NextResponse.json(
-        { error: "Stripe non è configurato correttamente." },
+        { error: "Stripe not configured" },
         { status: 500 },
+      );
+    }
+
+    const stripe = new Stripe(stripeSecret, {
+      apiVersion: "2024-06-20",
+    });
+
+    const body = (await request.json()) as CheckoutPayload;
+    const requestId = Number(body.requestId);
+    const userRole = body.userRole;
+    const amount = Number(body.amount);
+
+    console.log("Incoming data:", { requestId, userRole, amount });
+
+    if (!requestId || !amount) {
+      return NextResponse.json(
+        { error: "Invalid parameters" },
+        { status: 400 },
       );
     }
 
@@ -23,64 +44,46 @@ export async function POST(request: Request) {
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
 
     if (!baseUrl) {
+      console.error("Missing base URL");
       return NextResponse.json(
-        { error: "NEXT_PUBLIC_SITE_URL non configurata." },
+        { error: "Missing base URL" },
         { status: 500 },
       );
     }
 
-    const body = (await request.json()) as CheckoutPayload;
-    const requestId = Number(body.requestId);
-    const userRole = body.userRole;
-    const amount = Number(body?.amount);
-
-    if (!Number.isFinite(requestId)) {
-      return NextResponse.json({ error: "Parametri non validi." }, { status: 400 });
-    }
-
-    if (userRole !== "company") {
-      return NextResponse.json({ error: "Ruolo non valido." }, { status: 400 });
-    }
-
-    if (!amount || !Number.isInteger(amount) || amount <= 0) {
-      return NextResponse.json({ error: "Importo non valido." }, { status: 400 });
-    }
-
-    const stripe = new Stripe(stripeSecret, { apiVersion: "2024-06-20" });
-
-    console.log("Creating Stripe session for request:", requestId);
-
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
       mode: "payment",
-      metadata: {
-        requestId: String(requestId),
-        role: "company",
-      },
+      payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
             currency: "eur",
             product_data: {
               name: "Sblocco contatti",
-              description: "Commissione di servizio Dodix",
             },
             unit_amount: amount,
           },
           quantity: 1,
         },
       ],
-      success_url: `${baseUrl}/dashboard/stripe/success?requestId=${requestId}&role=company`,
-      cancel_url: `${baseUrl}/dashboard/stripe/cancel?requestId=${requestId}`,
+      metadata: {
+        requestId: String(requestId),
+        role: userRole,
+      },
+      success_url: `${baseUrl}/dashboard/stripe/success?requestId=${requestId}&role=${userRole}`,
+      cancel_url: `${baseUrl}/dashboard/company/requests`,
     });
 
     if (!session.url) {
-      return NextResponse.json({ error: "URL checkout non disponibile." }, { status: 500 });
+      throw new Error("Stripe session missing URL");
     }
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error("Errore Stripe Checkout", error);
-    return NextResponse.json({ error: "Impossibile avviare il checkout." }, { status: 500 });
+    console.error("Stripe unlock error:", error);
+    return NextResponse.json(
+      { error: "Stripe internal error" },
+      { status: 500 },
+    );
   }
 }
