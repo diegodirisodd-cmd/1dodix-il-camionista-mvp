@@ -48,6 +48,8 @@ export async function POST(request: Request) {
 
     const stripe = new Stripe(stripeSecret, { apiVersion: "2024-06-20" });
 
+    console.log("Creating Stripe session for request:", requestId);
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",

@@ -133,22 +133,34 @@ export function RequestDetailView({
         return;
       }
 
-      const response = await fetch("/api/stripe/unlock", {
+      const response = await fetch(role === "COMPANY" ? "/api/stripe/checkout" : "/api/stripe/unlock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ requestId }),
+        body: JSON.stringify(
+          role === "COMPANY"
+            ? {
+                requestId,
+                userRole: "company",
+                amount: totalCents,
+              }
+            : { requestId },
+        ),
       });
+
       if (!response.ok) {
-        console.error("Errore sblocco contatti", await response.text());
+        console.error("Stripe API error", await response.text());
         alert("Impossibile avviare il pagamento per lo sblocco contatti.");
         return;
       }
+
       const payload = (await response.json()) as { url?: string };
-      if (payload.url) {
+
+      if (payload?.url) {
         window.location.href = payload.url;
-        return;
+      } else {
+        console.error("No Stripe URL returned");
+        alert("URL pagamento non disponibile.");
       }
-      alert("URL pagamento non disponibile.");
     } catch (error) {
       console.error("Errore sblocco contatti", error);
       alert("Impossibile avviare il pagamento per lo sblocco contatti.");
