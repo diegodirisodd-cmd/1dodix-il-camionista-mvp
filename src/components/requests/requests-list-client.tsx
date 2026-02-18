@@ -15,6 +15,8 @@ type RequestApiItem = {
   createdAt: string;
   transporterId: number | null;
   contactsUnlocked: boolean;
+  unlockedByCompany: boolean;
+  unlockedByTransporter: boolean;
   companyId: number;
 };
 
@@ -115,6 +117,8 @@ export function RequestsListClient({ role, basePath, variant, emptyMessage }: Re
           transporterId: request.transporterId,
           contactsUnlocked: request.contactsUnlocked,
           createdAt: request.createdAt,
+          unlockedByCompany: request.unlockedByCompany,
+          unlockedByTransporter: request.unlockedByTransporter,
         }))}
         role={role}
         basePath={basePath}
