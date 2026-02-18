@@ -32,9 +32,23 @@ export async function POST(request: Request) {
 
     console.log("Incoming data:", { requestId, userRole, amount });
 
-    if (!requestId || !amount) {
+    if (!requestId || !amount || !userRole) {
       return NextResponse.json(
-        { error: "Invalid parameters" },
+        { error: "Parametri non validi." },
+        { status: 400 },
+      );
+    }
+
+    if (!Number.isFinite(requestId) || !Number.isFinite(amount) || amount <= 0) {
+      return NextResponse.json(
+        { error: "Parametri non validi." },
+        { status: 400 },
+      );
+    }
+
+    if (userRole !== "company" && userRole !== "transporter") {
+      return NextResponse.json(
+        { error: "Parametri non validi." },
         { status: 400 },
       );
     }
@@ -51,7 +65,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const params: Stripe.Checkout.SessionCreateParams = {
       mode: "payment",
       payment_method_types: ["card"],
       line_items: [
@@ -68,11 +82,13 @@ export async function POST(request: Request) {
       ],
       metadata: {
         requestId: String(requestId),
-        role: userRole,
+        role: String(userRole),
       },
       success_url: `${baseUrl}/dashboard/stripe/success?requestId=${requestId}&role=${userRole}`,
       cancel_url: `${baseUrl}/dashboard/company/requests`,
-    });
+    };
+
+    const session = await stripe.checkout.sessions.create(params);
 
     if (!session.url) {
       throw new Error("Stripe session missing URL");
