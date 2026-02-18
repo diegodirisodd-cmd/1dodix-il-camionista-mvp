@@ -25,6 +25,8 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
     price: number;
     transporterId: number | null;
     unlockedByCompany: boolean;
+    unlockedByTransporter: boolean;
+    contactsUnlocked: boolean;
     createdAt: Date;
   }[] = [];
   let loadError: string | null = null;
@@ -43,6 +45,8 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
         price: true,
         transporterId: true,
         unlockedByCompany: true,
+        unlockedByTransporter: true,
+        contactsUnlocked: true,
         createdAt: true,
       },
     });
@@ -112,7 +116,9 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
             cargo: request.cargo,
             priceCents: request.price,
             transporterId: request.transporterId,
-            contactsUnlocked: request.unlockedByCompany,
+            unlockedByCompany: request.unlockedByCompany,
+            unlockedByTransporter: request.unlockedByTransporter,
+            contactsUnlocked: request.contactsUnlocked,
             createdAt: request.createdAt.toISOString(),
           }))}
           role={user.role}

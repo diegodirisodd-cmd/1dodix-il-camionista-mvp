@@ -11,6 +11,8 @@ type RequestRow = {
   id: number;
   priceCents: number;
   transporterId: number | null;
+  unlockedByCompany: boolean;
+  unlockedByTransporter: boolean;
   contactsUnlocked: boolean;
   createdAt: string;
   pickup: string;
@@ -49,6 +51,10 @@ export function CompanyRequestsTable({
             {items.map((request) => {
               const isAccepted = Boolean(request.transporterId);
               const contactsUnlocked = request.contactsUnlocked;
+              const canCompanyUnlock =
+                request.unlockedByTransporter &&
+                !request.unlockedByCompany &&
+                !request.contactsUnlocked;
               const statusLabel = isAccepted ? "Accettata" : "In attesa";
               const detailHref = `${basePath}/${request.id}`;
               return (
@@ -101,7 +107,14 @@ export function CompanyRequestsTable({
                     )}
                   </td>
                   <td className="text-[#475569]">
-                    {isAccepted ? (
+                    {canCompanyUnlock ? (
+                      <Link
+                        href={detailHref}
+                        className="inline-flex items-center justify-center rounded-full bg-brand px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-hover"
+                      >
+                        Sblocca contatti
+                      </Link>
+                    ) : isAccepted ? (
                       <Link
                         href={detailHref}
                         className="inline-flex items-center justify-center rounded-full bg-brand px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-hover"

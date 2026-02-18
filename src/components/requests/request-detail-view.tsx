@@ -63,8 +63,10 @@ export function RequestDetailView({
   const contactsVisible = contactsUnlocked;
   const hasPaid =
     role === "COMPANY" ? companyUnlocked : role === "TRANSPORTER" ? transporterUnlocked : true;
+  const canCompanyUnlock =
+    role === "COMPANY" && transporterUnlocked && !companyUnlocked && !contactsVisible;
   const shouldShowCta =
-    role === "COMPANY" ? !companyUnlocked : role === "TRANSPORTER" ? !transporterUnlocked : false;
+    role === "COMPANY" ? canCompanyUnlock : role === "TRANSPORTER" ? !transporterUnlocked : false;
 
   const contactHeadline = useMemo(
     () => (role === "TRANSPORTER" ? "Referente aziendale" : "Referente trasportatore"),
