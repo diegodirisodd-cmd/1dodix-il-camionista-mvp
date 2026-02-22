@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
+import { getSessionUser } from "@/lib/auth";
+
 type CheckoutPayload = {
   requestId?: number;
   userRole?: "company" | "transporter";
@@ -10,6 +12,15 @@ type CheckoutPayload = {
 export async function POST(request: Request) {
   try {
     console.log("Stripe unlock called");
+
+    const sessionUser = await getSessionUser();
+
+    if (!sessionUser?.id) {
+      return NextResponse.json(
+        { error: "Non autorizzato." },
+        { status: 401 },
+      );
+    }
 
     const stripeSecret = process.env.STRIPE_SECRET_KEY;
 
@@ -25,7 +36,15 @@ export async function POST(request: Request) {
       apiVersion: "2024-06-20",
     });
 
-    const body = (await request.json()) as CheckoutPayload;
+    const body = (await request.json().catch(() => null)) as CheckoutPayload | null;
+
+    if (!body || body.requestId === undefined || body.amount === undefined || !body.userRole) {
+      return NextResponse.json(
+        { error: "Parametri non validi." },
+        { status: 400 },
+      );
+    }
+
     const requestId = Number(body.requestId);
     const userRole = body.userRole;
     const amount = Number(body.amount);
@@ -54,16 +73,10 @@ export async function POST(request: Request) {
     }
 
     const baseUrl =
-      process.env.NEXT_PUBLIC_SITE_URL ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
-
-    if (!baseUrl) {
-      console.error("Missing base URL");
-      return NextResponse.json(
-        { error: "Missing base URL" },
-        { status: 500 },
-      );
-    }
+      process.env.NEXT_PUBLIC_SITE_URL ??
+      (process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : "http://localhost:3000");
 
     const params: Stripe.Checkout.SessionCreateParams = {
       mode: "payment",
@@ -96,9 +109,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error("Stripe unlock error:", error);
+    console.error("Errore azienda checkout:", error);
     return NextResponse.json(
-      { error: "Stripe internal error" },
+      { error: "Errore interno server." },
       { status: 500 },
     );
   }
