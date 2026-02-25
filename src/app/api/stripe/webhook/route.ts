@@ -70,30 +70,40 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
-    const nextCompanyUnlocked =
-      request.unlockedByCompany || normalizedRole === "COMPANY";
-    const nextTransporterUnlocked =
-      request.unlockedByTransporter || normalizedRole === "TRANSPORTER";
-    const nextContactsUnlocked = nextCompanyUnlocked && nextTransporterUnlocked;
+    if (normalizedRole === "COMPANY" && !request.unlockedByCompany) {
+      await prisma.request.update({
+        where: { id: parsedRequestId },
+        data: {
+          unlockedByCompany: true,
+        },
+      });
+    }
 
-    const nextStatus =
-      nextCompanyUnlocked && nextTransporterUnlocked
-        ? "COMPLETED"
-        : nextTransporterUnlocked
-          ? "TRANSPORTER_PAID"
-          : nextCompanyUnlocked
-            ? "COMPANY_PAID"
-            : "OPEN";
+    if (normalizedRole === "TRANSPORTER" && !request.unlockedByTransporter) {
+      await prisma.request.update({
+        where: { id: parsedRequestId },
+        data: {
+          unlockedByTransporter: true,
+        },
+      });
+    }
 
-    await prisma.request.update({
+    const updatedRequest = await prisma.request.findUnique({
       where: { id: parsedRequestId },
-      data: {
-        unlockedByCompany: nextCompanyUnlocked,
-        unlockedByTransporter: nextTransporterUnlocked,
-        contactsUnlocked: nextContactsUnlocked,
-        status: nextStatus,
+      select: {
+        unlockedByCompany: true,
+        unlockedByTransporter: true,
       },
     });
+
+    if (updatedRequest?.unlockedByCompany && updatedRequest.unlockedByTransporter) {
+      await prisma.request.update({
+        where: { id: parsedRequestId },
+        data: {
+          contactsUnlocked: true,
+        },
+      });
+    }
 
     console.log("[WEBHOOK] stato pagamento aggiornato");
   }
