@@ -39,66 +39,49 @@ export async function POST(req: NextRequest) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const requestId = session.metadata?.requestId;
+
+    const requestId = Number(session.metadata?.requestId);
     const role = session.metadata?.role;
 
-    if (session.payment_status !== "paid") {
+    if (!requestId || !role) {
+      console.error("Missing metadata in Stripe session");
       return NextResponse.json({ received: true });
     }
 
-    console.log("[WEBHOOK] pagamento confermato");
-
-    const parsedRequestId = Number(requestId);
-    if (!Number.isFinite(parsedRequestId) || !role) {
-      return NextResponse.json({ received: true });
-    }
-
-    const normalizedRole = role.toUpperCase();
-    if (normalizedRole !== "COMPANY" && normalizedRole !== "TRANSPORTER") {
-      return NextResponse.json({ received: true });
-    }
-
-    const request = await prisma.request.findUnique({
-      where: { id: parsedRequestId },
-      select: {
-        unlockedByCompany: true,
-        unlockedByTransporter: true,
-      },
+    const existing = await prisma.request.findUnique({
+      where: { id: requestId },
     });
 
-    if (!request) {
+    if (!existing) {
+      console.error("Request not found");
       return NextResponse.json({ received: true });
     }
 
-    if (normalizedRole === "COMPANY" && !request.unlockedByCompany) {
+    if (role === "transporter") {
       await prisma.request.update({
-        where: { id: parsedRequestId },
-        data: {
-          unlockedByCompany: true,
-        },
-      });
-    }
-
-    if (normalizedRole === "TRANSPORTER" && !request.unlockedByTransporter) {
-      await prisma.request.update({
-        where: { id: parsedRequestId },
+        where: { id: requestId },
         data: {
           unlockedByTransporter: true,
         },
       });
     }
 
-    const updatedRequest = await prisma.request.findUnique({
-      where: { id: parsedRequestId },
-      select: {
-        unlockedByCompany: true,
-        unlockedByTransporter: true,
-      },
+    if (role === "company") {
+      await prisma.request.update({
+        where: { id: requestId },
+        data: {
+          unlockedByCompany: true,
+        },
+      });
+    }
+
+    const updated = await prisma.request.findUnique({
+      where: { id: requestId },
     });
 
-    if (updatedRequest?.unlockedByCompany && updatedRequest.unlockedByTransporter) {
+    if (updated?.unlockedByTransporter && updated?.unlockedByCompany) {
       await prisma.request.update({
-        where: { id: parsedRequestId },
+        where: { id: requestId },
         data: {
           contactsUnlocked: true,
         },
