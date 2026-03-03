@@ -56,19 +56,23 @@ export function CompanyRequestsTable({
                 request.unlockedByCompany === false;
               const statusLabel = isAccepted ? "Accettata" : "In attesa";
               const detailHref = `${basePath}/${request.id}`;
+
+              // Company can open detail if accepted OR if they already paid
+              const canOpenDetail = isAccepted || request.unlockedByCompany;
+
               return (
                 <tr
                   key={request.id}
-                  className={!isAccepted ? "bg-white/70" : "cursor-pointer"}
+                  className={isAccepted ? "bg-white/70" : "cursor-pointer"}
                   onClick={() => {
-                    if (isAccepted) {
+                    if (canOpenDetail) {
                       router.push(detailHref);
                     }
                   }}
                 >
                   <td className="font-semibold text-[#0f172a]">Richiesta #{request.id}</td>
                   <td className="text-[#475569]">{request.pickup} → {request.delivery}</td>
-                  <td className="text-[#475569]">{request.cargo ?? "—"}</td>
+                  <td className="text-[#475569]">{request.cargo ?? "–"}</td>
                   <td className="text-[#475569]">{formatCurrency(request.priceCents)}</td>
                   <td className="space-y-1 text-[#475569]">
                     {contactsUnlocked ? (
@@ -90,16 +94,16 @@ export function CompanyRequestsTable({
                         <div className="text-xs text-[#64748b]">I contatti saranno visibili quando un trasportatore accetta.</div>
                         <div className="space-y-1 text-xs text-[#475569]">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-[#64748b]">⏳</span>
+                            <span className="text-xs text-[#64748b]">👤</span>
                             <span className="blur-[1px]">Referente nascosto</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-[#64748b]">⏳</span>
+                            <span className="text-xs text-[#64748b]">📧</span>
                             <span className="blur-[1px]">••••@••••</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-[#64748b]">⏳</span>
-                            <span className="blur-[1px]">••••••</span>
+                            <span className="text-xs text-[#64748b]">📞</span>
+                            <span className="blur-[1px]">•••••••</span>
                           </div>
                         </div>
                       </div>
@@ -113,7 +117,7 @@ export function CompanyRequestsTable({
                       >
                         Sblocca contatti
                       </Link>
-                    ) : isAccepted ? (
+                    ) : canOpenDetail ? (
                       <Link
                         href={detailHref}
                         className="inline-flex items-center justify-center rounded-full bg-brand px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-hover"
@@ -136,7 +140,6 @@ export function CompanyRequestsTable({
           </tbody>
         </table>
       </div>
-
     </div>
   );
 }
