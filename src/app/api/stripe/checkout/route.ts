@@ -96,6 +96,7 @@ export async function POST(request: Request) {
       metadata: {
         requestId: String(requestId),
         role: String(userRole),
+        userId: String(sessionUser.id),
       },
       success_url: `${baseUrl}/dashboard/stripe/success?requestId=${requestId}&role=${userRole}`,
       cancel_url: `${baseUrl}/dashboard/company/requests`,
@@ -103,15 +104,13 @@ export async function POST(request: Request) {
 
     const session = await stripe.checkout.sessions.create(params);
 
-    if (!session.url) {
-      throw new Error("Stripe session missing URL");
-    }
+    console.log("Stripe session created:", session.id);
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error("Errore azienda checkout:", error);
+    console.error("Stripe checkout error:", error);
     return NextResponse.json(
-      { error: "Errore interno server." },
+      { error: "Errore interno del server." },
       { status: 500 },
     );
   }
