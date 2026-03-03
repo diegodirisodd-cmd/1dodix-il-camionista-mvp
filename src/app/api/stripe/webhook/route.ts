@@ -1,100 +1,115 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 import { prisma } from "@/lib/prisma";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-06-20",
-});
+const stripeSecret = process.env.STRIPE_SECRET_KEY;
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-export async function POST(request: Request) {
-  const body = await request.text(); // MUST be raw body
+const stripe = stripeSecret
+  ? new Stripe(stripeSecret, { apiVersion: "2024-06-20" })
+  : null;
 
-  const signature = request.headers.get("stripe-signature");
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+export async function POST(req: NextRequest) {
+  if (!stripe || !stripeSecret || !webhookSecret) {
+    return NextResponse.json({ error: "Stripe non configurato." }, { status: 500 });
+  }
+
+  const signature = req.headers.get("stripe-signature");
 
   if (!signature) {
-    console.error("Missing stripe-signature header");
-    return new NextResponse("Missing stripe-signature header", { status: 400 });
+    return NextResponse.json({ error: "Firma mancante" }, { status: 400 });
   }
+
+  const payload = await req.text();
 
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    console.error("Webhook signature verification failed:", message);
-    return new NextResponse("Webhook Error", { status: 400 });
+    event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+  } catch (error) {
+    console.error("Errore webhook Stripe", error);
+    return new NextResponse(`Webhook Error: ${(error as Error).message}`, { status: 400 });
   }
 
-  console.log("[WEBHOOK] Stripe event received:", event.type);
+  console.log("[WEBHOOK] evento ricevuto", event.type);
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
+    const requestId = session.metadata?.requestId;
+    const role = session.metadata?.role;
+    const userId = session.metadata?.userId;
 
     if (session.payment_status !== "paid") {
-      console.log("[WEBHOOK] Payment not completed, skipping");
       return NextResponse.json({ received: true });
     }
 
-    const requestId = Number(session.metadata?.requestId);
-    const role = session.metadata?.role;
+    console.log("[WEBHOOK] pagamento confermato");
 
-    console.log("[WEBHOOK] Payment completed:", { requestId, role });
-
-    if (!Number.isFinite(requestId) || requestId <= 0) {
-      console.error("[WEBHOOK] Invalid requestId:", session.metadata?.requestId);
+    const parsedRequestId = Number(requestId);
+    if (!Number.isFinite(parsedRequestId) || !role) {
       return NextResponse.json({ received: true });
     }
 
-    if (!role || (role !== "company" && role !== "transporter")) {
-      console.error("[WEBHOOK] Invalid role:", role);
+    const normalizedRole = role.toUpperCase();
+    if (normalizedRole !== "COMPANY" && normalizedRole !== "TRANSPORTER") {
       return NextResponse.json({ received: true });
     }
 
-    try {
-      if (role === "company") {
-        await prisma.request.update({
-          where: { id: requestId },
-          data: { unlockedByCompany: true },
-        });
-      } else {
-        await prisma.request.update({
-          where: { id: requestId },
-          data: { unlockedByTransporter: true },
-        });
+    const request = await prisma.request.findUnique({
+      where: { id: parsedRequestId },
+      select: {
+        unlockedByCompany: true,
+        unlockedByTransporter: true,
+        transporterId: true,
+      },
+    });
+
+    if (!request) {
+      return NextResponse.json({ received: true });
+    }
+
+    const nextCompanyUnlocked =
+      request.unlockedByCompany || normalizedRole === "COMPANY";
+    const nextTransporterUnlocked =
+      request.unlockedByTransporter || normalizedRole === "TRANSPORTER";
+    const nextContactsUnlocked = nextCompanyUnlocked && nextTransporterUnlocked;
+
+    const nextStatus =
+      nextCompanyUnlocked && nextTransporterUnlocked
+        ? "COMPLETED"
+        : nextTransporterUnlocked
+          ? "TRANSPORTER_PAID"
+          : nextCompanyUnlocked
+            ? "COMPANY_PAID"
+            : "OPEN";
+
+    // Build update data
+    const updateData: Record<string, unknown> = {
+      unlockedByCompany: nextCompanyUnlocked,
+      unlockedByTransporter: nextTransporterUnlocked,
+      contactsUnlocked: nextContactsUnlocked,
+      status: nextStatus,
+    };
+
+    // If transporter paid and no transporter assigned yet, assign them
+    if (normalizedRole === "TRANSPORTER" && userId && !request.transporterId) {
+      const parsedUserId = Number(userId);
+      if (Number.isFinite(parsedUserId)) {
+        updateData.transporterId = parsedUserId;
+        updateData.acceptedAt = new Date();
       }
-
-      const result = await prisma.request.updateMany({
-        where: {
-          id: requestId,
-          unlockedByCompany: true,
-          unlockedByTransporter: true,
-        },
-        data: {
-          contactsUnlocked: true,
-          status: "COMPLETED",
-        },
-      });
-
-      if (result.count > 0) {
-        console.log("[WEBHOOK] Both paid! Contacts unlocked for request " + requestId);
-      } else {
-        const partialStatus = role === "company" ? "COMPANY_PAID" : "TRANSPORTER_PAID";
-        await prisma.request.update({
-          where: { id: requestId },
-          data: { status: partialStatus },
-        });
-        console.log("[WEBHOOK] Partial unlock: " + partialStatus + " for request " + requestId);
-      }
-    } catch (dbError) {
-      console.error("[WEBHOOK] Database error:", dbError);
-      return new NextResponse("Database error", { status: 500 });
     }
+
+    await prisma.request.update({
+      where: { id: parsedRequestId },
+      data: updateData,
+    });
+
+    console.log("[WEBHOOK] stato pagamento aggiornato", { requestId: parsedRequestId, role: normalizedRole, userId });
   }
 
   return NextResponse.json({ received: true });
