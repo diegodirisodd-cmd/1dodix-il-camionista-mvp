@@ -10,7 +10,7 @@ const euroFormatter = new Intl.NumberFormat("it-IT", {
   style: "currency",
   currency: "EUR",
   minimumFractionDigits: 2,
-});
+});h
 
 type RequestDetailViewProps = {
   requestId: number;
@@ -241,7 +241,7 @@ export function RequestDetailView({
         </div>
       </div>
 
-      {role === "COMPANY" && isAccepted && contactsVisible && (
+      {role === "COMPANY" && contactsVisible && (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
           <p className="font-semibold">Trasporto accettato</p>
           <p className="text-sm text-[#475569]">
