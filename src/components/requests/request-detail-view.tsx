@@ -10,7 +10,7 @@ const euroFormatter = new Intl.NumberFormat("it-IT", {
   style: "currency",
   currency: "EUR",
   minimumFractionDigits: 2,
-});h
+});
 
 type RequestDetailViewProps = {
   requestId: number;
