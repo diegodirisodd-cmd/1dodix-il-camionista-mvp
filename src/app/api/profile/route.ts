@@ -10,7 +10,7 @@ const PROFILE_FIELDS = [
     "vatNumber",
     "address",
     "city",
-    "province",h
+    "province",
     "zipCode",
     "country",
     "contactPerson",
