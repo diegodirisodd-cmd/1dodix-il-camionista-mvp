@@ -52,6 +52,7 @@ I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato 
 ## Prerequisiti
 - Node.js 18+
 - npm (o altro package manager compatibile)
+- Un database PostgreSQL raggiungibile
 
 ## Setup locale
 1. **Installazione dipendenze**
