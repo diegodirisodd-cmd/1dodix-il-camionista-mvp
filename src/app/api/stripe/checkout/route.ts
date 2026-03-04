@@ -3,57 +3,115 @@ import Stripe from "stripe";
 
 import { getSessionUser } from "@/lib/auth";
 
-const stripeSecret = process.env.STRIPE_SECRET_KEY;
-const priceId = process.env.STRIPE_PRICE_ID;
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+type CheckoutPayload = {
+  requestId?: number;
+  userRole?: "company" | "transporter";
+  amount?: number;
+};
 
-const stripe = stripeSecret
-  ? new Stripe(stripeSecret, { apiVersion: "2024-06-20" })
-  : null;
-
-export async function POST() {
-  if (!stripe || !stripeSecret || !priceId) {
-    return NextResponse.json(
-      { error: "Stripe non è configurato correttamente." },
-      { status: 500 },
-    );
-  }
-
-  const user = await getSessionUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Non autenticato." }, { status: 401 });
-  }
-
-  if (user.subscriptionActive) {
-    return NextResponse.json({ url: `${appUrl}/dashboard?checkout=active` });
-  }
-
+export async function POST(request: Request) {
   try {
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      customer_email: user.email,
+    console.log("Stripe unlock called");
+
+    const sessionUser = await getSessionUser();
+
+    if (!sessionUser?.id) {
+      return NextResponse.json(
+        { error: "Non autorizzato." },
+        { status: 401 },
+      );
+    }
+
+    const stripeSecret = process.env.STRIPE_SECRET_KEY;
+
+    if (!stripeSecret) {
+      console.error("Missing STRIPE_SECRET_KEY");
+      return NextResponse.json(
+        { error: "Stripe not configured" },
+        { status: 500 },
+      );
+    }
+
+    const stripe = new Stripe(stripeSecret, {
+      apiVersion: "2024-06-20",
+    });
+
+    const body = (await request.json().catch(() => null)) as CheckoutPayload | null;
+
+    if (!body || body.requestId === undefined || body.amount === undefined || !body.userRole) {
+      return NextResponse.json(
+        { error: "Parametri non validi." },
+        { status: 400 },
+      );
+    }
+
+    const requestId = Number(body.requestId);
+    const userRole = body.userRole;
+    const amount = Number(body.amount);
+
+    console.log("Incoming data:", { requestId, userRole, amount });
+
+    if (!requestId || !amount || !userRole) {
+      return NextResponse.json(
+        { error: "Parametri non validi." },
+        { status: 400 },
+      );
+    }
+
+    if (!Number.isFinite(requestId) || !Number.isFinite(amount) || amount <= 0) {
+      return NextResponse.json(
+        { error: "Parametri non validi." },
+        { status: 400 },
+      );
+    }
+
+    if (userRole !== "company" && userRole !== "transporter") {
+      return NextResponse.json(
+        { error: "Parametri non validi." },
+        { status: 400 },
+      );
+    }
+
+    const baseUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ??
+      (process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : "http://localhost:3000");
+
+    const params: Stripe.Checkout.SessionCreateParams = {
+      mode: "payment",
+      payment_method_types: ["card"],
       line_items: [
         {
-          price: priceId,
+          price_data: {
+            currency: "eur",
+            product_data: {
+              name: "Sblocco contatti",
+            },
+            unit_amount: amount,
+          },
           quantity: 1,
         },
       ],
-      success_url: `${appUrl}/dashboard?checkout=success`,
-      cancel_url: `${appUrl}/dashboard/billing`,
       metadata: {
-        userId: String(user.id),
-        role: user.role,
+        requestId: String(requestId),
+        role: String(userRole),
+        userId: String(sessionUser.id),
       },
-    });
+      success_url: `${baseUrl}/dashboard/stripe/success?requestId=${requestId}&role=${userRole}`,
+      cancel_url: `${baseUrl}/dashboard/company/requests`,
+    };
 
-    if (!session.url) {
-      return NextResponse.json({ error: "URL checkout non disponibile." }, { status: 500 });
-    }
+    const session = await stripe.checkout.sessions.create(params);
+
+    console.log("Stripe session created:", session.id);
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error("Errore Stripe Checkout", error);
-    return NextResponse.json({ error: "Impossibile avviare il checkout." }, { status: 500 });
+    console.error("Stripe checkout error:", error);
+    return NextResponse.json(
+      { error: "Errore interno del server." },
+      { status: 500 },
+    );
   }
 }

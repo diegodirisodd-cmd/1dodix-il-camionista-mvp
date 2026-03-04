@@ -12,7 +12,7 @@ export default async function OnboardingPage() {
   }
 
   if (user.onboardingCompleted) {
-    redirect(routeForUser({ role: user.role, onboardingCompleted: true }));
+    redirect(routeForUser(user.role));
   }
 
   return (

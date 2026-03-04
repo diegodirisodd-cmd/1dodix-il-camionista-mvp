@@ -75,7 +75,7 @@ export default function HomePage() {
         <section className="grid gap-6 lg:grid-cols-2">
           <div className="space-y-4 rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
             <div className="space-y-2">
-              <h2 className="text-xl font-semibold text-[#0f172a]">Sei un’azienda che deve spedire?</h2>
+              <h2 className="text-xl font-semibold text-[#0f172a]">Sei un&apos;azienda che deve spedire?</h2>
               <p className="text-sm leading-relaxed text-[#475569]">
                 Pubblica incarichi e ricevi contatti verificati in modo diretto e misurabile.
               </p>
@@ -123,7 +123,7 @@ export default function HomePage() {
         <section className="space-y-4 rounded-3xl border border-[#e2e8f0] bg-white p-10 text-center shadow-sm">
           <h2 className="text-3xl font-semibold text-[#0f172a]">Inizia ora su DodiX – Il Camionista</h2>
           <p className="text-base leading-relaxed text-[#475569]">
-            Contatti diretti, operatori verificati e gestione completa in un’unica piattaforma.
+            Contatti diretti, operatori verificati e gestione completa in un&apos;unica piattaforma.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link

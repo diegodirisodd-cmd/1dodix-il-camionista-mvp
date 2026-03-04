@@ -9,7 +9,7 @@ export default async function PublicLayout({ children }: { children: React.React
   const sessionUser = await getSessionUser();
 
   if (sessionUser) {
-    redirect(routeForUser({ role: sessionUser.role, onboardingCompleted: sessionUser.onboardingCompleted }));
+    redirect(routeForUser(sessionUser.role));
   }
 
   return (
