@@ -8,12 +8,25 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  phone     String?
-  role      String   @default("COMPANY")
-  createdAt DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  password      String
+  phone         String?
+  role          String   @default("COMPANY")
+  createdAt     DateTime @default(now())
+
+  // Profilo utente
+  firstName     String?
+  lastName      String?
+  companyName   String?
+  vatNumber     String?
+  address       String?
+  city          String?
+  province      String?
+  zipCode       String?
+  country       String?  @default("IT")
+  contactPerson String?
+  avatarUrl     String?
 
   companyRequests     Request[] @relation("CompanyRequests")
   transporterRequests Request[] @relation("TransporterJobs")
