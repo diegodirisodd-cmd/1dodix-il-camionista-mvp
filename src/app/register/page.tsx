@@ -64,8 +64,8 @@ export default function RegisterPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Onboarding</p>
         <h1>Registrati</h1>
         <p className="mx-auto max-w-3xl text-neutral-100/80">
-          Crea un account con email, password e ruolo operativo per accedere a richieste e contatti. L&apos;abbonamento è richiesto
-          per l&apos;uso della piattaforma.
+          Crea un account con i tuoi dati aziendali per accedere a richieste e contatti.
+          L&apos;abbonamento Ã¨ richiesto per l&apos;uso della piattaforma.
         </p>
       </header>
 
@@ -74,7 +74,7 @@ export default function RegisterPage() {
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-brand-50">Dati account</h3>
             <p className="text-sm text-neutral-100/80">
-              Compila i campi obbligatori. Gli errori saranno evidenziati per permetterti di correggere velocemente.
+              Compila i campi obbligatori. I campi con * sono richiesti.
             </p>
           </div>
 
@@ -90,74 +90,112 @@ export default function RegisterPage() {
           )}
 
           <form className="space-y-5" action={handleSubmit}>
-            <div className="form-field">
-              <label className="label" htmlFor="name">
-                Nome o ragione sociale
-              </label>
-              <input className="input-field" id="name" name="name" type="text" required autoComplete="organization" />
-              <p className="text-xs text-neutral-100/70">Inserisci il nominativo con cui operi sulla piattaforma.</p>
+            {/* --- Sezione Dati Personali --- */}
+            <div className="space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-widest text-accent-200">Dati personali</p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="form-field">
+                <label className="label" htmlFor="firstName">Nome *</label>
+                <input className="input-field" id="firstName" name="firstName" type="text" required autoComplete="given-name" />
+              </div>
+              <div className="form-field">
+                <label className="label" htmlFor="lastName">Cognome *</label>
+                <input className="input-field" id="lastName" name="lastName" type="text" required autoComplete="family-name" />
+              </div>
             </div>
 
             <div className="form-field">
-              <label className="label" htmlFor="email">
-                Email
-              </label>
+              <label className="label" htmlFor="email">Email *</label>
               <input className="input-field" id="email" name="email" type="email" required autoComplete="email" />
-              <p className="text-xs text-neutral-100/70">Usa un indirizzo aziendale valido: verrà usato per gli avvisi e il login.</p>
+              <p className="text-xs text-neutral-100/70">Usa un indirizzo aziendale valido: verr&agrave; usato per gli avvisi e il login.</p>
             </div>
 
             <div className="form-field">
-              <label className="label" htmlFor="password">
-                Password
-              </label>
-              <input
-                className="input-field"
-                id="password"
-                name="password"
-                type="password"
-                minLength={6}
-                required
-                autoComplete="new-password"
-              />
-              <p className="text-xs text-neutral-100/70">Almeno 6 caratteri. Mantieni la password protetta.</p>
+              <label className="label" htmlFor="password">Password *</label>
+              <input className="input-field" id="password" name="password" type="password" minLength={6} required autoComplete="new-password" />
+              <p className="text-xs text-neutral-100/70">Almeno 6 caratteri.</p>
             </div>
 
             <div className="form-field">
-              <label className="label" htmlFor="phone">
-                Telefono (opzionale)
-              </label>
-              <input className="input-field" id="phone" name="phone" type="tel" autoComplete="tel" />
-              <p className="text-xs text-neutral-100/70">Verrà usato per i contatti diretti. Puoi aggiornarlo in seguito.</p>
+              <label className="label" htmlFor="phone">Telefono</label>
+              <input className="input-field" id="phone" name="phone" type="tel" autoComplete="tel" placeholder="+39 ..." />
+              <p className="text-xs text-neutral-100/70">Verr&agrave; usato per i contatti diretti.</p>
+            </div>
+
+            {/* --- Sezione Dati Aziendali --- */}
+            <div className="space-y-1 pt-2">
+              <p className="text-xs font-semibold uppercase tracking-widest text-accent-200">Dati aziendali</p>
             </div>
 
             <div className="form-field">
-              <label className="label" htmlFor="operatingArea">
-                Area operativa
-              </label>
-              <input
-                className="input-field"
-                id="operatingArea"
-                name="operatingArea"
-                type="text"
-                required
-                placeholder="Es. Nord Italia, Lombardia"
-              />
-              <p className="text-xs text-neutral-100/70">Indica l&apos;area geografica in cui operi abitualmente.</p>
+              <label className="label" htmlFor="companyName">Ragione sociale *</label>
+              <input className="input-field" id="companyName" name="companyName" type="text" required autoComplete="organization" />
             </div>
 
             <div className="form-field">
-              <label className="label" htmlFor="role">
-                Ruolo
-              </label>
+              <label className="label" htmlFor="vatNumber">Partita IVA *</label>
+              <input className="input-field" id="vatNumber" name="vatNumber" type="text" required placeholder="IT12345678901" pattern="[A-Za-z]{0,2}[0-9]{11,13}" title="Inserisci una partita IVA valida (es. IT12345678901)" />
+            </div>
+
+            <div className="form-field">
+              <label className="label" htmlFor="contactPerson">Persona di contatto</label>
+              <input className="input-field" id="contactPerson" name="contactPerson" type="text" autoComplete="name" />
+              <p className="text-xs text-neutral-100/70">Referente per le comunicazioni operative.</p>
+            </div>
+
+            {/* --- Sezione Sede --- */}
+            <div className="space-y-1 pt-2">
+              <p className="text-xs font-semibold uppercase tracking-widest text-accent-200">Sede operativa</p>
+            </div>
+
+            <div className="form-field">
+              <label className="label" htmlFor="address">Indirizzo *</label>
+              <input className="input-field" id="address" name="address" type="text" required autoComplete="street-address" placeholder="Via Roma 1" />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="form-field sm:col-span-1">
+                <label className="label" htmlFor="city">Citt&agrave; *</label>
+                <input className="input-field" id="city" name="city" type="text" required autoComplete="address-level2" />
+              </div>
+              <div className="form-field">
+                <label className="label" htmlFor="province">Provincia *</label>
+                <input className="input-field" id="province" name="province" type="text" required maxLength={2} placeholder="MI" autoComplete="address-level1" />
+              </div>
+              <div className="form-field">
+                <label className="label" htmlFor="zipCode">CAP *</label>
+                <input className="input-field" id="zipCode" name="zipCode" type="text" required pattern="[0-9]{5}" title="Inserisci un CAP valido (5 cifre)" placeholder="20100" autoComplete="postal-code" />
+              </div>
+            </div>
+
+            <div className="form-field">
+              <label className="label" htmlFor="country">Paese</label>
+              <select className="input-field" id="country" name="country" defaultValue="IT" autoComplete="country">
+                <option value="IT">Italia</option>
+                <option value="FR">Francia</option>
+                <option value="DE">Germania</option>
+                <option value="ES">Spagna</option>
+                <option value="AT">Austria</option>
+                <option value="CH">Svizzera</option>
+              </select>
+            </div>
+
+            {/* --- Ruolo --- */}
+            <div className="space-y-1 pt-2">
+              <p className="text-xs font-semibold uppercase tracking-widest text-accent-200">Tipo account</p>
+            </div>
+
+            <div className="form-field">
+              <label className="label" htmlFor="role">Ruolo *</label>
               <select className="input-field" id="role" name="role" required defaultValue="">
-                <option value="" disabled>
-                  Seleziona un ruolo
-                </option>
-                <option value="company">Azienda</option>
-                <option value="transporter">Trasportatore</option>
+                <option value="" disabled>Seleziona un ruolo</option>
+                <option value="company">Azienda (spedisco merce)</option>
+                <option value="transporter">Trasportatore (trasporto merce)</option>
               </select>
               <p className="text-xs text-neutral-100/70">
-                Il ruolo guida la navigazione (dashboard azienda o trasportatore) e i permessi disponibili.
+                Il ruolo determina la tua dashboard e i permessi disponibili.
               </p>
             </div>
 
@@ -166,7 +204,8 @@ export default function RegisterPage() {
                 {isPending ? "Creazione in corso..." : "Crea account"}
               </button>
               <span className="text-sm text-neutral-100/80">
-                Hai già un account? <Link className="text-accent-200 underline" href="/login">Accedi</Link>
+                Hai gi&agrave; un account?{" "}
+                <Link className="text-accent-200 underline" href="/login">Accedi</Link>
               </span>
             </div>
           </form>
@@ -181,17 +220,16 @@ export default function RegisterPage() {
             </li>
             <li className="flex items-start gap-3">
               <span className="badge">Abbonamento</span>
-              <span>È obbligatorio per accedere ai contatti e ai dati sensibili.</span>
+              <span>&Egrave; obbligatorio per accedere ai contatti e ai dati sensibili.</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="badge">Supporto</span>
               <span>Assistenza via dashboard per verifiche e aggiornamenti account.</span>
             </li>
           </ul>
-
           <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-neutral-100/80">
-            Dopo la registrazione verrai indirizzato alla dashboard: da lì potrai completare l&apos;abbonamento Stripe se non è già
-            attivo.
+            Dopo la registrazione verrai indirizzato alla dashboard: da l&igrave; potrai completare
+            l&apos;abbonamento Stripe se non &egrave; gi&agrave; attivo.
           </div>
         </div>
       </div>
