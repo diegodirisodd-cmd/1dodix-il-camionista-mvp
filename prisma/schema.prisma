@@ -8,12 +8,12 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
-  password      String
-  phone         String?
-  role          String   @default("COMPANY")
-  createdAt     DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  phone     String?
+  role      String   @default("COMPANY")
+  createdAt DateTime @default(now())
 
   // Profilo utente
   firstName     String?
@@ -24,7 +24,7 @@ model User {
   city          String?
   province      String?
   zipCode       String?
-  country       String?  @default("IT")
+  country       String? @default("IT")
   contactPerson String?
   avatarUrl     String?
 
@@ -33,21 +33,38 @@ model User {
 }
 
 model Request {
-  id                    Int       @id @default(autoincrement())
-  pickup                String
-  delivery              String
-  cargo                 String?
-  description           String?
-  price                 Int
-  companyId             Int
-  transporterId         Int?
-  contactsUnlocked      Boolean   @default(false)
-  unlockedByCompany     Boolean   @default(false)
-  unlockedByTransporter Boolean   @default(false)
-  acceptedAt            DateTime?
-  status                String    @default("OPEN")
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  id          Int     @id @default(autoincrement())
+  pickup      String
+  delivery    String
+  cargo       String?
+  description String?
+  price       Int
+
+  companyId     Int
+  transporterId Int?
+
+  contactsUnlocked     Boolean  @default(false)
+  unlockedByCompany    Boolean  @default(false)
+  unlockedByTransporter Boolean @default(false)
+
+  acceptedAt DateTime?
+  status     String   @default("OPEN")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Nuovi campi professionali
+  pickupDate    DateTime? 
+  deliveryDate  DateTime? 
+  cargoType     String?   
+  weight        Decimal?  
+  volume        String?   
+  palletCount   Int?      
+  vehicleType   String?   
+  isAdr         Boolean   @default(false)
+  paymentTerms  String?   
+  pickupContact String?   
+  pickupPhone   String?   
+  distanceKm    Decimal?  
 
   company     User  @relation("CompanyRequests", fields: [companyId], references: [id])
   transporter User? @relation("TransporterJobs", fields: [transporterId], references: [id])
