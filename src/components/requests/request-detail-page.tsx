@@ -50,7 +50,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
     return (
       <section className="space-y-4">
         <h1 className="text-2xl font-semibold text-[#0f172a]">Richiesta non valida</h1>
-        <p className="text-sm text-[#475569]">L&apos;identificativo della richiesta non è valido.</p>
+        <p className="text-sm text-[#475569]">L&apos;identificativo della richiesta non Ã¨ valido.</p>
       </section>
     );
   }
@@ -68,7 +68,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
     return (
       <section className="space-y-4">
         <h1 className="text-2xl font-semibold text-[#0f172a]">Richiesta non trovata</h1>
-        <p className="text-sm text-[#475569]">La richiesta non esiste oppure non è più disponibile.</p>
+        <p className="text-sm text-[#475569]">La richiesta non esiste oppure non Ã¨ piÃ¹ disponibile.</p>
       </section>
     );
   }
@@ -85,13 +85,14 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
   return (
     <RequestDetailView
       requestId={requestRecord.id}
-      title={`${requestRecord.pickup} → ${requestRecord.delivery}`}
+      title={`${requestRecord.pickup} \u2192 ${requestRecord.delivery}`}
       description={requestRecord.description ?? ""}
       cargo={requestRecord.cargo ?? null}
       priceCents={requestRecord.price}
       createdAt={requestRecord.createdAt.toISOString()}
       acceptedAt={requestRecord.acceptedAt ? requestRecord.acceptedAt.toISOString() : null}
       companyEmail={requestRecord.company.email}
+      companyName={requestRecord.company.companyName ?? null}
       contactEmail={getContactEmail({
         role: user.role as Role,
         companyEmail: requestRecord.company.email,
@@ -110,6 +111,18 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       backHref={backHref}
       assignedToSelf={assignedToSelf}
       assignedToOther={assignedToOther}
+      pickupDate={requestRecord.pickupDate ? requestRecord.pickupDate.toISOString() : null}
+      deliveryDate={requestRecord.deliveryDate ? requestRecord.deliveryDate.toISOString() : null}
+      cargoType={requestRecord.cargoType ?? null}
+      weight={requestRecord.weight ? Number(requestRecord.weight) : null}
+      volume={requestRecord.volume ?? null}
+      palletCount={requestRecord.palletCount ?? null}
+      vehicleType={requestRecord.vehicleType ?? null}
+      isAdr={requestRecord.isAdr}
+      paymentTerms={requestRecord.paymentTerms ?? null}
+      pickupContact={requestRecord.pickupContact ?? null}
+      pickupPhone={requestRecord.pickupPhone ?? null}
+      distanceKm={requestRecord.distanceKm ? Number(requestRecord.distanceKm) : null}
     />
   );
 }
