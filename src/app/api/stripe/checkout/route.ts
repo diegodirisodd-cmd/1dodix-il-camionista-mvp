@@ -14,7 +14,6 @@ export async function POST(request: Request) {
     console.log("Stripe unlock called");
 
     const sessionUser = await getSessionUser();
-
     if (!sessionUser?.id) {
       return NextResponse.json(
         { error: "Non autorizzato." },
@@ -23,7 +22,6 @@ export async function POST(request: Request) {
     }
 
     const stripeSecret = process.env.STRIPE_SECRET_KEY;
-
     if (!stripeSecret) {
       console.error("Missing STRIPE_SECRET_KEY");
       return NextResponse.json(
@@ -38,7 +36,12 @@ export async function POST(request: Request) {
 
     const body = (await request.json().catch(() => null)) as CheckoutPayload | null;
 
-    if (!body || body.requestId === undefined || body.amount === undefined || !body.userRole) {
+    if (
+      !body ||
+      body.requestId === undefined ||
+      body.amount === undefined ||
+      !body.userRole
+    ) {
       return NextResponse.json(
         { error: "Parametri non validi." },
         { status: 400 },
@@ -58,7 +61,11 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!Number.isFinite(requestId) || !Number.isFinite(amount) || amount <= 0) {
+    if (
+      !Number.isFinite(requestId) ||
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ) {
       return NextResponse.json(
         { error: "Parametri non validi." },
         { status: 400 },
@@ -98,12 +105,11 @@ export async function POST(request: Request) {
         role: String(userRole),
         userId: String(sessionUser.id),
       },
-      success_url: `${baseUrl}/dashboard/stripe/success?requestId=${requestId}&role=${userRole}`,
+      success_url: `${baseUrl}/dashboard/stripe/success?session_id={CHECKOUT_SESSION_ID}&requestId=${requestId}&role=${userRole}`,
       cancel_url: `${baseUrl}/dashboard/company/requests`,
     };
 
     const session = await stripe.checkout.sessions.create(params);
-
     console.log("Stripe session created:", session.id);
 
     return NextResponse.json({ url: session.url });
