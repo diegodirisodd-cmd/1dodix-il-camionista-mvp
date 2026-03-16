@@ -1,71 +1,99 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-function DashboardStripeSuccessContent() {
+function StripeSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const requestIdParam = searchParams.get("requestId");
-  const roleParam = searchParams.get("role");
+  const sessionId = searchParams.get("session_id");
+  const requestId = searchParams.get("requestId");
+  const role = searchParams.get("role");
 
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [errorMessage, setErrorMessage] = useState("");
 
-  useEffect(() => {
-    const requestId = Number(requestIdParam);
-    const role =
-      roleParam === "company" ? "COMPANY" : roleParam === "transporter" ? "TRANSPORTER" : null;
+  const requestPath = useMemo(() => {
+    if (!requestId || !role) return null;
+    if (role === "company") {
+      return `/dashboard/company/requests/${requestId}`;
+    }
+    if (role === "transporter") {
+      return `/dashboard/transporter/requests/${requestId}`;
+    }
+    return null;
+  }, [requestId, role]);
 
-    if (!Number.isFinite(requestId) || !role) {
+  useEffect(() => {
+    if (!sessionId || !requestId || !role) {
       setStatus("error");
-      setErrorMessage("Parametri mancanti o non validi. Controlla il link e riprova.");
+      setErrorMessage("Parametri mancanti. Controlla il link e riprova.");
       return;
     }
 
-    try {
-      const stored = window.localStorage.getItem("unlockedRequests");
-      let parsed: { COMPANY?: number[]; TRANSPORTER?: number[] } = {};
-      try {
-        parsed = stored ? (JSON.parse(stored) as { COMPANY?: number[]; TRANSPORTER?: number[] }) : {};
-      } catch {
-        parsed = {};
-      }
+    let cancelled = false;
 
-      const list = role === "COMPANY" ? parsed.COMPANY ?? [] : parsed.TRANSPORTER ?? [];
-      if (!list.includes(requestId)) {
-        const next = [...list, requestId];
-        if (role === "COMPANY") {
-          parsed.COMPANY = next;
+    async function confirmPayment() {
+      try {
+        const response = await fetch("/api/stripe/confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            session_id: sessionId,
+            requestId: Number(requestId),
+            role,
+          }),
+        });
+
+        if (cancelled) return;
+
+        if (response.ok) {
+          setStatus("success");
         } else {
-          parsed.TRANSPORTER = next;
+          const data = (await response.json().catch(() => ({}))) as {
+            error?: string;
+          };
+          setStatus("error");
+          setErrorMessage(
+            data.error ??
+              "Errore nella conferma del pagamento. Il pagamento potrebbe essere stato comunque elaborato."
+          );
         }
-        window.localStorage.setItem("unlockedRequests", JSON.stringify(parsed));
+      } catch {
+        if (!cancelled) {
+          setStatus("error");
+          setErrorMessage(
+            "Errore di rete. Il pagamento potrebbe essere stato elaborato. Torna alla dashboard per verificare."
+          );
+        }
       }
-    } catch (e) {
-      console.warn("localStorage non disponibile:", e);
     }
 
-    const detailPath =
-      role === "COMPANY"
-        ? `/dashboard/company/requests/${requestId}`
-        : `/dashboard/transporter/requests/${requestId}`;
+    void confirmPayment();
 
-    setStatus("success");
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionId, requestId, role]);
+
+  useEffect(() => {
+    if (status !== "success" || !requestPath) return;
 
     const timer = window.setTimeout(() => {
-      router.push(detailPath);
+      router.push(requestPath);
     }, 2500);
 
     return () => window.clearTimeout(timer);
-  }, [requestIdParam, roleParam, router]);
+  }, [status, requestPath, router]);
 
   if (status === "loading") {
     return (
       <section className="space-y-4 p-6">
         <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
           <p className="font-semibold">Conferma pagamento in corso...</p>
-          <p className="mt-1 text-blue-600">Attendere, non chiudere questa pagina.</p>
+          <p className="mt-1 text-blue-600">
+            Attendere, non chiudere questa pagina.
+          </p>
         </div>
       </section>
     );
@@ -75,13 +103,17 @@ function DashboardStripeSuccessContent() {
     return (
       <section className="space-y-4 p-6">
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          <p className="font-semibold">Errore</p>
+          <p className="font-semibold">Attenzione</p>
           <p className="mt-1">{errorMessage}</p>
         </div>
         <button
           type="button"
           className="btn-primary"
-          onClick={() => router.push("/dashboard")}
+          onClick={() =>
+            requestPath
+              ? router.push(requestPath)
+              : router.push("/dashboard")
+          }
         >
           Torna alla dashboard
         </button>
@@ -92,22 +124,19 @@ function DashboardStripeSuccessContent() {
   return (
     <section className="space-y-4 p-6">
       <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
-        <p className="font-semibold">Pagamento completato. I contatti sono ora disponibili.</p>
-        <p className="mt-1 text-emerald-600">Verrai reindirizzato automaticamente tra pochi secondi...</p>
+        <p className="font-semibold">
+          Pagamento completato con successo!
+        </p>
+        <p className="mt-1 text-emerald-600">
+          Verrai reindirizzato automaticamente tra pochi secondi...
+        </p>
       </div>
       <button
         type="button"
         className="btn-primary"
-        onClick={() => {
-          const requestId = Number(requestIdParam);
-          const role =
-            roleParam === "company" ? "COMPANY" : roleParam === "transporter" ? "TRANSPORTER" : null;
-          const path =
-            role === "COMPANY"
-              ? `/dashboard/company/requests/${requestId}`
-              : `/dashboard/transporter/requests/${requestId}`;
-          router.push(path);
-        }}
+        onClick={() =>
+          requestPath ? router.push(requestPath) : router.back()
+        }
       >
         Vai ai dettagli ora
       </button>
@@ -126,7 +155,7 @@ export default function StripeSuccessPage() {
         </section>
       }
     >
-      <DashboardStripeSuccessContent />
+      <StripeSuccessContent />
     </Suspense>
   );
 }
