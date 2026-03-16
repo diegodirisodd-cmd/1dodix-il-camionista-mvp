@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+
 import Stripe from "stripe";
 
 import { getSessionUser } from "@/lib/auth";
@@ -6,14 +7,16 @@ import { prisma } from "@/lib/prisma";
 
 const baseUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+  (process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000");
 
 export async function POST(req: Request) {
   try {
-    console.log("🚀 [STRIPE] unlock API HIT");
+    console.log("[STRIPE] unlock API HIT");
 
     if (!process.env.STRIPE_SECRET_KEY) {
-      console.error("❌ STRIPE_SECRET_KEY mancante");
+      console.error("STRIPE_SECRET_KEY mancante");
       return NextResponse.json({ error: "Stripe key missing" }, { status: 500 });
     }
 
@@ -35,12 +38,11 @@ export async function POST(req: Request) {
       apiVersion: "2024-06-20",
     });
 
-    console.log("🔑 Stripe inizializzato");
-
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
     }
+
     const role = user.role.toLowerCase();
 
     const priceEuro = request.price / 100;
@@ -49,18 +51,13 @@ export async function POST(req: Request) {
     const totaleEuro = commission + iva;
     const unitAmountCents = Math.round(totaleEuro * 100);
 
-    console.log("REQUEST PRICE:", request.price);
-    console.log("COMMISSION:", commission);
-    console.log("IVA:", iva);
-    console.log("TOTALE EURO:", totaleEuro);
-    console.log("UNIT AMOUNT CENTS:", unitAmountCents);
-
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
       metadata: {
         requestId: String(requestId),
         role: role.toUpperCase(),
+        userId: String(user.id),
       },
       line_items: [
         {
@@ -74,21 +71,16 @@ export async function POST(req: Request) {
           quantity: 1,
         },
       ],
-      success_url:
-        `${baseUrl}/stripe/success?session_id={CHECKOUT_SESSION_ID}` +
-        `&requestId=${requestId}&role=${role}`,
-      cancel_url: `${baseUrl}/stripe/cancel?requestId=${requestId}&role=${role}`,
+      success_url: `${baseUrl}/dashboard/stripe/success?session_id={CHECKOUT_SESSION_ID}&requestId=${requestId}&role=${role}`,
+      cancel_url: `${baseUrl}/dashboard/company/requests`,
     });
 
-    console.log("✅ Session creata:", session.id);
-    console.log("➡️ Redirect URL:", session.url);
+    console.log("[STRIPE] Session creata:", session.id);
 
     return NextResponse.json({ url: session.url });
-  } catch (error: any) {
-    console.error("❌ STRIPE ERROR:", error);
-    return NextResponse.json(
-      { error: error.message ?? "Stripe error" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Stripe error";
+    console.error("[STRIPE] ERROR:", error);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
