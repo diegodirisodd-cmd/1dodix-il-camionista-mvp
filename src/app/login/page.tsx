@@ -180,6 +180,11 @@ export default function LoginPage() {
                 />
               </div>
               <p className="text-xs text-neutral-500">Minimo 6 caratteri. Non condividere la password.</p>
+              <div className="text-right mt-1">
+                <Link href="/reset-password" className="text-xs text-[#0f2a44] hover:underline">
+                  Password dimenticata?
+                </Link>
+              </div>
             </div>
 
             <div className="space-y-3">
