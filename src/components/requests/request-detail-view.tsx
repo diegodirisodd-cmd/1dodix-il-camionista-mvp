@@ -57,9 +57,9 @@ type RequestDetailViewProps = {
   contactPhone: string | null;
   transporterEmail: string | null;
   role: Role;
-  contactsUnlocked: boolean;
-  companyUnlocked: boolean;
-  transporterUnlocked: boolean;
+  unlockedForCurrentUser: boolean;
+  unlockedByOtherParty: boolean;
+  bothPartiesUnlocked: boolean;
   backHref: string;
   assignedToSelf: boolean;
   assignedToOther: boolean;
@@ -101,9 +101,9 @@ export function RequestDetailView({
   contactPhone,
   transporterEmail,
   role,
-  contactsUnlocked,
-  companyUnlocked,
-  transporterUnlocked,
+  unlockedForCurrentUser,
+  unlockedByOtherParty,
+  bothPartiesUnlocked,
   backHref,
   assignedToSelf,
   assignedToOther,
@@ -126,15 +126,13 @@ export function RequestDetailView({
   const [unlocking, setUnlocking] = useState(false);
 
   const isAccepted = Boolean(acceptedAtDate);
-  const bothUnlocked = companyUnlocked && transporterUnlocked;
-  const contactsVisible = contactsUnlocked;
-  const hasPaid =
-    role === "COMPANY" ? companyUnlocked : role === "TRANSPORTER" ? transporterUnlocked : true;
+  const contactsVisible = bothPartiesUnlocked && unlockedForCurrentUser;
+  const hasPaid = role === "ADMIN" ? true : unlockedForCurrentUser;
 
   const canCompanyUnlock =
-    role === "COMPANY" && transporterUnlocked === true && companyUnlocked === false;
+    role === "COMPANY" && unlockedByOtherParty === true && unlockedForCurrentUser === false;
   const shouldShowCta =
-    role === "COMPANY" ? canCompanyUnlock : role === "TRANSPORTER" ? !transporterUnlocked : false;
+    role === "COMPANY" ? canCompanyUnlock : role === "TRANSPORTER" ? !unlockedForCurrentUser : false;
 
   const contactHeadline = useMemo(
     () => (role === "TRANSPORTER" ? "Referente aziendale" : "Referente trasportatore"),

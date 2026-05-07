@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { type Role } from "@/lib/roles";
+import { getUnlockState } from "@/lib/unlocks";
 
 type RequestPayload = {
   pickup?: string;
@@ -32,19 +34,14 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
 
+  const requestId = Number(params.id);
+  if (!Number.isFinite(requestId)) {
+    return NextResponse.json({ error: "Richiesta non valida" }, { status: 400 });
+  }
+
   const requestRecord = await prisma.request.findUnique({
-    where: { id: Number(params.id) },
-    select: {
-      id: true,
-      pickup: true,
-      delivery: true,
-      cargo: true,
-      description: true,
-      price: true,
-      companyId: true,
-      transporterId: true,
-      createdAt: true,
-    },
+    where: { id: requestId },
+    include: { company: true, transporter: true },
   });
 
   if (!requestRecord) {
@@ -61,7 +58,38 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 403 });
   }
 
-  return NextResponse.json(requestRecord);
+  const unlockState = await getUnlockState(requestId, user.id, user.role as Role);
+  const showContacts = unlockState.bothUnlocked && unlockState.unlockedByMe;
+
+  const counterpartEmail =
+    user.role === "TRANSPORTER"
+      ? requestRecord.company.email
+      : user.role === "COMPANY"
+        ? requestRecord.transporter?.email ?? null
+        : requestRecord.company.email;
+  const counterpartPhone =
+    user.role === "TRANSPORTER"
+      ? requestRecord.company.phone ?? null
+      : user.role === "COMPANY"
+        ? requestRecord.transporter?.phone ?? null
+        : requestRecord.company.phone ?? null;
+
+  return NextResponse.json({
+    id: requestRecord.id,
+    pickup: requestRecord.pickup,
+    delivery: requestRecord.delivery,
+    cargo: requestRecord.cargo,
+    description: requestRecord.description,
+    price: requestRecord.price,
+    companyId: requestRecord.companyId,
+    transporterId: requestRecord.transporterId,
+    createdAt: requestRecord.createdAt,
+    unlockedForCurrentUser: unlockState.unlockedByMe,
+    unlockedByOtherParty: unlockState.unlockedByOther,
+    bothPartiesUnlocked: unlockState.bothUnlocked,
+    contactEmail: showContacts ? counterpartEmail : null,
+    contactPhone: showContacts ? counterpartPhone : null,
+  });
 }
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {

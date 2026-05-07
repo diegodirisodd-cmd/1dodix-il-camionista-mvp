@@ -50,7 +50,8 @@ export async function POST(req: NextRequest) {
     console.log("[WEBHOOK] pagamento confermato");
 
     const parsedRequestId = Number(requestId);
-    if (!Number.isFinite(parsedRequestId) || !role) {
+    const parsedUserId = Number(userId);
+    if (!Number.isFinite(parsedRequestId) || !role || !Number.isFinite(parsedUserId)) {
       return NextResponse.json({ received: true });
     }
 
@@ -72,6 +73,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
+    const stripeSessionId = session.id;
+    const stripePaymentIntentId =
+      typeof session.payment_intent === "string"
+        ? session.payment_intent
+        : session.payment_intent?.id ?? null;
+    const amountCents = session.amount_total ?? null;
+
+    await prisma.requestUnlock.upsert({
+      where: {
+        requestId_userId: {
+          requestId: parsedRequestId,
+          userId: parsedUserId,
+        },
+      },
+      create: {
+        requestId: parsedRequestId,
+        userId: parsedUserId,
+        userRole: normalizedRole,
+        amountCents,
+        stripeSessionId,
+        stripePaymentIntentId,
+      },
+      update: {
+        userRole: normalizedRole,
+        amountCents,
+        stripeSessionId,
+        stripePaymentIntentId,
+        paidAt: new Date(),
+      },
+    });
+
     const nextCompanyUnlocked =
       request.unlockedByCompany || normalizedRole === "COMPANY";
     const nextTransporterUnlocked =
@@ -87,7 +119,7 @@ export async function POST(req: NextRequest) {
             ? "COMPANY_PAID"
             : "OPEN";
 
-    // Build update data
+    // Legacy global flags kept in sync for backward-compat during migration.
     const updateData: Record<string, unknown> = {
       unlockedByCompany: nextCompanyUnlocked,
       unlockedByTransporter: nextTransporterUnlocked,
@@ -95,13 +127,9 @@ export async function POST(req: NextRequest) {
       status: nextStatus,
     };
 
-    // If transporter paid and no transporter assigned yet, assign them
-    if (normalizedRole === "TRANSPORTER" && userId && !request.transporterId) {
-      const parsedUserId = Number(userId);
-      if (Number.isFinite(parsedUserId)) {
-        updateData.transporterId = parsedUserId;
-        updateData.acceptedAt = new Date();
-      }
+    if (normalizedRole === "TRANSPORTER" && !request.transporterId) {
+      updateData.transporterId = parsedUserId;
+      updateData.acceptedAt = new Date();
     }
 
     await prisma.request.update({
@@ -109,7 +137,7 @@ export async function POST(req: NextRequest) {
       data: updateData,
     });
 
-    console.log("[WEBHOOK] stato pagamento aggiornato", { requestId: parsedRequestId, role: normalizedRole, userId });
+    console.log("[WEBHOOK] stato pagamento aggiornato", { requestId: parsedRequestId, role: normalizedRole, userId: parsedUserId });
   }
 
   return NextResponse.json({ received: true });

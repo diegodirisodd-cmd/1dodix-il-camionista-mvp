@@ -11,7 +11,8 @@ type RequestRow = {
   id: number;
   priceCents: number;
   transporterId: number | null;
-  contactsUnlocked: boolean;
+  unlockedForCurrentUser: boolean;
+  bothPartiesUnlocked: boolean;
   createdAt: string;
   pickup: string;
   delivery: string;
@@ -50,7 +51,7 @@ export function TransporterJobsTable({
             <tbody>
               {items.map((request) => {
                 const isAccepted = Boolean(request.transporterId);
-                const contactsUnlocked = request.contactsUnlocked;
+                const contactsUnlocked = request.bothPartiesUnlocked && request.unlockedForCurrentUser;
                 const detailHref = `${basePath}/${request.id}`;
                 return (
                 <tr

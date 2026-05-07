@@ -2,7 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 
 export default async function PaymentSuccessPage({
   searchParams,
@@ -42,14 +41,8 @@ export default async function PaymentSuccessPage({
     );
   }
 
-  await prisma.request.update({
-    where: { id: requestId },
-    data: {
-      unlockedByCompany: role === "COMPANY" ? true : undefined,
-      unlockedByTransporter: role === "TRANSPORTER" ? true : undefined,
-    },
-  });
-
+  // The Stripe webhook is the source of truth for unlock state.
+  // No DB writes here — the URL is user-controlled and would otherwise allow tampering.
   const detailHref =
     role === "COMPANY"
       ? `/dashboard/company/requests/${requestId}`
@@ -58,8 +51,10 @@ export default async function PaymentSuccessPage({
   return (
     <section className="space-y-4">
       <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
-        <p className="font-semibold">Contatti sbloccati</p>
-        <p className="text-sm text-[#475569]">Ora puoi contattare direttamente l&apos;altra parte.</p>
+        <p className="font-semibold">Pagamento ricevuto</p>
+        <p className="text-sm text-[#475569]">
+          Lo sblocco viene confermato automaticamente da Stripe. Se non vedi i contatti, ricarica la pagina tra qualche secondo.
+        </p>
       </div>
       <Link href={detailHref} className="btn-primary">
         Torna alla richiesta
