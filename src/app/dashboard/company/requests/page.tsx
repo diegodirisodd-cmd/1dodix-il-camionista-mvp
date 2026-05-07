@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { CompanyRequestsTable } from "@/components/dashboard/company-requests-table";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { type Role } from "@/lib/roles";
+import { getUnlockStatesForRequests } from "@/lib/unlocks";
 
 export default async function CompanyRequestsPage({ searchParams }: { searchParams?: { created?: string } }) {
   const user = await getSessionUser();
@@ -24,17 +26,17 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
     cargo: string | null;
     price: number;
     transporterId: number | null;
-    unlockedByCompany: boolean;
-    unlockedByTransporter: boolean;
-    contactsUnlocked: boolean;
     createdAt: Date;
+    unlockedForCurrentUser: boolean;
+    unlockedByOtherParty: boolean;
+    bothPartiesUnlocked: boolean;
   }[] = [];
   let loadError: string | null = null;
   let loadErrorDetails: string | null = null;
   const pathname = "/dashboard/company/requests";
 
   try {
-    companyRequests = await prisma.request.findMany({
+    const rows = await prisma.request.findMany({
       where: { companyId: user.id },
       orderBy: { createdAt: "desc" },
       select: {
@@ -44,11 +46,28 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
         cargo: true,
         price: true,
         transporterId: true,
-        unlockedByCompany: true,
-        unlockedByTransporter: true,
-        contactsUnlocked: true,
         createdAt: true,
       },
+    });
+
+    const unlockStates = await getUnlockStatesForRequests(
+      rows.map((r) => r.id),
+      user.id,
+      user.role as Role,
+    );
+
+    companyRequests = rows.map((r) => {
+      const state = unlockStates.get(r.id) ?? {
+        unlockedByMe: false,
+        unlockedByOther: false,
+        bothUnlocked: false,
+      };
+      return {
+        ...r,
+        unlockedForCurrentUser: state.unlockedByMe,
+        unlockedByOtherParty: state.unlockedByOther,
+        bothPartiesUnlocked: state.bothUnlocked,
+      };
     });
   } catch (error) {
     console.error("[Company Requests] load failed", {
@@ -116,12 +135,12 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
             cargo: request.cargo,
             priceCents: request.price,
             transporterId: request.transporterId,
-            unlockedByCompany: request.unlockedByCompany,
-            unlockedByTransporter: request.unlockedByTransporter,
-            contactsUnlocked: request.contactsUnlocked,
+            unlockedForCurrentUser: request.unlockedForCurrentUser,
+            unlockedByOtherParty: request.unlockedByOtherParty,
+            bothPartiesUnlocked: request.bothPartiesUnlocked,
             createdAt: request.createdAt.toISOString(),
           }))}
-          role={user.role}
+          role={user.role as Role}
           basePath="/dashboard/company/requests"
         />
       )}

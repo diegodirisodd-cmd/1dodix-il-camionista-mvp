@@ -14,9 +14,9 @@ type RequestApiItem = {
   price: number;
   createdAt: string;
   transporterId: number | null;
-  contactsUnlocked: boolean;
-  unlockedByCompany: boolean;
-  unlockedByTransporter: boolean;
+  unlockedForCurrentUser: boolean;
+  unlockedByOtherParty: boolean;
+  bothPartiesUnlocked: boolean;
   companyId: number;
 };
 
@@ -115,10 +115,10 @@ export function RequestsListClient({ role, basePath, variant, emptyMessage }: Re
           cargo: request.cargo,
           priceCents: request.price,
           transporterId: request.transporterId,
-          contactsUnlocked: request.contactsUnlocked,
+          unlockedForCurrentUser: request.unlockedForCurrentUser,
+          unlockedByOtherParty: request.unlockedByOtherParty,
+          bothPartiesUnlocked: request.bothPartiesUnlocked,
           createdAt: request.createdAt,
-          unlockedByCompany: request.unlockedByCompany,
-          unlockedByTransporter: request.unlockedByTransporter,
         }))}
         role={role}
         basePath={basePath}
@@ -135,7 +135,8 @@ export function RequestsListClient({ role, basePath, variant, emptyMessage }: Re
         cargo: request.cargo,
         priceCents: request.price,
         transporterId: request.transporterId,
-        contactsUnlocked: request.contactsUnlocked,
+        unlockedForCurrentUser: request.unlockedForCurrentUser,
+        bothPartiesUnlocked: request.bothPartiesUnlocked,
         createdAt: request.createdAt,
       }))}
       role={role}

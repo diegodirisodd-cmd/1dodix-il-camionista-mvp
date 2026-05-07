@@ -11,9 +11,9 @@ type RequestRow = {
   id: number;
   priceCents: number;
   transporterId: number | null;
-  unlockedByCompany: boolean;
-  unlockedByTransporter: boolean;
-  contactsUnlocked: boolean;
+  unlockedForCurrentUser: boolean;
+  unlockedByOtherParty: boolean;
+  bothPartiesUnlocked: boolean;
   createdAt: string;
   pickup: string;
   delivery: string;
@@ -50,15 +50,15 @@ export function CompanyRequestsTable({
           <tbody>
             {items.map((request) => {
               const isAccepted = Boolean(request.transporterId);
-              const contactsUnlocked = request.contactsUnlocked;
+              const contactsUnlocked = request.bothPartiesUnlocked && request.unlockedForCurrentUser;
               const canCompanyUnlock =
-                request.unlockedByTransporter === true &&
-                request.unlockedByCompany === false;
+                request.unlockedByOtherParty === true &&
+                request.unlockedForCurrentUser === false;
               const statusLabel = isAccepted ? "Accettata" : "In attesa";
               const detailHref = `${basePath}/${request.id}`;
 
               // Company can open detail if accepted OR if they already paid
-              const canOpenDetail = isAccepted || request.unlockedByCompany;
+              const canOpenDetail = isAccepted || request.unlockedForCurrentUser;
 
               return (
                 <tr

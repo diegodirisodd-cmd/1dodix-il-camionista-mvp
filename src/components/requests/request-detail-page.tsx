@@ -5,6 +5,7 @@ import { getSessionUser } from "@/lib/auth";
 import { routeForUser } from "@/lib/navigation";
 import { prisma } from "@/lib/prisma";
 import { type Role } from "@/lib/roles";
+import { getUnlockState } from "@/lib/unlocks";
 
 type RequestDetailPageProps = {
   requestId: number;
@@ -79,8 +80,8 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
     requestRecord.transporterId !== null &&
     requestRecord.transporterId !== user.id;
 
-  const companyUnlocked = requestRecord.unlockedByCompany;
-  const transporterUnlocked = requestRecord.unlockedByTransporter;
+  const unlockState = await getUnlockState(requestRecord.id, user.id, user.role as Role);
+  const showContacts = unlockState.bothUnlocked && unlockState.unlockedByMe;
 
   return (
     <RequestDetailView
@@ -93,21 +94,29 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       acceptedAt={requestRecord.acceptedAt ? requestRecord.acceptedAt.toISOString() : null}
       companyEmail={requestRecord.company.email}
       companyName={requestRecord.company.companyName ?? null}
-      contactEmail={getContactEmail({
-        role: user.role as Role,
-        companyEmail: requestRecord.company.email,
-        transporterEmail: requestRecord.transporter?.email ?? null,
-      })}
-      contactPhone={getContactPhone({
-        role: user.role as Role,
-        companyPhone: requestRecord.company.phone ?? null,
-        transporterPhone: requestRecord.transporter?.phone ?? null,
-      })}
-      transporterEmail={requestRecord.transporter?.email ?? null}
+      contactEmail={
+        showContacts
+          ? getContactEmail({
+              role: user.role as Role,
+              companyEmail: requestRecord.company.email,
+              transporterEmail: requestRecord.transporter?.email ?? null,
+            })
+          : null
+      }
+      contactPhone={
+        showContacts
+          ? getContactPhone({
+              role: user.role as Role,
+              companyPhone: requestRecord.company.phone ?? null,
+              transporterPhone: requestRecord.transporter?.phone ?? null,
+            })
+          : null
+      }
+      transporterEmail={showContacts ? requestRecord.transporter?.email ?? null : null}
       role={user.role as Role}
-      contactsUnlocked={requestRecord.contactsUnlocked}
-      companyUnlocked={companyUnlocked}
-      transporterUnlocked={transporterUnlocked}
+      unlockedForCurrentUser={unlockState.unlockedByMe}
+      unlockedByOtherParty={unlockState.unlockedByOther}
+      bothPartiesUnlocked={unlockState.bothUnlocked}
       backHref={backHref}
       assignedToSelf={assignedToSelf}
       assignedToOther={assignedToOther}

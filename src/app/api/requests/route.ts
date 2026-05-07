@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { type Role } from "@/lib/roles";
+import { getUnlockStatesForRequests } from "@/lib/unlocks";
 
 type RequestPayload = {
   pickup?: string;
@@ -68,7 +70,27 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(requests);
+    const unlockStates = await getUnlockStatesForRequests(
+      requests.map((r) => r.id),
+      user.id,
+      user.role as Role,
+    );
+
+    const enriched = requests.map((r) => {
+      const state = unlockStates.get(r.id) ?? {
+        unlockedByMe: false,
+        unlockedByOther: false,
+        bothUnlocked: false,
+      };
+      return {
+        ...r,
+        unlockedForCurrentUser: state.unlockedByMe,
+        unlockedByOtherParty: state.unlockedByOther,
+        bothPartiesUnlocked: state.bothUnlocked,
+      };
+    });
+
+    return NextResponse.json(enriched);
   } catch (error) {
     console.error("[Requests API] load failed", {
       pathname,

@@ -30,6 +30,7 @@ model User {
 
   companyRequests     Request[] @relation("CompanyRequests")
   transporterRequests Request[] @relation("TransporterJobs")
+  requestUnlocks      RequestUnlock[]
 }
 
 model Request {
@@ -68,4 +69,22 @@ model Request {
 
   company     User  @relation("CompanyRequests", fields: [companyId], references: [id])
   transporter User? @relation("TransporterJobs", fields: [transporterId], references: [id])
+  unlocks     RequestUnlock[]
+}
+
+model RequestUnlock {
+  id                    Int      @id @default(autoincrement())
+  requestId             Int
+  userId                Int
+  userRole              String
+  amountCents           Int?
+  stripeSessionId       String?
+  stripePaymentIntentId String?
+  paidAt                DateTime @default(now())
+  createdAt             DateTime @default(now())
+
+  request Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, userId])
 }
