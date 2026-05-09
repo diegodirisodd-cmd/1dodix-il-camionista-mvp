@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { RequestDetailView } from "@/components/requests/request-detail-view";
 import { getSessionUser } from "@/lib/auth";
 import { routeForUser } from "@/lib/navigation";
+import { sanitizeSensitiveContacts } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { type Role } from "@/lib/roles";
 import { getUnlockState } from "@/lib/unlocks";
@@ -83,6 +84,12 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
   const unlockState = await getUnlockState(requestRecord.id, user.id, user.role as Role);
   const showContacts = unlockState.bothUnlocked && unlockState.unlockedByMe;
 
+  const sanitized = sanitizeSensitiveContacts(
+    requestRecord,
+    { id: user.id, role: user.role },
+    unlockState,
+  );
+
   return (
     <RequestDetailView
       requestId={requestRecord.id}
@@ -129,8 +136,8 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       vehicleType={requestRecord.vehicleType ?? null}
       isAdr={requestRecord.isAdr}
       paymentTerms={requestRecord.paymentTerms ?? null}
-      pickupContact={requestRecord.pickupContact ?? null}
-      pickupPhone={requestRecord.pickupPhone ?? null}
+      pickupContact={sanitized.pickupContact ?? null}
+      pickupPhone={sanitized.pickupPhone ?? null}
       distanceKm={requestRecord.distanceKm ? Number(requestRecord.distanceKm) : null}
     />
   );
