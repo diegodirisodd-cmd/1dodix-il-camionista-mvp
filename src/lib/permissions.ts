@@ -1,4 +1,3 @@
-import { type Role } from "./roles";
 import { type UnlockState } from "./unlocks";
 
 type RequestPrivacyShape = {
@@ -6,9 +5,12 @@ type RequestPrivacyShape = {
   transporterId: number | null;
 };
 
+// Accetta `role: string` perché getSessionUser ritorna il valore grezzo
+// dal DB Prisma (User.role è String). I confronti literal qui sotto
+// fanno il narrowing corretto; ruoli sconosciuti finiscono nel "deny" finale.
 type SessionUser = {
   id: number;
-  role: Role;
+  role: string;
 };
 
 export type CanViewSensitiveContactsContext = {
