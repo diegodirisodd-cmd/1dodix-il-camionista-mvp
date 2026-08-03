@@ -156,6 +156,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Data entro cui serve l'intervento non valida" }, { status: 400 });
   }
 
+  // I path restituiti da /api/uploads/service-photo sono sempre "<userId>/<uuid>.<ext>":
+  // rifiutare gli altri impedisce di allegare (e far firmare) file caricati da terzi.
+  const fotoPaths = body.fotoUrls ?? [];
+  if (fotoPaths.some((path) => !path.startsWith(`${user.id}/`))) {
+    return NextResponse.json({ error: "Foto non valide per questo utente" }, { status: 400 });
+  }
+
   try {
     const created = await prisma.serviceRequest.create({
       data: {
@@ -168,9 +175,7 @@ export async function POST(request: Request) {
         descrizione,
         urgenza,
         scadenza: scadenzaDate,
-        fotos: body.fotoUrls?.length
-          ? { create: body.fotoUrls.map((url) => ({ url })) }
-          : undefined,
+        fotos: fotoPaths.length ? { create: fotoPaths.map((url) => ({ url })) } : undefined,
       },
       include: { fotos: true },
     });
