@@ -309,7 +309,7 @@ function OwnerPanel({
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {item.quotes.map((quote, index) => (
-            <ScrollReveal key={quote.id} delayMs={Math.min(index, 5) * 60}>
+            <ScrollReveal key={quote.id} className="h-full" delayMs={Math.min(index, 5) * 60}>
               <QuoteCard
                 quote={quote}
                 assigned={quote.id === item.assignedQuoteId}

@@ -121,7 +121,7 @@ export function ServicesBoard({ role }: ServicesBoardProps) {
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {visibleItems.map((item, index) => (
-            <ScrollReveal key={item.id} delayMs={Math.min(index, 5) * 60}>
+            <ScrollReveal key={item.id} className="h-full" delayMs={Math.min(index, 5) * 60}>
               <ServiceRequestCard item={item} isTransporter={isTransporter} />
             </ScrollReveal>
           ))}
