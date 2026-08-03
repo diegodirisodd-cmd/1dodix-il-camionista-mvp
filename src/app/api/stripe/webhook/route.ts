@@ -49,6 +49,14 @@ export async function POST(req: NextRequest) {
 
     console.log("[WEBHOOK] pagamento confermato");
 
+    // Borsa Servizi: sblocco contatto del trasportatore per un fornitore.
+    // Percorso separato da quello dei trasporti (RequestUnlock), riconosciuto
+    // dal metadata "kind" impostato in api/stripe/service-unlock.
+    if (session.metadata?.kind === "SERVICE_CONTACT_UNLOCK") {
+      await handleServiceContactUnlock(session);
+      return NextResponse.json({ received: true });
+    }
+
     const parsedRequestId = Number(requestId);
     const parsedUserId = Number(userId);
     if (!Number.isFinite(parsedRequestId) || !role || !Number.isFinite(parsedUserId)) {
@@ -141,4 +149,50 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ received: true });
+}
+
+async function handleServiceContactUnlock(session: Stripe.Checkout.Session) {
+  const serviceRequestId = Number(session.metadata?.serviceRequestId);
+  const supplierProfileId = Number(session.metadata?.supplierProfileId);
+
+  if (!Number.isFinite(serviceRequestId) || !Number.isFinite(supplierProfileId)) {
+    console.error("[WEBHOOK] metadata sblocco servizio incompleti", session.metadata);
+    return;
+  }
+
+  const stripePaymentIntentId =
+    typeof session.payment_intent === "string"
+      ? session.payment_intent
+      : session.payment_intent?.id ?? null;
+
+  try {
+    await prisma.serviceContactUnlock.upsert({
+      where: {
+        requestId_supplierId: {
+          requestId: serviceRequestId,
+          supplierId: supplierProfileId,
+        },
+      },
+      create: {
+        requestId: serviceRequestId,
+        supplierId: supplierProfileId,
+        amountCents: session.amount_total ?? null,
+        stripeSessionId: session.id,
+        stripePaymentIntentId,
+      },
+      update: {
+        amountCents: session.amount_total ?? null,
+        stripeSessionId: session.id,
+        stripePaymentIntentId,
+        paidAt: new Date(),
+      },
+    });
+
+    console.log("[WEBHOOK] sblocco contatto Borsa Servizi registrato", {
+      serviceRequestId,
+      supplierProfileId,
+    });
+  } catch (error) {
+    console.error("[WEBHOOK] sblocco contatto Borsa Servizi fallito", error);
+  }
 }

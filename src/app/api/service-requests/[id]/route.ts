@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { withSignedPhotoUrls } from "@/lib/supabase-storage";
 
 export async function GET(_request: Request, { params }: { params: { id: string } }) {
   const user = await getSessionUser();
@@ -62,6 +63,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
 
   const sanitized = {
     ...serviceRequest,
+    fotos: await withSignedPhotoUrls(serviceRequest.fotos),
     transporter: canSeeTransporterContact
       ? serviceRequest.transporter
       : { ...serviceRequest.transporter, email: null, phone: null },

@@ -62,6 +62,18 @@ export const SERVICE_REQUEST_STATUS_LABELS: Record<ServiceRequestStatus, string>
 // Prima versione: importo unico, indipendente dalla categoria. Regolabile qui.
 export const SERVICE_CONTACT_UNLOCK_PRICE_CENTS = 900; // 9,00 €
 
+// Stessa aliquota applicata alla commissione in api/stripe/unlock.
+export const VAT_RATE = 0.22;
+
+// Totale effettivamente addebitato al fornitore in checkout (IVA inclusa).
+export function getServiceUnlockTotalCents() {
+  return Math.round(SERVICE_CONTACT_UNLOCK_PRICE_CENTS * (1 + VAT_RATE));
+}
+
+export function formatCents(cents: number) {
+  return new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(cents / 100);
+}
+
 export function isServiceCategory(value: unknown): value is ServiceCategory {
   return typeof value === "string" && (SERVICE_CATEGORY_VALUES as string[]).includes(value);
 }

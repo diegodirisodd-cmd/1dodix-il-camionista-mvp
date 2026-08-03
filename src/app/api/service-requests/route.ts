@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, emailShell } from "@/lib/email";
+import { signServicePhotoPaths } from "@/lib/supabase-storage";
 import {
   isServiceCategory,
   isUrgencyLevel,
@@ -26,6 +27,19 @@ const baseUrl =
   process.env.NEXT_PUBLIC_APP_URL ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
+// Le foto sono su un bucket privato: in DB c'è il path dell'oggetto, qui lo
+// trasformiamo in URL firmato (una sola chiamata per tutta la lista).
+async function withSignedPhotos<T extends { fotos: { url: string }[] }>(requests: T[]) {
+  const signed = await signServicePhotoPaths(
+    requests.flatMap((serviceRequest) => serviceRequest.fotos.map((foto) => foto.url)),
+  );
+
+  return requests.map((serviceRequest) => ({
+    ...serviceRequest,
+    fotos: serviceRequest.fotos.map((foto) => ({ ...foto, url: signed.get(foto.url) ?? foto.url })),
+  }));
+}
+
 export async function GET(request: Request) {
   const user = await getSessionUser();
 
@@ -46,7 +60,7 @@ export async function GET(request: Request) {
           quotes: { include: { supplier: true } },
         },
       });
-      return NextResponse.json(requests);
+      return NextResponse.json(await withSignedPhotos(requests));
     }
 
     if (user.role === "SUPPLIER") {
@@ -83,7 +97,7 @@ export async function GET(request: Request) {
           quotes: { where: { supplierId: supplierProfile.id } },
         },
       });
-      return NextResponse.json(requests);
+      return NextResponse.json(await withSignedPhotos(requests));
     }
 
     if (user.role === "ADMIN") {
@@ -91,7 +105,7 @@ export async function GET(request: Request) {
         orderBy: { createdAt: "desc" },
         include: { fotos: true, quotes: true },
       });
-      return NextResponse.json(requests);
+      return NextResponse.json(await withSignedPhotos(requests));
     }
 
     return NextResponse.json({ error: "Ruolo non abilitato a Borsa Servizi" }, { status: 403 });
