@@ -77,12 +77,21 @@ type RequestDetailViewProps = {
   distanceKm?: number | null;
 };
 
-function InfoCell({ label, value }: { label: string; value: string | null | undefined }) {
+function InfoCell({
+  label,
+  value,
+  mono,
+}: {
+  label: string;
+  value: string | null | undefined;
+  // mono = valore quantitativo (peso, distanza, colli, date): JetBrains Mono.
+  mono?: boolean;
+}) {
   if (!value) return null;
   return (
     <div>
-      <p className="text-xs font-semibold uppercase text-[#64748b]">{label}</p>
-      <p className="text-sm font-medium text-[#0f172a]">{value}</p>
+      <p className="table-meta">{label}</p>
+      <p className={`text-sm font-medium text-textStrong ${mono ? "stat-mono" : ""}`}>{value}</p>
     </div>
   );
 }
@@ -227,35 +236,34 @@ export function RequestDetailView({
 
   return (
     <section className="space-y-6">
-      <Link href={backHref} className="inline-flex items-center gap-2 text-sm font-semibold text-[#0f172a]">
+      <Link href={backHref} className="inline-flex items-center gap-2 text-sm font-semibold text-textStrong">
         &larr; Torna alle richieste
       </Link>
 
       {/* === HEADER === */}
-      <div className="card space-y-4">
+      <div className="card animate-fadeUp space-y-4">
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#64748b]">Dettaglio richiesta</p>
-          <h1 className="text-3xl font-semibold text-[#0f172a]">{title}</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">Dettaglio richiesta</p>
+          <h1>{title}</h1>
 
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
-            <span className="rounded-full bg-[#f1f5f9] px-3 py-1 text-[#0f172a]">{statusLabel}</span>
+            <span className="badge">{statusLabel}</span>
             {isAdr && (
-              <span className="rounded-full bg-red-100 px-3 py-1 text-red-700">ADR</span>
+              <span className="badge border-danger/30 bg-danger/10 text-danger">ADR</span>
             )}
             {completed && (
-              <span className="rounded-full bg-emerald-50 px-2 py-1 text-emerald-700 ring-1 ring-emerald-200">
-                Completato
-              </span>
+              <span className="badge-verified">Completato</span>
             )}
             {acceptedAtDate && (
-              <span className="rounded-full bg-[#f1f5f9] px-3 py-1 text-[#0f172a]">
-                Accettato il {acceptedAtDate.toLocaleDateString("it-IT")}
+              <span className="badge">
+                Accettato il{" "}
+                <span className="stat-mono ml-1">{acceptedAtDate.toLocaleDateString("it-IT")}</span>
               </span>
             )}
           </div>
 
-          <p className="text-sm text-[#475569]">{statusCopy}</p>
-          {acceptMessage && <p className="text-sm text-[#0f172a]">{acceptMessage}</p>}
+          <p className="text-sm text-neutral-600">{statusCopy}</p>
+          {acceptMessage && <p className="text-sm text-textStrong">{acceptMessage}</p>}
 
           {role === "COMPANY" && isAccepted && !completed && (
             <button type="button" onClick={handleMarkCompleted} className="btn-secondary text-xs">
@@ -263,65 +271,67 @@ export function RequestDetailView({
             </button>
           )}
           {role === "TRANSPORTER" && assignedToOther && (
-            <p className="text-sm text-[#0f172a]">Trasporto gi&agrave; accettato.</p>
+            <p className="text-sm text-textStrong">Trasporto gi&agrave; accettato.</p>
           )}
           {role === "TRANSPORTER" && assignedToSelf && (
-            <p className="text-sm text-[#0f172a]">Sei il trasportatore assegnato.</p>
+            <p className="text-sm text-textStrong">Sei il trasportatore assegnato.</p>
           )}
         </div>
 
         {/* === RIEPILOGO GRIGLIA === */}
-        <div className="grid gap-4 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-4 text-sm md:grid-cols-4">
+        <div className="grid gap-4 rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-sm md:grid-cols-4">
           <div>
-            <p className="text-xs font-semibold uppercase text-[#64748b]">Valore trasporto</p>
-            <p className="text-lg font-semibold text-[#0f172a]">{formatCurrency(priceCents)}</p>
+            <p className="table-meta">Valore trasporto</p>
+            <p className="stat-mono text-lg font-bold text-textStrong">{formatCurrency(priceCents)}</p>
           </div>
-          <InfoCell label="Data ritiro" value={fmtDate(pickupDate)} />
-          <InfoCell label="Data consegna" value={fmtDate(deliveryDate)} />
+          <InfoCell label="Data ritiro" value={fmtDate(pickupDate)} mono />
+          <InfoCell label="Data consegna" value={fmtDate(deliveryDate)} mono />
           <div>
-            <p className="text-xs font-semibold uppercase text-[#64748b]">ID richiesta</p>
-            <p className="text-sm font-medium text-[#0f172a]">#{requestId}</p>
+            <p className="table-meta">ID richiesta</p>
+            <p className="stat-mono text-sm font-medium text-textStrong">#{requestId}</p>
           </div>
         </div>
       </div>
 
       {/* === DETTAGLI CARICO === */}
       <div className="card space-y-4">
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-[#0b3c5d]">Dettagli carico</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">Dettagli carico</h2>
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
           <InfoCell label="Tipo merce" value={cargoType ? (CARGO_LABELS[cargoType] || cargoType) : null} />
           <InfoCell label="Mezzo richiesto" value={vehicleType ? (VEHICLE_LABELS[vehicleType] || vehicleType) : null} />
-          <InfoCell label="Peso stimato" value={weight ? `${weight.toLocaleString("it-IT")} kg` : null} />
+          <InfoCell label="Peso stimato" value={weight ? `${weight.toLocaleString("it-IT")} kg` : null} mono />
           <InfoCell label="Volume / Dimensioni" value={volume} />
-          <InfoCell label="N. colli / pallet" value={palletCount ? String(palletCount) : null} />
-          <InfoCell label="Distanza" value={distanceKm ? `${distanceKm.toLocaleString("it-IT")} km` : null} />
+          <InfoCell label="N. colli / pallet" value={palletCount ? String(palletCount) : null} mono />
+          <InfoCell label="Distanza" value={distanceKm ? `${distanceKm.toLocaleString("it-IT")} km` : null} mono />
         </div>
         {cargo && (
           <div>
-            <p className="text-xs font-semibold uppercase text-[#64748b]">Note carico</p>
-            <p className="text-sm text-[#475569]">{cargo}</p>
+            <p className="table-meta">Note carico</p>
+            <p className="text-sm text-neutral-600">{cargo}</p>
           </div>
         )}
         {description && (
           <div>
-            <p className="text-xs font-semibold uppercase text-[#64748b]">Descrizione / istruzioni</p>
-            <p className="text-sm leading-relaxed text-[#475569]">{description}</p>
+            <p className="table-meta">Descrizione / istruzioni</p>
+            <p className="text-sm leading-relaxed text-neutral-600">{description}</p>
           </div>
         )}
       </div>
 
       {/* === ECONOMIA E PAGAMENTO === */}
       <div className="card space-y-4">
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-[#0b3c5d]">Budget e pagamento</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">Budget e pagamento</h2>
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
           <div>
-            <p className="text-xs font-semibold uppercase text-[#64748b]">Prezzo trasporto</p>
-            <p className="text-lg font-semibold text-[#0f172a]">{formatCurrency(priceCents)}</p>
+            <p className="table-meta">Prezzo trasporto</p>
+            <p className="stat-mono text-lg font-bold text-textStrong">{formatCurrency(priceCents)}</p>
           </div>
           <InfoCell label="Modalit&agrave; pagamento" value={paymentTerms ? (PAYMENT_LABELS[paymentTerms] || paymentTerms) : null} />
           <div>
-            <p className="text-xs font-semibold uppercase text-[#64748b]">Pubblicata il</p>
-            <p className="text-sm font-medium text-[#0f172a]">{new Date(createdAt).toLocaleDateString("it-IT")}</p>
+            <p className="table-meta">Pubblicata il</p>
+            <p className="stat-mono text-sm font-medium text-textStrong">
+              {new Date(createdAt).toLocaleDateString("it-IT")}
+            </p>
           </div>
         </div>
       </div>
@@ -329,7 +339,7 @@ export function RequestDetailView({
       {/* === REFERENTE RITIRO === */}
       {(pickupContact || pickupPhone || companyName) && (
         <div className="card space-y-4">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-[#0b3c5d]">Referente ritiro</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">Referente ritiro</h2>
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             <InfoCell label="Azienda" value={companyName} />
             <InfoCell label="Nome referente" value={pickupContact} />
@@ -340,12 +350,12 @@ export function RequestDetailView({
 
       {/* === CONTATTI (SBLOCCO) === */}
       {role === "COMPANY" && contactsVisible && (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
+        <div className="rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm text-textStrong">
           <p className="font-semibold">Trasporto accettato</p>
-          <p className="text-sm text-[#475569]">
+          <p className="text-sm text-neutral-600">
             Email trasportatore: {contactEmail ?? "Non disponibile"}
           </p>
-          <p className="text-sm text-[#475569]">
+          <p className="text-sm text-neutral-600">
             Telefono trasportatore: {contactPhone ?? "Non disponibile"}
           </p>
         </div>
@@ -354,8 +364,8 @@ export function RequestDetailView({
       <div className="card space-y-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
-            <h2 className="text-xl font-semibold text-[#0f172a]">Contatti</h2>
-            <p className="text-sm text-[#475569]">
+            <h2 className="text-xl font-semibold text-textStrong">Contatti</h2>
+            <p className="text-sm text-neutral-600">
               {contactsVisible
                 ? "Contatti disponibili per questa richiesta."
                 : "I contatti saranno visibili solo dopo il pagamento di entrambe le parti."}
@@ -364,39 +374,39 @@ export function RequestDetailView({
         </div>
 
         {contactsVisible ? (
-          <div className="space-y-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
+          <div className="space-y-2 rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-textStrong">
             <p className="font-semibold">{contactHeadline}</p>
-            <p className="text-sm text-[#475569]">{contactEmail ?? "Email non disponibile"}</p>
-            <p className="text-sm text-[#475569]">{contactPhone ?? "Telefono non disponibile"}</p>
-            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-700">
+            <p className="text-sm text-neutral-600">{contactEmail ?? "Email non disponibile"}</p>
+            <p className="text-sm text-neutral-600">{contactPhone ?? "Telefono non disponibile"}</p>
+            <span className="inline-flex items-center gap-2 rounded-full bg-success/15 px-2 py-1 text-[11px] font-semibold text-success">
               Contatti sbloccati
             </span>
           </div>
         ) : (
-          <div className="space-y-4 rounded-xl border border-dashed border-[#f5c76a]/80 bg-[#fff8ed] p-4 text-sm text-[#475569]">
-            <div className="text-sm text-[#0f172a]">
+          <div className="space-y-4 rounded-xl border border-dashed border-accent-200 bg-accent-50/60 p-4 text-sm text-neutral-600">
+            <div className="text-sm text-textStrong">
               Contatti disponibili dopo il pagamento della commissione (2% + IVA)
             </div>
             {shouldShowCta && (
-              <div className="rounded-xl border border-[#e2e8f0] bg-white p-4 text-sm text-[#0f172a] shadow-sm">
+              <div className="rounded-xl border border-neutral-200 bg-white p-4 text-sm text-textStrong shadow-sm">
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#64748b]">Sblocca contatti</p>
-                  <p className="text-sm text-[#475569]">Commissione di servizio applicata solo a trasporto concluso.</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Sblocca contatti</p>
+                  <p className="text-sm text-neutral-600">Commissione di servizio applicata solo a trasporto concluso.</p>
                 </div>
-                <div className="mt-4 space-y-2 rounded-lg bg-[#f8fafc] p-3">
-                  <div className="flex items-center justify-between text-xs text-[#475569]">
+                <div className="mt-4 space-y-2 rounded-lg bg-neutral-50 p-3">
+                  <div className="flex items-center justify-between text-xs text-neutral-600">
                     <span>Importo trasporto</span>
-                    <span className="font-semibold text-[#0f172a]">{euroFormatter.format(transportValue)}</span>
+                    <span className="font-semibold text-textStrong">{euroFormatter.format(transportValue)}</span>
                   </div>
-                  <div className="flex items-center justify-between text-xs text-[#475569]">
+                  <div className="flex items-center justify-between text-xs text-neutral-600">
                     <span>Commissione DodiX (2%)</span>
                     <span>{euroFormatter.format(commission)}</span>
                   </div>
-                  <div className="flex items-center justify-between text-xs text-[#475569]">
+                  <div className="flex items-center justify-between text-xs text-neutral-600">
                     <span>IVA 22%</span>
                     <span>{euroFormatter.format(iva)}</span>
                   </div>
-                  <div className="mt-2 flex items-center justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-[#0f172a]">
+                  <div className="mt-2 flex items-center justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-textStrong">
                     <span>Totale</span>
                     <span>{euroFormatter.format(total)}</span>
                   </div>
@@ -413,10 +423,10 @@ export function RequestDetailView({
             )}
             {hasPaid && !contactsVisible && (
               <div className="space-y-2">
-                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-700">
+                <span className="inline-flex items-center gap-2 rounded-full bg-success/15 px-2 py-1 text-[11px] font-semibold text-success">
                   Pagamento completato
                 </span>
-                <p className="text-xs text-[#475569]">In attesa del pagamento dell&apos;altra parte</p>
+                <p className="text-xs text-neutral-600">In attesa del pagamento dell&apos;altra parte</p>
               </div>
             )}
           </div>

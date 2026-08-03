@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { CompanyRequestsTable } from "@/components/dashboard/company-requests-table";
+import { SkeletonCard } from "@/components/skeleton";
 import { TransporterJobsTable } from "@/components/dashboard/transporter/jobs-table";
 import { type Role } from "@/lib/roles";
 
@@ -84,7 +85,14 @@ export function RequestsListClient({ role, basePath, variant, emptyMessage }: Re
   }, []);
 
   if (loading) {
-    return <p className="text-sm leading-relaxed text-[#475569]">Caricamento richieste...</p>;
+    // Skeleton al posto dello spinner: la lista appare gia nella sua forma finale.
+    return (
+      <div className="space-y-3">
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
+      </div>
+    );
   }
 
   if (loadError) {
@@ -92,7 +100,7 @@ export function RequestsListClient({ role, basePath, variant, emptyMessage }: Re
       <div className="space-y-1">
         <p className="alert-warning">{loadError}</p>
         {process.env.NODE_ENV !== "production" && loadErrorDetails ? (
-          <p className="text-xs text-slate-600">Dettaglio errore: {loadErrorDetails}</p>
+          <p className="text-xs text-neutral-600">Dettaglio errore: {loadErrorDetails}</p>
         ) : null}
       </div>
     );
@@ -101,7 +109,7 @@ export function RequestsListClient({ role, basePath, variant, emptyMessage }: Re
   if (variant === "company") {
     if (items.length === 0) {
       return (
-        <div className="card text-sm leading-relaxed text-[#475569]">
+        <div className="card-muted text-sm leading-relaxed text-neutral-600">
           {emptyMessage ?? "Nessuna richiesta presente. Pubblica la prima per ricevere contatti diretti."}
         </div>
       );

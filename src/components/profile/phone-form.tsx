@@ -34,7 +34,7 @@ export function PhoneForm({ initialPhone }: { initialPhone?: string | null }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="space-y-1">
-        <label className="text-xs font-semibold uppercase tracking-wide text-[#475569]" htmlFor="phone">
+        <label className="label" htmlFor="phone">
           Telefono
         </label>
         <input
@@ -46,12 +46,12 @@ export function PhoneForm({ initialPhone }: { initialPhone?: string | null }) {
           onChange={(event) => setPhone(event.target.value)}
           placeholder="Inserisci il tuo numero"
         />
-        <p className="text-xs text-[#64748b]">Il numero sarà visibile alle aziende dopo l&apos;assegnazione.</p>
+        <p className="text-xs text-neutral-500">Il numero sarà visibile alle aziende dopo l&apos;assegnazione.</p>
       </div>
-      <button type="submit" className="btn-primary w-full sm:w-auto" disabled={saving}>
+      <button type="submit" className="btn-primary min-h-[44px] w-full sm:w-auto" disabled={saving}>
         {saving ? "Salvataggio..." : "Salva numero"}
       </button>
-      {message && <p className="text-xs text-[#475569]">{message}</p>}
+      {message && <p className="text-xs font-semibold text-success">{message}</p>}
     </form>
   );
 }

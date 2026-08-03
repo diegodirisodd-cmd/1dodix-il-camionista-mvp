@@ -50,7 +50,7 @@ export function PaywallModal({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-3 top-3 inline-flex items-center justify-center rounded-full p-2 text-slate-500 transition hover:bg-slate-100"
+          className="absolute right-3 top-3 inline-flex items-center justify-center rounded-full p-2 text-neutral-500 transition hover:bg-neutral-100"
           aria-label="Chiudi paywall"
         >
           <span aria-hidden="true" className="text-lg leading-none">
@@ -60,50 +60,50 @@ export function PaywallModal({
 
         <div className="space-y-4 p-6">
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#475569]">Sblocco contatti</p>
-            <h2 className="text-2xl font-semibold text-[#0f172a]">Sblocca i contatti di questa richiesta</h2>
-            <p className="text-sm font-semibold text-[#0f172a]">{roleHeadline}</p>
-            <p className="text-sm text-[#475569]">{roleMicrocopy}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-600">Sblocco contatti</p>
+            <h2 className="text-2xl font-semibold text-textStrong">Sblocca i contatti di questa richiesta</h2>
+            <p className="text-sm font-semibold text-textStrong">{roleHeadline}</p>
+            <p className="text-sm text-neutral-600">{roleMicrocopy}</p>
           </div>
 
-          <div className="space-y-2 rounded-xl border border-[#E5E7EB] bg-[#F8FAFC] p-4">
-            <p className="text-sm font-semibold text-[#0f172a]">Informazioni principali</p>
-            <ul className="space-y-2 text-sm text-[#475569]">
-              <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Nessun abbonamento</li>
-              <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Paghi solo quando lavori</li>
-              <li className="flex items-start gap-2"><span className="text-[#0f172a]">✔</span> Commissione una tantum per questa richiesta</li>
+          <div className="space-y-2 rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+            <p className="text-sm font-semibold text-textStrong">Informazioni principali</p>
+            <ul className="space-y-2 text-sm text-neutral-600">
+              <li className="flex items-start gap-2"><span className="text-textStrong">✔</span> Nessun abbonamento</li>
+              <li className="flex items-start gap-2"><span className="text-textStrong">✔</span> Paghi solo quando lavori</li>
+              <li className="flex items-start gap-2"><span className="text-textStrong">✔</span> Commissione una tantum per questa richiesta</li>
             </ul>
           </div>
 
-          <div className="space-y-2 rounded-xl border border-[#E5E7EB] bg-white p-4">
-            <p className="text-sm font-semibold text-[#0f172a]">Riepilogo commissione</p>
-            <div className="space-y-2 text-sm text-[#475569]">
+          <div className="space-y-2 rounded-xl border border-neutral-200 bg-white p-4">
+            <p className="text-sm font-semibold text-textStrong">Riepilogo commissione</p>
+            <div className="space-y-2 text-sm text-neutral-600">
               <div className="flex items-center justify-between">
                 <span>Valore trasporto</span>
-                <span className="font-semibold text-[#0f172a]">
+                <span className="font-semibold text-textStrong">
                   {normalizedPriceCents !== null ? formatCurrency(normalizedPriceCents) : "Importo non specificato"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Commissione 2%</span>
-                <span className="font-semibold text-[#0f172a]">
+                <span className="font-semibold text-textStrong">
                   {breakdown ? formatCurrency(breakdown.commission) : "—"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span>IVA (22%)</span>
-                <span className="font-semibold text-[#0f172a]">
+                <span className="font-semibold text-textStrong">
                   {breakdown ? formatCurrency(breakdown.vat) : "—"}
                 </span>
               </div>
-              <div className="flex items-center justify-between border-t border-[#E5E7EB] pt-2">
-                <span className="font-semibold text-[#0f172a]">Totale commissione</span>
-                <span className="font-semibold text-[#0f172a]">
+              <div className="flex items-center justify-between border-t border-neutral-200 pt-2">
+                <span className="font-semibold text-textStrong">Totale commissione</span>
+                <span className="font-semibold text-textStrong">
                   {breakdown ? formatCurrency(breakdown.total) : "—"}
                 </span>
               </div>
             </div>
-            <p className="text-xs text-[#64748b]">
+            <p className="text-xs text-neutral-500">
               Questa commissione viene applicata una sola volta solo per questa richiesta.
             </p>
           </div>
@@ -113,24 +113,24 @@ export function PaywallModal({
               type="button"
               onClick={onConfirm}
               disabled={loading}
-              className="w-full rounded-full bg-[#0f172a] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+              className="btn-primary min-h-[44px] w-full px-4 py-3"
             >
               {loading ? "Sblocco in corso..." : "Conferma e sblocca contatti"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-full rounded-full border border-[#e2e8f0] px-4 py-3 text-sm font-semibold text-[#0f172a] transition hover:bg-[#f8fafc]"
+              className="btn-secondary min-h-[44px] w-full px-4 py-3"
             >
               Annulla
             </button>
-            <p className="text-xs font-medium text-[#64748b]">
+            <p className="text-xs font-medium text-neutral-500">
               {breakdown
                 ? `Totale commissione: ${formatCurrency(breakdown.total)} (2% + IVA)`
                 : "La commissione verrà calcolata sull’importo concordato."}
             </p>
             {normalizedPriceCents !== null && (
-              <p className="text-[11px] text-[#64748b]">
+              <p className="text-[11px] text-neutral-500">
                 La commissione è calcolata sull’importo indicato nella richiesta.
               </p>
             )}

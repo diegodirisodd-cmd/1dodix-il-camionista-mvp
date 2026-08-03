@@ -19,12 +19,12 @@ export default async function CompanyBillingPage() {
 
   return (
     <section className="space-y-6">
-      <div className="card space-y-3">
+      <div className="card animate-fadeUp space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-wide text-textStrong">Commissione per richiesta</p>
-            <h1 className="text-3xl font-semibold text-textStrong">Sblocca i contatti quando serve</h1>
-            <p className="text-sm leading-relaxed text-slate-600">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">Commissione per richiesta</p>
+            <h1>Sblocca i contatti quando serve</h1>
+            <p className="text-sm leading-relaxed text-neutral-600">
               Paghi solo quando sblocchi i contatti di una richiesta. Nessun canone fisso.
             </p>
           </div>
@@ -33,14 +33,14 @@ export default async function CompanyBillingPage() {
       </div>
 
       <div className="card space-y-4">
-        <p className="text-sm leading-relaxed text-slate-600">
+        <p className="text-sm leading-relaxed text-neutral-600">
           Pubblica richieste e sblocca i contatti solo quando vuoi parlare con un trasportatore. Paghi una commissione una tantum per richiesta.
         </p>
         <div className="flex flex-wrap items-center gap-3">
-          <a href="/dashboard/company/requests" className="btn btn-primary">
+          <a href="/dashboard/company/requests" className="btn-primary min-h-[44px]">
             Vai alle richieste
           </a>
-          <div className="space-y-1 text-xs font-medium text-slate-600">
+          <div className="space-y-1 text-xs font-medium text-neutral-600">
             <div className="flex items-start gap-2"><span className="text-textStrong">✔</span> Contatti diretti verificati</div>
             <div className="flex items-start gap-2"><span className="text-textStrong">✔</span> Nessuna intermediazione</div>
             <div className="flex items-start gap-2"><span className="text-textStrong">✔</span> Priorità nelle richieste</div>

@@ -18,12 +18,12 @@ export default async function ProfilePage() {
 
   return (
     <section className="space-y-6">
-      <div className="card space-y-3">
+      <div className="card animate-fadeUp space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-slate-700">Profilo</p>
-            <h1 className="text-2xl font-semibold text-slate-900">Dettagli account</h1>
-            <p className="text-sm leading-relaxed text-slate-700">
+            <p className="text-sm font-semibold text-neutral-600">Profilo</p>
+            <h1>Dettagli account</h1>
+            <p className="text-sm leading-relaxed text-neutral-600">
               Accesso verificato per {user.email}. Gestisci le tue informazioni principali da questa sezione.
             </p>
           </div>
@@ -36,31 +36,31 @@ export default async function ProfilePage() {
         </div>
       </div>
 
-      <div className="card space-y-6 text-sm text-slate-700">
+      <div className="card space-y-6 text-sm text-neutral-600">
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">Ruolo</p>
-            <p className="text-base font-semibold text-slate-900">{user.role}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-600">Ruolo</p>
+            <p className="text-base font-semibold text-textStrong">{user.role}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">Telefono</p>
-            <p className="text-base font-semibold text-slate-900">{user.phone ?? "Telefono non disponibile"}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-600">Telefono</p>
+            <p className="text-base font-semibold text-textStrong">{user.phone ?? "Telefono non disponibile"}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">Creato il</p>
-            <p className="text-base font-semibold text-slate-900">{new Date(user.createdAt).toLocaleString("it-IT")}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-600">Creato il</p>
+            <p className="text-base font-semibold text-textStrong">{new Date(user.createdAt).toLocaleString("it-IT")}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">Commissione contatti</p>
-            <p className="text-base font-semibold text-slate-900">{subscriptionActive ? "Accesso completo attivo" : "Paghi solo quando sblocchi"}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-600">Commissione contatti</p>
+            <p className="text-base font-semibold text-textStrong">{subscriptionActive ? "Accesso completo attivo" : "Paghi solo quando sblocchi"}</p>
           </div>
         </div>
 
         {user.role === "TRANSPORTER" && (
-          <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+          <div className="space-y-3 rounded-xl border border-neutral-200 bg-white p-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">Aggiorna telefono</p>
-              <p className="text-sm text-slate-600">Il numero sarà mostrato alle aziende dopo l&apos;assegnazione.</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-600">Aggiorna telefono</p>
+              <p className="text-sm text-neutral-600">Il numero sarà mostrato alle aziende dopo l&apos;assegnazione.</p>
             </div>
             <PhoneForm initialPhone={user.phone} />
           </div>

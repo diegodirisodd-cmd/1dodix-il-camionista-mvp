@@ -21,26 +21,26 @@ export function AppFrame({ user, children }: { user: AppUser; children: React.Re
   const subscriptionActive = hasActiveSubscription(user);
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa] text-[#0f172a]">
+    <div className="min-h-screen bg-[#f5f7fa] text-textStrong">
       <AppSidebar open={open} onClose={() => setOpen(false)} user={user} />
 
       <div className="md:ml-64">
-        <header className="sticky top-0 z-30 border-b border-[#e2e8f0] bg-white/95 backdrop-blur">
+        <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white/95 backdrop-blur">
           <div className="flex items-center justify-between px-4 py-4 sm:px-6">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setOpen(true)}
-                className="inline-flex items-center justify-center rounded-md border border-[#e2e8f0] px-3 py-2 text-sm font-semibold text-[#0f172a] shadow-sm transition hover:bg-slate-50 md:hidden"
+                className="inline-flex items-center justify-center rounded-md border border-neutral-200 px-3 py-2 text-sm font-semibold text-textStrong shadow-sm transition hover:bg-neutral-50 md:hidden"
                 aria-label="Apri menu"
               >
                 Menu
               </button>
-              <Link href="/" className="text-lg font-semibold text-[#0f172a]">
+              <Link href="/" className="text-lg font-semibold text-textStrong">
                 DodiX – Il Camionista
               </Link>
             </div>
 
-            <div className="flex items-center gap-3 text-sm text-[#475569]">
+            <div className="flex items-center gap-3 text-sm text-neutral-600">
               <SubscriptionBadge active={subscriptionActive} role={user.role} />
               <LogoutButton variant="light" />
             </div>

@@ -32,8 +32,8 @@ export function LogoutButton({ variant = "dark" }: { variant?: "dark" | "light" 
 
   const buttonClass =
     variant === "light"
-      ? "inline-flex items-center rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
-      : "inline-flex items-center rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-sm font-semibold text-[#0f172a] shadow-sm transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b3c5d]/15";
+      ? "inline-flex items-center rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/40"
+      : "inline-flex items-center rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-semibold text-textStrong shadow-sm transition-colors duration-150 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-200";
 
   return (
     <div className="space-y-2">
@@ -41,7 +41,7 @@ export function LogoutButton({ variant = "dark" }: { variant?: "dark" | "light" 
         {submitting ? "Uscita in corso..." : "Esci"}
       </button>
       {error && (
-        <p role="alert" className="text-xs font-semibold text-red-600">
+        <p role="alert" className="text-xs font-semibold text-danger">
           {error}
         </p>
       )}

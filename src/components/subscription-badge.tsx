@@ -61,7 +61,7 @@ export function SubscriptionBadge({
         color: "bg-warning/10 text-warning ring-1 ring-warning/20",
         icon: <IconLightning />,
         helper: (
-          <span className="text-[11px] font-medium text-slate-600">
+          <span className="text-[11px] font-medium text-neutral-600">
             Paghi solo quando sblocchi i contatti di una richiesta.
           </span>
         ),
