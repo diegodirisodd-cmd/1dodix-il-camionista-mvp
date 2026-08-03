@@ -46,7 +46,10 @@ Un'animazione con uno scopo, non decorazione sparsa:
   di emergenza: usare solo per urgenza/emergenza reale, non come decorazione.
 - `.skeleton` — shimmer per stati di caricamento al posto degli spinner.
 - `.bg-road` — texture "linee di carreggiata" molto discreta (opacità ~5%) per
-  hero scuri, pan lentissimo (18s).
+  hero scuri, pan lentissimo (18s). È un **overlay su `::before`**, non un
+  `background-image` sull'elemento: si combina con `.card-contrast` (o con un
+  gradiente Tailwind) senza sostituirne lo sfondo. I figli diretti vengono
+  alzati a `z-index: 1`; le utility di posizionamento continuano a vincere.
 - Tutto rispetta `prefers-reduced-motion` (regola globale in `globals.css` che
   azzera le durate).
 
@@ -62,7 +65,9 @@ Un'animazione con uno scopo, non decorazione sparsa:
   al hover con lift.
 - `.card-contrast` — gradiente asfalto (`brand-900` → `brand-700`) con glow
   radiale hi-vis discreto in alto a destra. Per hero, form di registrazione,
-  callout finali.
+  callout finali. Lo sfondo è una singola dichiarazione `background`: **non
+  aggiungere `bg-gradient-to-*` / `from-*` / `via-*` / `to-*` in `@apply`**,
+  emettono un `background-image` concorrente che entra in conflitto.
 - `.card-muted` — tinta `steel-50`, per box informativi/guida.
 - `.glass` — superficie traslucida (`bg-white/5`, `backdrop-blur`) su fondi
   scuri.

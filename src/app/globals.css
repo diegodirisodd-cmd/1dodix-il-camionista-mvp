@@ -101,9 +101,12 @@ a {
     @apply hover:-translate-y-1 hover:shadow-cardHover;
   }
 
+  /* Niente utility gradiente in @apply: le classi bg-gradient-to-* / from-* /
+     via-* / to-* emettono un loro background-image che entra in conflitto con
+     quello esplicito qui sotto. Una sola dichiarazione "background". */
   .card-contrast {
-    @apply relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-brand-900 via-brand-800 to-brand-700 p-8 text-neutral-50 shadow-deep;
-    background-image:
+    @apply relative overflow-hidden rounded-2xl border border-white/10 p-8 text-neutral-50 shadow-deep;
+    background:
       radial-gradient(600px circle at 85% -10%, rgba(255,106,0,0.16), transparent 60%),
       linear-gradient(135deg, #0B1420 0%, #182838 55%, #22394D 100%);
   }
@@ -230,8 +233,20 @@ a {
     @apply opacity-100 translate-y-0;
   }
 
-  /* ── Texture "strada" ambientale per hero scuri, molto discreta ── */
+  /* ── Texture "strada" ambientale per hero scuri, molto discreta ──
+     È un overlay su pseudo-elemento, non un background-image sull'elemento:
+     .bg-road viene quasi sempre combinata con .card-contrast (o con un
+     gradiente Tailwind, come in /onboarding e /login) e, essendo dichiarata
+     più avanti nel foglio, ne sostituirebbe integralmente lo sfondo scuro
+     lasciando solo le righe bianche su fondo trasparente. */
   .bg-road {
+    @apply relative;
+  }
+
+  .bg-road::before {
+    content: "";
+    @apply pointer-events-none absolute inset-0 z-0;
+    border-radius: inherit;
     background-image: repeating-linear-gradient(
       -45deg,
       rgba(255,255,255,0.05) 0px,
@@ -241,5 +256,11 @@ a {
     );
     background-size: 200% 200%;
     animation: floatSlow 18s ease-in-out infinite;
+  }
+
+  /* Il contenuto resta sopra l'overlay. Le utility di posizionamento
+     (es. "absolute") vincono comunque: il layer utilities viene dopo. */
+  .bg-road > * {
+    @apply relative z-[1];
   }
 }
