@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { ScrollReveal } from "@/components/scroll-reveal";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { hasActiveSubscription } from "@/lib/subscription";
@@ -62,43 +63,66 @@ export default async function TransporterDashboardPage() {
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <div className="card animate-fadeUp space-y-3">
-          <div className="space-y-1">
-            <h2 className="text-lg">Richieste disponibili</h2>
-            <p className="text-sm leading-relaxed text-neutral-600">Consulta le tratte compatibili e valuta i carichi.</p>
+        <ScrollReveal className="h-full">
+          <div className="card card-hover flex h-full flex-col space-y-3">
+            <div className="space-y-1">
+              <h2 className="text-lg">Richieste disponibili</h2>
+              <p className="text-sm leading-relaxed text-neutral-600">
+                Consulta le tratte compatibili e valuta i carichi.
+              </p>
+            </div>
+            <Link href="/dashboard/transporter/jobs" className="btn-primary min-h-[44px]">
+              Vedi richieste
+            </Link>
+            <p className="text-xs text-neutral-600">Contatti visibili solo dopo lo sblocco con commissione.</p>
           </div>
-          <Link href="/dashboard/transporter/jobs" className="btn-primary min-h-[44px]">
-            Vedi richieste
-          </Link>
-          <p className="text-xs text-neutral-600">Contatti visibili solo dopo lo sblocco con commissione.</p>
-        </div>
+        </ScrollReveal>
 
-        <div className="card animate-fadeUp space-y-3">
-          <div className="space-y-1">
-            <h2 className="text-lg">Commissione per richiesta</h2>
-            <p className="text-sm leading-relaxed text-neutral-600">
-              Scopri come funziona lo sblocco dei contatti per richiesta.
-            </p>
+        <ScrollReveal className="h-full" delayMs={80}>
+          <div className="card card-hover flex h-full flex-col space-y-3">
+            <div className="space-y-1">
+              <h2 className="text-lg">Borsa Servizi</h2>
+              <p className="text-sm leading-relaxed text-neutral-600">
+                Mezzo fermo o intervento da programmare? Pubblica una richiesta e ricevi preventivi da
+                officine, telonai, gommisti e soccorso stradale.
+              </p>
+            </div>
+            <Link href="/dashboard/services/new" className="btn-primary min-h-[44px]">
+              Cerco un servizio
+            </Link>
+            <p className="text-xs text-neutral-600">Pubblicare è gratuito.</p>
           </div>
-          <Link
-            href="/dashboard/billing"
-            className="btn-secondary min-h-[44px]"
-          >
-            Dettagli commissioni
-          </Link>
-          <p className="text-xs text-neutral-600">Paghi solo quando sblocchi i contatti.</p>
-        </div>
+        </ScrollReveal>
 
-        <div className="card animate-fadeUp space-y-3">
-          <div className="space-y-1">
-            <h2 className="text-lg">Profilo</h2>
-            <p className="text-sm leading-relaxed text-neutral-600">Aggiorna mezzi, tratte preferite e recapiti.</p>
+        <ScrollReveal className="h-full" delayMs={160}>
+          <div className="card card-hover flex h-full flex-col space-y-3">
+            <div className="space-y-1">
+              <h2 className="text-lg">Commissione per richiesta</h2>
+              <p className="text-sm leading-relaxed text-neutral-600">
+                Scopri come funziona lo sblocco dei contatti per richiesta.
+              </p>
+            </div>
+            <Link href="/dashboard/billing" className="btn-secondary min-h-[44px]">
+              Dettagli commissioni
+            </Link>
+            <p className="text-xs text-neutral-600">Paghi solo quando sblocchi i contatti.</p>
           </div>
-          <Link href="/dashboard/transporter/profile" className="btn-secondary min-h-[44px]">
-            Vai al profilo
-          </Link>
-          <p className="text-xs text-neutral-600">Resta visibile alle aziende verifiche.</p>
-        </div>
+        </ScrollReveal>
+
+        <ScrollReveal className="h-full" delayMs={240}>
+          <div className="card card-hover flex h-full flex-col space-y-3">
+            <div className="space-y-1">
+              <h2 className="text-lg">Profilo</h2>
+              <p className="text-sm leading-relaxed text-neutral-600">
+                Aggiorna mezzi, tratte preferite e recapiti.
+              </p>
+            </div>
+            <Link href="/dashboard/transporter/profile" className="btn-secondary min-h-[44px]">
+              Vai al profilo
+            </Link>
+            <p className="text-xs text-neutral-600">Resta visibile alle aziende verificate.</p>
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );

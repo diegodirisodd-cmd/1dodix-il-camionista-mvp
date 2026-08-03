@@ -89,10 +89,21 @@ I ruoli sono stringhe (`TRANSPORTER`, `COMPANY`, `ADMIN` - quest'ultimo pensato 
 - **Admin (solo lettura)**: il ruolo `ADMIN` accede a `/dashboard/admin` per visualizzare elenco utenti e richieste in modalità di sola consultazione; non sono previste azioni di modifica o moderazione nell'MVP.
 
 ## Design system
-- Palette industriale B2B: blu profondo (`brand-800`) come primario, arancio (`accent-500`) come accento e neutri controllati (`neutral-*`).
-- Tipografia: Inter via `next/font` (fallback Roboto/system) con gerarchia forte su H1-H3 e label in `text-sm` semibold.
-- Spaziatura codificata in variabili CSS (`--space-*`) e classi component per bottoni, card, form, tabelle, alert e badge (vedi `src/app/globals.css`).
-- Documentazione completa in `docs/design-system.md` per palette, scala tipografica, componenti riutilizzabili e regole di layout.
+- Identità "asfalto e alta visibilità": scala `brand` asfalto (`brand-900` = `#0B1420`) per sidebar e superfici scure, `accent` hi-vis (`accent-500` = `#FF6A00`) per le CTA, `steel` come accento freddo secondario.
+- Tipografia: Inter per corpo/UI, Archivo per i titoli (`font-display`), JetBrains Mono per ogni cifra quantitativa (`.stat-mono`) — prezzi, km, ID richiesta, date. Tutto via `next/font`.
+- Spaziatura codificata in variabili CSS (`--space-*`) e classi component per bottoni, card, form, tabelle, alert e badge (vedi `src/app/globals.css`). Niente hex hardcoded nel markup.
+- Animazioni con uno scopo: `animate-fadeUp` all'apertura, `ScrollReveal` per sezione, `.card-hover`, `.badge-urgent`, `.skeleton` al posto degli spinner — tutte disattivate sotto `prefers-reduced-motion`.
+- **`docs/design-system.md` è la fonte di verità**: leggilo prima di scrivere nuovo CSS o markup.
+
+## Borsa Servizi
+Marketplace di servizi al mezzo (officine, telonai, gommisti, soccorso stradale,
+carrozzerie, lavaggio) dentro DodiX, per il ruolo `TRANSPORTER` e il nuovo ruolo
+`SUPPLIER`. Ruoli, stati della richiesta, matching, visibilità dei contatti,
+prezzi e API sono documentati in `docs/borsa-servizi.md`.
+
+Variabili d'ambiente aggiuntive:
+- `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` — upload delle foto sul bucket privato Supabase Storage (solo lato server).
+- `RESEND_API_KEY` e `FROM_EMAIL` — notifiche email ai fornitori (opzionali: senza chiave gli invii vengono saltati con un warning).
 
 ## Pubblicazione richieste
 - **Company**: compila il form nella pagina `/dashboard/company` oppure invia una `POST /api/requests` con `pickup`, `delivery`, `price` (campi facoltativi: `cargo`, `description`).
