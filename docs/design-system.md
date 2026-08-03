@@ -1,90 +1,102 @@
-# DodiX – Il Camionista · Design System
+# DodiX – Il Camionista · Design System v2
 
-Identità visiva industriale e premium pensata per clienti B2B nel settore trasporti e food/export. Gli elementi qui descritti sono implementati con Tailwind e classi di utilità dedicate in `src/app/globals.css` e nel tema `tailwind.config.ts`.
+Identità industriale "asfalto e alta visibilità": blu asfalto profondo, arancione
+hi-vis satura, cifre in monospace per tutto ciò che è quantitativo (prezzi, km,
+ID richiesta). Fluida ma disciplinata: un'animazione alla volta, mai decorazione
+fine a sé stessa. Implementata in `src/app/globals.css` e `tailwind.config.ts`.
 
 ## Color palette
 | Token | Hex | Uso |
 | --- | --- | --- |
-| `brand-900` | `#0f1a2a` | Blu industriale profondo per header, sfondi scuri, card contrast |
-| `brand-700` | `#26395b` | Hover primario, icone, sidebar |
-| `brand-300` | `#7e9ac6` | Bordi e highlight su superfici scure |
-| `accent-500` | `#f46f00` | CTA principali, indicatori urgenti |
-| `accent-300` | `#ffa240` | Hover accent, badge informativi |
-| `neutral-50` | `#f6f7fa` | Neutro chiaro per overlay e contrasti |
-| `neutral-900` | `#121824` | Testo principale su fondi chiari, ombre profonde |
-| `success` | `#16a34a` | Conferme, badge VERIFIED |
-| `warning` | `#f59e0b` | Attenzione |
-| `danger` | `#dc2626` | Errori |
+| `brand-900` | `#0B1420` | Asfalto profondo: hero, sidebar, card-contrast |
+| `brand-700` | `#22394D` | Superficie scura secondaria, hover su fondo scuro |
+| `brand-300` | `#87A3BA` | Bordi/testo secondario su fondi scuri |
+| `accent-500` | `#FF6A00` | CTA principali, stati urgenti — hi-vis, non decorativo |
+| `accent-300` | `#FFA347` | Hover accent, badge informativi |
+| `steel-500` | `#41708F` | Accento freddo secondario: link, badge "in corso" |
+| `appBg` | `#F6F7FA` | Sfondo pagine chiare (dashboard) |
+| `neutral-900` | `#121824` | Testo principale su fondi chiari |
+| `success` / `warning` / `danger` | `#22C55E` / `#F59E0B` / `#EF4444` | Semantici, invariati |
 
-## Typography scale
-Font primario: **Inter** (fallback Roboto/system). Tagli netti e leggibili.
+Regola: le pagine "hero" (home, register, login) usano fondo scuro asfalto
+(`card-contrast`, `bg-road`); le dashboard usano fondo chiaro (`appBg`). Non
+mischiare: un componente scuro su pagina chiara va sempre dentro `.card-contrast`
+o `.glass`, mai testo chiaro direttamente sul body chiaro.
 
-- Display / H1: `text-4xl` (mobile) / `text-5xl` (desktop), `font-semibold`, `leading-tight`
-- H2: `text-3xl` / `text-4xl`, `font-semibold`
-- H3: `text-2xl`, `font-semibold`
-- H4: `text-xl`, `font-semibold`
-- Body: `text-base`, `text-neutral-100/80` su fondi scuri
-- Meta/Label: `text-xs` o `text-sm`, uppercase con tracking ampia
+## Typography
+- **Display / titoli** (`h1`-`h3`, classe `font-display`): **Archivo** 700/800,
+  `tracking-tight` — dà carattere senza diventare un cliché editoriale.
+- **Corpo / UI**: **Inter**, invariato, resta il workhorse per leggibilità.
+- **Cifre** (prezzi, km, ID richiesta, orari): classe `.stat-mono` → **JetBrains
+  Mono** — firma distintiva del prodotto, richiama un manifesto/bolla di
+  trasporto. Usare ovunque compaia un numero quantitativo, mai per testo libero.
 
-Inter è importato via `next/font` in `src/app/layout.tsx` e applicato al `<body>`.
+Caricati via `next/font/google` in `src/app/layout.tsx` (variabili CSS
+`--font-inter`, `--font-archivo`, `--font-jbmono`), niente `<link>` esterni.
 
-## Spacing rules
-Scala coerente espressa come CSS custom properties (vedi `:root` in `globals.css`):
-- `--space-2xs`: 4px
-- `--space-xs`: 8px
-- `--space-sm`: 12px
-- `--space-md`: 16px
-- `--space-lg`: 24px
-- `--space-xl`: 32px
-- `--space-2xl`: 48px
-- `--space-3xl`: 64px
-
-Usa `gap`/`padding` con questi step per sezioni, card e form.
+## Motion
+Un'animazione con uno scopo, non decorazione sparsa:
+- `animate-fadeUp` — hero e card al primo render.
+- `.reveal` + `components/scroll-reveal.tsx` — fade-up all'ingresso in viewport
+  (una volta sola, IntersectionObserver).
+- Hover card: `.card-hover` (`-translate-y-1` + `shadow-cardHover`).
+- `.btn-primary` — sheen animato al passaggio del mouse (`::after`), lift,
+  glow arancio.
+- `.badge-urgent` — puntino pulsante (`animate-pulseGlow`), richiama una luce
+  di emergenza: usare solo per urgenza/emergenza reale, non come decorazione.
+- `.skeleton` — shimmer per stati di caricamento al posto degli spinner.
+- `.bg-road` — texture "linee di carreggiata" molto discreta (opacità ~5%) per
+  hero scuri, pan lentissimo (18s).
+- Tutto rispetta `prefers-reduced-motion` (regola globale in `globals.css` che
+  azzera le durate).
 
 ## Buttons
-Classi riutilizzabili definite in `@layer components`:
-- **Primario**: `.btn-primary` — arancione industriale, testo bianco, focus ring arancio chiaro, disabled attenuato.
-- **Secondario**: `.btn-secondary` — bordo blu chiaro su fondo scuro, testo chiaro, hover con leggero contrasto.
-- **Ghost**: `.btn-ghost` — testo chiaro e hover trasparente per link contestuali.
+- `.btn-primary` — gradiente hi-vis, glow, sheen al hover, lift, focus ring
+  arancio.
+- `.btn-secondary` — bordo `brand-300`, testo `brand-700`, per superfici
+  chiare.
+- `.btn-ghost` — testo puro, hover neutro, per link contestuali.
 
 ## Cards
-- `.card`: superficie traslucida su fondi scuri (`bg-white/5`), bordo `white/10`, `shadow-card`, `rounded-2xl`.
-- `.card-muted`: variante leggermente più chiara (`bg-white/10`) per messaggi informativi.
-- `.card-contrast`: versione più intensa (`bg-brand-900/60`) per hero o callout.
+- `.card` + `.card-hover` — superficie bianca, `shadow-card` → `shadow-cardHover`
+  al hover con lift.
+- `.card-contrast` — gradiente asfalto (`brand-900` → `brand-700`) con glow
+  radiale hi-vis discreto in alto a destra. Per hero, form di registrazione,
+  callout finali.
+- `.card-muted` — tinta `steel-50`, per box informativi/guida.
+- `.glass` — superficie traslucida (`bg-white/5`, `backdrop-blur`) su fondi
+  scuri.
 
 ## Forms
-- Etichetta: `.label`
-- Campo: `.input-field` (bordo `white/20`, fondo semitrasparente, focus accent, testo chiaro)
-- Wrapper campi: `.form-field` (gap maggiore e spaziatura generosa)
-- Azioni: `.form-actions` per distribuire pulsanti e link di supporto.
+- `.input-field` — su superfici chiare.
+- `.input-field-dark` — su `.card-contrast`/`.glass` (bordo e fondo
+  semitrasparenti bianchi, testo chiaro).
+- `.form-field`, `.form-actions` invariati.
 
 ## Tables
-Contenitore `div.table-shell` e `table` interno:
-- `table-shell`: bordo `white/10`, `bg-white/5`, `rounded-2xl`, backdrop-blur.
-- `thead`: `bg-white/5`, testo uppercase XS chiaro.
-- `tbody tr:hover`: highlight `white/5`.
-
-## Alerts
-- Base: `.alert`
-- Successo: `.alert-success`
-- Warning: `.alert-warning`
-- Errore: `.alert-danger`
-
-Ogni variante usa combinazioni di bordo/riempimento a bassa opacità per mantenere un tono professionale.
+`.table-shell` — bordo `neutral-100`, righe alternate `neutral-50/60`, hover
+riga `accent-50/60`, transizioni di colore fluide invece di stacchi netti.
 
 ## Badges
-- Base: `.badge` — pill, uppercase XS, fondo `neutral-100`.
-- Verified: `.badge-verified` — stato di verifica/contratto attivo (`success`).
+- `.badge`, `.badge-verified` invariati.
+- `.badge-urgent` — nuovo, puntino hi-vis pulsante per urgenza/emergenza reale.
 
-## Layout e superfici
-- Header: gradient `brand-800` → `surface-muted`, testo chiaro, ombra profonda.
-- Contenuto: max-width 1200px, padding `--space-xl` orizzontale `--space-lg`.
-- Background app: mix diagonale brand → `neutral-50` per dare profondità industriale senza distrarre dal contenuto.
+## Dati quantitativi
+`.stat-mono` (JetBrains Mono, `tabular-nums`) su ogni prezzo, distanza, ID
+richiesta o timestamp mostrato in UI — è la firma visiva del prodotto.
+
+## Mobile
+- Bottom nav fissa (già presente) con indicatore attivo hi-vis.
+- Sotto i 640px: preferire card impilate a tabelle dense (vedi `.table-shell`
+  con `overflow-x-auto` come fallback quando una tabella è indispensabile).
+- Target touch minimo 44px su azioni primarie.
+- CTA primaria di ogni pagina raggiungibile senza scroll su mobile.
 
 ## Uso rapido
-- Pulsante CTA: `<button className="btn-primary">Abbonati ora</button>`
-- Card sezione: `<section className="card">…</section>`
-- Tabella: wrapper `<div className="table-shell"><table>…</table></div>`
-- Badge verificato: `<span className="badge-verified">VERIFIED</span>`
-
-Questi token e componenti mantengono coerenza B2B, affidabilità e leggibilità su tutto il prodotto.
+```
+<section className="card-contrast bg-road">…</section>
+<button className="btn-primary">Pubblica richiesta</button>
+<span className="badge-urgent">Emergenza</span>
+<span className="stat-mono">€ 180,00</span>
+<ScrollReveal><div className="card card-hover">…</div></ScrollReveal>
+```

@@ -18,8 +18,14 @@ export const navByRole: Record<Role, { href: string; label: string }[]> = {
     { href: "/dashboard/transporter", label: "Panoramica trasportatore" },
     { href: "/dashboard/transporter/jobs", label: "Richieste disponibili" },
     { href: "/dashboard/transporter/accepted", label: "Trasporti accettati" },
+    { href: "/dashboard/services", label: "Borsa Servizi" },
     { href: "/dashboard/transporter/profile", label: "Profilo operatore" },
     { href: "/dashboard/transporter/billing", label: "Commissioni" },
+  ],
+  SUPPLIER: [
+    { href: "/dashboard/supplier", label: "Panoramica fornitore" },
+    { href: "/dashboard/services", label: "Richieste disponibili" },
+    { href: "/dashboard/supplier/profile", label: "Profilo e zone servite" },
   ],
   ADMIN: [
     { href: "/dashboard/admin", label: "Panoramica operativa" },
@@ -48,10 +54,10 @@ export function SidebarNav({
             href={item.href}
             onClick={onNavigate}
             className={clsx(
-              "flex items-center justify-between rounded-lg px-3 py-3 transition-colors",
+              "flex items-center justify-between rounded-lg px-3 py-3 transition-all duration-150",
               active
-                ? "bg-brand-hover text-white"
-                : "text-white/90 hover:bg-brand-hover/90 hover:text-white",
+                ? "bg-white/10 text-white shadow-glow ring-1 ring-accent-500/40"
+                : "text-white/80 hover:bg-white/5 hover:text-white",
             )}
           >
             <span className="font-medium text-white">{item.label}</span>

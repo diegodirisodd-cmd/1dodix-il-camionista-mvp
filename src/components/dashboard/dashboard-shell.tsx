@@ -59,12 +59,12 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
       </div>
 
       <div className="flex">
-        <aside className="hidden h-full w-64 shrink-0 bg-brand px-4 py-6 text-white md:fixed md:inset-y-0 md:block md:px-6">
+        <aside className="hidden h-full w-64 shrink-0 bg-gradient-to-b from-brand-900 via-brand-800 to-brand px-4 py-6 text-white md:fixed md:inset-y-0 md:block md:px-6">
           <div className="flex h-full flex-col gap-8">
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">Area utente</p>
-              <p className="text-lg font-semibold leading-tight text-white">{user.email}</p>
-              <p className="text-xs text-white/80">Ruolo: {user.role}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent-300">Area utente</p>
+              <p className="font-display text-lg font-bold leading-tight text-white">{user.email}</p>
+              <p className="text-xs text-neutral-300/80">Ruolo: {user.role}</p>
               <SubscriptionBadge active={subscriptionActive} role={user.role} className="mt-2" />
             </div>
 
@@ -85,7 +85,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
         </aside>
 
         <main className="min-h-screen w-full px-4 pb-24 pt-6 sm:px-6 md:ml-64 md:px-6 md:pb-10 md:pt-8">
-          <div className="mx-auto flex max-w-6xl flex-col space-y-6">
+          <div className="mx-auto flex max-w-6xl animate-fadeIn flex-col space-y-6">
             <div className="hidden items-center justify-between rounded-xl border border-slate-200 bg-card px-4 py-3 text-sm text-slate-600 shadow-sm md:flex">
               <div className="space-y-1">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Area privata</p>
@@ -149,14 +149,14 @@ function MobileBottomNav({
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-1 rounded-md px-2 py-1 ${
-                active ? "text-textStrong" : "text-slate-600 hover:text-textStrong"
+              className={`flex flex-col items-center gap-1 rounded-md px-2 py-1 transition-colors duration-150 ${
+                active ? "text-textStrong" : "text-slate-500 hover:text-textStrong"
               }`}
             >
               <span className="text-[13px] font-semibold leading-tight">{item.label}</span>
               <span
-                className={`h-1 w-6 rounded-full transition ${
-                  active ? "bg-brand" : "bg-transparent"
+                className={`h-1 w-6 rounded-full transition-all duration-200 ${
+                  active ? "bg-accent-500" : "bg-transparent"
                 }`}
                 aria-hidden
               />

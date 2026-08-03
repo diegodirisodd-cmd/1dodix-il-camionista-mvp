@@ -23,6 +23,9 @@ const navByRole: Record<Role, NavItem[]> = {
   { href: "/app/transporter/subscription", label: "Commissioni" },
     { href: "/app/transporter/profile", label: "Profilo" },
   ],
+  SUPPLIER: [
+    { href: "/dashboard/supplier", label: "Panoramica fornitore" },
+  ],
   ADMIN: [
     { href: "/app/admin", label: "Panoramica operativa" },
   ],
