@@ -5,6 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
+const highlights = [
+  "Pubblica richieste in pochi minuti",
+  "Ricevi offerte da trasportatori verificati",
+  "Officine e fornitori per il mezzo nella Borsa Servizi",
+];
+
 export default function LoginPage() {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -42,26 +48,27 @@ export default function LoginPage() {
   };
 
   return (
-    <section className="grid min-h-screen grid-cols-1 bg-gradient-to-br from-[#0f2a44] via-[#132d46] to-[#0f172a] text-white lg:grid-cols-2">
-      <div className="relative hidden overflow-hidden px-12 py-16 lg:block">
-        <div className="absolute inset-0 opacity-40" aria-hidden>
-          <div className="h-full w-full bg-[radial-gradient(circle_at_25%_20%,rgba(255,255,255,0.12),transparent_35%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.1),transparent_30%)]" />
+    <section className="grid min-h-screen grid-cols-1 bg-gradient-to-br from-brand-900 via-brand-800 to-brand-700 text-white lg:grid-cols-2">
+      <div className="bg-road relative hidden overflow-hidden px-12 py-16 lg:block">
+        <div className="absolute inset-0" aria-hidden>
+          <div className="h-full w-full bg-[radial-gradient(600px_circle_at_20%_15%,rgba(255,106,0,0.18),transparent_60%),radial-gradient(500px_circle_at_85%_80%,rgba(65,112,143,0.22),transparent_60%)]" />
         </div>
         <div className="relative mx-auto flex h-full max-w-3xl items-center justify-center">
-          <div className="space-y-8 rounded-2xl border border-white/15 bg-black/20 p-8 shadow-2xl shadow-black/40 backdrop-blur">
+          <div className="glass animate-fadeUp space-y-8 p-8">
             <div className="space-y-3">
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-100">
+              <span className="inline-flex items-center gap-2 rounded-full border border-accent-500/30 bg-accent-500/15 px-4 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-accent-300">
                 DodiX – Il Camionista
               </span>
-              <h1 className="text-4xl font-semibold leading-tight text-white">Trasporti, senza perdite di tempo</h1>
-              <p className="text-base text-white/80">
-                Soluzione unica per aziende e trasportatori che vogliono pubblicare, ricevere e gestire richieste in modo diretto e affidabile.
+              <h1 className="text-4xl text-white">Trasporti, senza perdite di tempo</h1>
+              <p className="text-base text-neutral-200/85">
+                Una piattaforma sola per aziende, trasportatori e fornitori di servizi: pubblica,
+                ricevi e gestisci richieste in modo diretto.
               </p>
             </div>
-            <ul className="space-y-4 text-base text-white/80">
-              {["Pubblica richieste in pochi minuti", "Ricevi offerte da trasportatori verificati", "Gestisci tutto da un'unica dashboard"].map((item) => (
+            <ul className="space-y-4 text-base">
+              {highlights.map((item) => (
                 <li key={item} className="flex items-start gap-3">
-                  <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/10 text-emerald-200">
+                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-accent-500/40 bg-accent-500/15 text-accent-300">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -76,7 +83,7 @@ export default function LoginPage() {
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   </span>
-                  <span className="leading-relaxed text-white">{item}</span>
+                  <span className="leading-relaxed text-neutral-100">{item}</span>
                 </li>
               ))}
             </ul>
@@ -85,40 +92,38 @@ export default function LoginPage() {
       </div>
 
       <div className="flex items-center justify-center px-4 py-12 sm:px-8 lg:px-12 lg:py-16">
-        <div className="w-full max-w-[420px] space-y-6 rounded-2xl border border-neutral-200 bg-white/95 p-8 text-neutral-900 shadow-xl shadow-black/10">
+        <div className="card animate-fadeUp w-full max-w-[440px] space-y-6 p-8 shadow-deep">
           <div className="space-y-3 text-center">
-              <div className="flex justify-center">
-                <div className="inline-flex items-center gap-3 rounded-2xl border border-neutral-200/70 bg-white px-4 py-2 shadow-sm">
-                  <div className="relative h-14 w-14 overflow-hidden rounded-xl bg-neutral-100">
-                    <Image
-                      src="/dodix-logo.svg"
-                      alt="Logo DodiX"
-                      fill
-                      sizes="56px"
-                      className="object-contain"
-                      priority
-                    />
-                  </div>
-                  <div className="text-left leading-tight">
-                    <p className="text-[11px] uppercase tracking-[0.3em] text-neutral-500">DodiX</p>
-                    <p className="text-lg font-semibold text-[#0f2a44]">Il Camionista</p>
-                  </div>
+            <div className="flex justify-center">
+              <div className="inline-flex items-center gap-3 rounded-2xl border border-neutral-100 bg-white px-4 py-2 shadow-card">
+                <div className="relative h-14 w-14 overflow-hidden rounded-xl bg-brand-900">
+                  <Image
+                    src="/dodix-logo.svg"
+                    alt="Logo DodiX"
+                    fill
+                    sizes="56px"
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+                <div className="text-left leading-tight">
+                  <p className="text-[11px] uppercase tracking-[0.3em] text-accent-600">DodiX</p>
+                  <p className="text-lg font-semibold text-textStrong">Il Camionista</p>
                 </div>
               </div>
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#0f2a44]">Accesso</p>
-            <h2 className="text-3xl font-semibold text-[#0f2a44]">Accedi a DodiX</h2>
-            <p className="text-sm text-neutral-600">
-              La piattaforma che collega aziende e trasportatori in modo semplice e veloce.
-            </p>
+            </div>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">Accesso</p>
+            <h2>Accedi a DodiX</h2>
+            <p>La piattaforma che collega aziende, trasportatori e officine.</p>
           </div>
 
           {result && (
-            <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800" aria-live="polite">
+            <p className="alert-success" aria-live="polite">
               {result}
             </p>
           )}
           {error && (
-            <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert" aria-live="assertive">
+            <div className="alert-danger" role="alert" aria-live="assertive">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
@@ -138,18 +143,18 @@ export default function LoginPage() {
 
           <form className="space-y-5" action={handleSubmit}>
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-neutral-800" htmlFor="email">
+              <label className="label" htmlFor="email">
                 Email aziendale
               </label>
               <div className="relative">
-                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-600">
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-neutral-400">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
                     <path d="M1.5 8.67v6.66a2.67 2.67 0 002.67 2.67h15.66a2.67 2.67 0 002.67-2.67V8.67L12 13.5 1.5 8.67z" />
                     <path d="M21.5 6.67A2.67 2.67 0 0018.83 4H5.17A2.67 2.67 0 002.5 6.67L12 11.5l9.5-4.83z" />
                   </svg>
                 </span>
                 <input
-                  className="w-full rounded-xl border border-neutral-200 bg-white pl-11 pr-3 py-3 text-sm text-neutral-900 shadow-inner transition focus:border-[#0f2a44] focus:outline-none focus:ring-2 focus:ring-[#0f2a44]/40"
+                  className="input-field h-12 pl-11"
                   id="email"
                   name="email"
                   type="email"
@@ -161,17 +166,17 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-neutral-800" htmlFor="password">
+              <label className="label" htmlFor="password">
                 Password
               </label>
               <div className="relative">
-                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-600">
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-neutral-400">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
                     <path d="M12 2a5 5 0 00-5 5v2H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2h-2V7a5 5 0 00-5-5zm-3 7V7a3 3 0 116 0v2H9zm3 4a1.5 1.5 0 011.5 1.5 1.5 1.5 0 11-3 0A1.5 1.5 0 0112 13z" />
                   </svg>
                 </span>
                 <input
-                  className="w-full rounded-xl border border-neutral-200 bg-white pl-11 pr-3 py-3 text-sm text-neutral-900 shadow-inner transition focus:border-[#0f2a44] focus:outline-none focus:ring-2 focus:ring-[#0f2a44]/40"
+                  className="input-field h-12 pl-11"
                   id="password"
                   name="password"
                   type="password"
@@ -179,20 +184,16 @@ export default function LoginPage() {
                   autoComplete="current-password"
                 />
               </div>
-              <p className="text-xs text-neutral-500">Minimo 6 caratteri. Non condividere la password.</p>
-              <div className="text-right mt-1">
-                <Link href="/reset-password" className="text-xs text-[#0f2a44] hover:underline">
+              <div className="mt-1 flex items-center justify-between gap-3">
+                <p className="text-xs text-neutral-500">Minimo 6 caratteri.</p>
+                <Link href="/reset-password" className="text-xs font-semibold text-accent-600 hover:underline">
                   Password dimenticata?
                 </Link>
               </div>
             </div>
 
             <div className="space-y-3">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#0f2a44] text-sm font-semibold text-white shadow-md transition duration-150 hover:bg-[#13375a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f2a44] focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:border disabled:border-[#0f2a44]/30 disabled:bg-[#0f2a44]/60"
-              >
+              <button type="submit" disabled={loading} className="btn-primary h-12 w-full gap-2 text-base">
                 {loading && (
                   <svg
                     className="h-4 w-4 animate-spin text-white"
@@ -202,19 +203,12 @@ export default function LoginPage() {
                     aria-hidden
                   >
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                    ></path>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                   </svg>
                 )}
                 {loading ? "Accesso in corso..." : "Accedi alla piattaforma"}
               </button>
-              <Link
-                href="/register"
-                className="flex h-12 w-full items-center justify-center rounded-xl border border-[#0f2a44]/20 bg-emerald-50 text-sm font-semibold text-[#0f2a44] transition duration-150 hover:border-[#0f2a44]/40 hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f2a44] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-              >
+              <Link href="/register" className="btn-secondary h-12 w-full">
                 Non hai un account? Crea il tuo profilo
               </Link>
             </div>
