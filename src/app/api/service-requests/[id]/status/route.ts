@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { canRequestServices } from "@/lib/roles";
 import { type ServiceRequestStatus } from "@/lib/service-categories";
 
 type StatusPayload = {
   stato?: string;
 };
 
-// Il trasportatore può solo chiudere la richiesta: gli stati "aperta",
+// Chi ha pubblicato la richiesta può solo chiuderla: gli stati "aperta",
 // "in trattativa" e "assegnata" sono conseguenza delle azioni sui preventivi.
 const CLOSABLE_STATES: ServiceRequestStatus[] = ["CONCLUSA", "ANNULLATA"];
 
@@ -40,7 +41,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
   }
 
-  if (user.role !== "TRANSPORTER" || serviceRequest.transporterId !== user.id) {
+  if (!canRequestServices(user.role) || serviceRequest.transporterId !== user.id) {
     return NextResponse.json(
       { error: "Solo il proprietario della richiesta può cambiarne lo stato" },
       { status: 403 },

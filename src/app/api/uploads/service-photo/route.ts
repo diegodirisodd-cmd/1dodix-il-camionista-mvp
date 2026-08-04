@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 
 import { getSessionUser } from "@/lib/auth";
+import { canRequestServices } from "@/lib/roles";
 import {
   SERVICE_PHOTO_ALLOWED_TYPES,
   SERVICE_PHOTO_BUCKET,
@@ -29,9 +30,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
 
-  if (user.role !== "TRANSPORTER") {
+  if (!canRequestServices(user.role)) {
     return NextResponse.json(
-      { error: "Solo i trasportatori possono caricare foto di una richiesta" },
+      { error: "Solo trasportatori e aziende possono caricare foto di una richiesta" },
       { status: 403 },
     );
   }

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, emailShell } from "@/lib/email";
+import { canRequestServices } from "@/lib/roles";
 import { signServicePhotoPaths } from "@/lib/supabase-storage";
 import {
   isServiceCategory,
@@ -51,7 +52,8 @@ export async function GET(request: Request) {
   const statoFilter = searchParams.get("stato") ?? undefined;
 
   try {
-    if (user.role === "TRANSPORTER") {
+    // Chi pubblica (trasportatore o azienda) vede solo le proprie richieste.
+    if (canRequestServices(user.role)) {
       const requests = await prisma.serviceRequest.findMany({
         where: { transporterId: user.id, ...(statoFilter ? { stato: statoFilter } : {}) },
         orderBy: { createdAt: "desc" },
@@ -122,9 +124,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   }
 
-  if (user.role !== "TRANSPORTER") {
+  if (!canRequestServices(user.role)) {
     return NextResponse.json(
-      { error: "Solo i trasportatori possono pubblicare richieste di servizio" },
+      { error: "Solo trasportatori e aziende possono pubblicare richieste di servizio" },
       { status: 403 },
     );
   }

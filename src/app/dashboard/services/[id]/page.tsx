@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { ServiceRequestDetail } from "@/components/services/service-request-detail";
 import { SkeletonCard } from "@/components/skeleton";
 import { getSessionUser } from "@/lib/auth";
-import { type Role } from "@/lib/roles";
+import { canRequestServices, type Role } from "@/lib/roles";
 
 export default async function ServiceRequestDetailPage({ params }: { params: { id: string } }) {
   const user = await getSessionUser();
@@ -13,7 +13,7 @@ export default async function ServiceRequestDetailPage({ params }: { params: { i
     redirect("/login");
   }
 
-  if (user.role !== "TRANSPORTER" && user.role !== "SUPPLIER" && user.role !== "ADMIN") {
+  if (!canRequestServices(user.role) && user.role !== "SUPPLIER" && user.role !== "ADMIN") {
     redirect("/dashboard");
   }
 

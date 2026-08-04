@@ -55,7 +55,7 @@ export default async function SupplierDashboardPage() {
           {profile?.ragioneSociale ? `Ciao, ${profile.ragioneSociale}` : "Benvenuto tra i fornitori DodiX"}
         </h1>
         <p className="max-w-2xl text-neutral-200/90">
-          Ricevi richieste di intervento dalle aziende di trasporto della tua zona, invii un preventivo
+          Ricevi richieste di intervento dalle aziende della tua zona, invii un preventivo
           gratuito e paghi solo se vuoi il contatto diretto del cliente.
         </p>
         <div className="flex flex-wrap gap-3 pt-2">
@@ -148,7 +148,7 @@ export default async function SupplierDashboardPage() {
               <Step index={1}>Ricevi via email le richieste della tua categoria e provincia.</Step>
               <Step index={2}>Invii un preventivo gratuito con prezzo, tempi e disponibilità.</Step>
               <Step index={3}>
-                Se vuoi contattare il trasportatore fuori piattaforma sblocchi il contatto a{" "}
+                Se vuoi contattare il cliente fuori piattaforma sblocchi il contatto a{" "}
                 <span className="stat-mono font-semibold text-textStrong">
                   {formatCents(getServiceUnlockTotalCents())}
                 </span>{" "}

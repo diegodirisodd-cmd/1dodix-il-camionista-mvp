@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { canRequestServices } from "@/lib/roles";
 import { withSignedPhotoUrls } from "@/lib/supabase-storage";
 
 export async function GET(_request: Request, { params }: { params: { id: string } }) {
@@ -43,7 +44,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
   }
 
-  const isOwner = user.role === "TRANSPORTER" && serviceRequest.transporterId === user.id;
+  const isOwner = canRequestServices(user.role) && serviceRequest.transporterId === user.id;
   const isAdmin = user.role === "ADMIN";
 
   let supplierProfileId: number | null = null;

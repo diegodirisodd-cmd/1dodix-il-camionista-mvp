@@ -11,6 +11,7 @@ export const navByRole: Record<Role, { href: string; label: string }[]> = {
     { href: "/dashboard/company", label: "Panoramica azienda" },
     { href: "/dashboard/company/requests", label: "Richieste inviate" },
     { href: "/dashboard/company/history", label: "Storico trasporti" },
+    { href: "/dashboard/services", label: "Borsa Servizi" },
     { href: "/dashboard/company/profile", label: "Profilo aziendale" },
     { href: "/dashboard/company/billing", label: "Commissioni" },
   ],

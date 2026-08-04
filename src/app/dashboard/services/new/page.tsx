@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { ServiceRequestForm } from "@/components/services/service-request-form";
 import { getSessionUser } from "@/lib/auth";
+import { canRequestServices } from "@/lib/roles";
 
 export default async function NewServiceRequestPage() {
   const user = await getSessionUser();
@@ -11,7 +12,7 @@ export default async function NewServiceRequestPage() {
     redirect("/login");
   }
 
-  if (user.role !== "TRANSPORTER") {
+  if (!canRequestServices(user.role)) {
     redirect("/dashboard/services");
   }
 

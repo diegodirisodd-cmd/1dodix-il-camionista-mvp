@@ -6,7 +6,7 @@ import clsx from "clsx";
 
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { SkeletonCard } from "@/components/skeleton";
-import { type Role } from "@/lib/roles";
+import { canRequestServices, type Role } from "@/lib/roles";
 import {
   SERVICE_CATEGORY_LABELS,
   SERVICE_REQUEST_STATUS_LABELS,
@@ -30,7 +30,7 @@ export function ServicesBoard({ role }: ServicesBoardProps) {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<ServiceRequestStatus | "TUTTE">("TUTTE");
 
-  const isTransporter = role === "TRANSPORTER";
+  const isRequester = canRequestServices(role);
 
   useEffect(() => {
     let isMounted = true;
@@ -89,17 +89,17 @@ export function ServicesBoard({ role }: ServicesBoardProps) {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatTile label={isTransporter ? "Richieste pubblicate" : "Richieste compatibili"} value={counters.total} />
+        <StatTile label={isRequester ? "Richieste pubblicate" : "Richieste compatibili"} value={counters.total} />
         <StatTile label="In corso" value={counters.open} />
         <StatTile
-          label={isTransporter ? "Preventivi ricevuti" : "Preventivi inviati"}
+          label={isRequester ? "Preventivi ricevuti" : "Preventivi inviati"}
           value={counters.quotes}
         />
       </div>
 
       {loadError && <p className="alert-danger">{loadError}</p>}
 
-      {isTransporter && (
+      {isRequester && (
         <div className="flex flex-wrap gap-2">
           <FilterChip active={statusFilter === "TUTTE"} onClick={() => setStatusFilter("TUTTE")}>
             Tutte
@@ -122,7 +122,7 @@ export function ServicesBoard({ role }: ServicesBoardProps) {
         <div className="grid gap-4 md:grid-cols-2">
           {visibleItems.map((item, index) => (
             <ScrollReveal key={item.id} className="h-full" delayMs={Math.min(index, 5) * 60}>
-              <ServiceRequestCard item={item} isTransporter={isTransporter} />
+              <ServiceRequestCard item={item} isRequester={isRequester} />
             </ScrollReveal>
           ))}
         </div>
@@ -133,10 +133,10 @@ export function ServicesBoard({ role }: ServicesBoardProps) {
 
 function ServiceRequestCard({
   item,
-  isTransporter,
+  isRequester,
 }: {
   item: ServiceRequestItem;
-  isTransporter: boolean;
+  isRequester: boolean;
 }) {
   const quotes = item.quotes ?? [];
   const bestQuote = quotes.reduce<number | null>(
@@ -184,7 +184,7 @@ function ServiceRequestCard({
           <UrgencyBadge urgenza={item.urgenza} />
         </div>
         <p className="text-xs text-neutral-500">
-          {isTransporter ? (
+          {isRequester ? (
             quotes.length > 0 ? (
               <>
                 <span className="stat-mono font-semibold text-textStrong">{quotes.length}</span> preventivi · da{" "}
@@ -250,7 +250,7 @@ function EmptyState({ role, filtered }: { role: Role; filtered: boolean }) {
     return <div className="card-muted text-sm text-neutral-600">Nessuna richiesta con questo stato.</div>;
   }
 
-  if (role === "TRANSPORTER") {
+  if (canRequestServices(role)) {
     return (
       <div className="card-muted space-y-3">
         <h3>Nessuna richiesta pubblicata</h3>

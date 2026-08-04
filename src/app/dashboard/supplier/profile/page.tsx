@@ -22,7 +22,7 @@ export default async function SupplierProfilePage() {
         <h1>Servizi offerti e zone servite</h1>
         <p className="max-w-2xl">
           Le richieste che ti arrivano dipendono da queste impostazioni: ricevi una notifica solo quando
-          un trasportatore pubblica una richiesta in una categoria e in una provincia che copri.
+          un cliente pubblica una richiesta in una categoria e in una provincia che copri.
         </p>
       </div>
 

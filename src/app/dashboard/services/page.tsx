@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { ServicesBoard } from "@/components/services/services-board";
 import { getSessionUser } from "@/lib/auth";
 import { SERVICE_CATEGORY_LABELS, SERVICE_CATEGORY_VALUES } from "@/lib/service-categories";
-import { type Role } from "@/lib/roles";
+import { canRequestServices, type Role } from "@/lib/roles";
 
 export default async function ServicesBoardPage() {
   const user = await getSessionUser();
@@ -13,11 +13,11 @@ export default async function ServicesBoardPage() {
     redirect("/login");
   }
 
-  if (user.role !== "TRANSPORTER" && user.role !== "SUPPLIER") {
+  const isRequester = canRequestServices(user.role);
+
+  if (!isRequester && user.role !== "SUPPLIER") {
     redirect("/dashboard");
   }
-
-  const isTransporter = user.role === "TRANSPORTER";
 
   return (
     <section className="space-y-6">
@@ -26,15 +26,15 @@ export default async function ServicesBoardPage() {
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">Borsa Servizi</p>
             <h1>
-              {isTransporter ? "Servizi per il tuo mezzo, in tempi rapidi" : "Richieste compatibili con i tuoi servizi"}
+              {isRequester ? "Servizi per i tuoi mezzi, in tempi rapidi" : "Richieste compatibili con i tuoi servizi"}
             </h1>
             <p className="max-w-2xl">
-              {isTransporter
-                ? "Pubblica una richiesta di intervento e ricevi preventivi da officine, telonai, gommisti e soccorso stradale della zona in cui ti trovi."
-                : "Qui trovi le richieste aperte che rientrano nelle categorie e nelle province che copri. Invia un preventivo e sblocca il contatto quando il trasportatore ti interessa."}
+              {isRequester
+                ? "Pubblica una richiesta di intervento e ricevi preventivi da officine, telonai, gommisti e soccorso stradale della zona in cui si trova il mezzo."
+                : "Qui trovi le richieste aperte che rientrano nelle categorie e nelle province che copri. Invia un preventivo e sblocca il contatto quando il cliente ti interessa."}
             </p>
           </div>
-          {isTransporter && (
+          {isRequester && (
             <Link href="/dashboard/services/new" className="btn-primary min-h-[44px] shrink-0">
               Cerco un servizio
             </Link>

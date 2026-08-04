@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { canRequestServices } from "@/lib/roles";
 import { sendEmail, emailShell } from "@/lib/email";
 import { SERVICE_CATEGORY_LABELS, type ServiceCategory } from "@/lib/service-categories";
 
@@ -41,7 +42,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
   }
 
-  if (user.role !== "TRANSPORTER" || serviceRequest.transporterId !== user.id) {
+  if (!canRequestServices(user.role) || serviceRequest.transporterId !== user.id) {
     return NextResponse.json(
       { error: "Solo il proprietario della richiesta può assegnare un preventivo" },
       { status: 403 },
@@ -103,7 +104,7 @@ async function notifyAssignedSupplier(
         "Preventivo accettato",
         `<p>Il tuo preventivo per un intervento di <strong>${
           SERVICE_CATEGORY_LABELS[categoria] ?? categoria
-        }</strong> è stato scelto dal trasportatore.</p>
+        }</strong> è stato scelto dal cliente.</p>
          <p>Apri la richiesta per vedere i dettagli e organizzare l'intervento.</p>`,
         `${baseUrl}/dashboard/services/${requestId}`,
         "Apri la richiesta",

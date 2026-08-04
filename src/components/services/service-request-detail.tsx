@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { Skeleton, SkeletonCard } from "@/components/skeleton";
-import { type Role } from "@/lib/roles";
+import { canRequestServices, type Role } from "@/lib/roles";
 import {
   SERVICE_CATEGORY_LABELS,
   formatCents,
@@ -112,7 +112,7 @@ export function ServiceRequestDetail({ requestId, role, userId }: ServiceRequest
     );
   }
 
-  const isOwner = role === "TRANSPORTER" && item.transporterId === userId;
+  const isOwner = canRequestServices(role) && item.transporterId === userId;
   const isSupplier = role === "SUPPLIER";
   const isClosed = item.stato === "CONCLUSA" || item.stato === "ANNULLATA";
   const myQuote = isSupplier
@@ -124,7 +124,7 @@ export function ServiceRequestDetail({ requestId, role, userId }: ServiceRequest
     <div className="space-y-6">
       {unlockOutcome === "success" && (
         <p className="alert-success">
-          Pagamento completato. Il contatto del trasportatore compare qui sotto appena Stripe conferma
+          Pagamento completato. Il contatto del cliente compare qui sotto appena Stripe conferma
           l&apos;operazione (di norma pochi secondi).
         </p>
       )}
@@ -423,8 +423,8 @@ function SupplierPanel({
           <h2>{myQuote ? "Il tuo preventivo" : "Invia un preventivo"}</h2>
           <p>
             {myQuote
-              ? "Puoi aggiornarlo finché il trasportatore non assegna l'intervento."
-              : "Prezzo, tempi e disponibilità: il trasportatore confronta le offerte e sceglie."}
+              ? "Puoi aggiornarlo finché il cliente non assegna l'intervento."
+              : "Prezzo, tempi e disponibilità: il cliente confronta le offerte e sceglie."}
           </p>
         </div>
 
@@ -506,9 +506,9 @@ function SupplierPanel({
 
       <div className="card space-y-4">
         <div className="space-y-1">
-          <h2>Contatto del trasportatore</h2>
+          <h2>Contatto del cliente</h2>
           <p>
-            Il preventivo è gratuito. Paghi solo se vuoi contattare direttamente il trasportatore fuori
+            Il preventivo è gratuito. Paghi solo se vuoi contattare direttamente il cliente fuori
             dalla piattaforma.
           </p>
         </div>
@@ -524,7 +524,7 @@ function SupplierPanel({
           <>
             <div className="card-muted space-y-2 p-4">
               <p className="text-sm font-semibold text-textStrong">
-                {item.transporter?.companyName ?? "Azienda di trasporto"}
+                {item.transporter?.companyName ?? "Cliente DodiX"}
               </p>
               <p className="stat-mono text-sm tracking-widest text-neutral-400">••• ••• ••••</p>
               <p className="text-xs text-neutral-500">
