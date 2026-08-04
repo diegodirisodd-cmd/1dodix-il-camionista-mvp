@@ -51,8 +51,8 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
   if (!Number.isFinite(requestId)) {
     return (
       <section className="space-y-4">
-        <h1 className="text-2xl font-semibold text-[#0f172a]">Richiesta non valida</h1>
-        <p className="text-sm text-[#475569]">L&apos;identificativo della richiesta non Ã¨ valido.</p>
+        <h1 className="text-2xl font-semibold text-textStrong">Richiesta non valida</h1>
+        <p className="text-sm text-neutral-600">L&apos;identificativo della richiesta non Ã¨ valido.</p>
       </section>
     );
   }
@@ -69,8 +69,8 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
   if (!requestRecord) {
     return (
       <section className="space-y-4">
-        <h1 className="text-2xl font-semibold text-[#0f172a]">Richiesta non trovata</h1>
-        <p className="text-sm text-[#475569]">La richiesta non esiste oppure non Ã¨ piÃ¹ disponibile.</p>
+        <h1 className="text-2xl font-semibold text-textStrong">Richiesta non trovata</h1>
+        <p className="text-sm text-neutral-600">La richiesta non esiste oppure non Ã¨ piÃ¹ disponibile.</p>
       </section>
     );
   }

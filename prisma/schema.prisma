@@ -31,6 +31,9 @@ model User {
   companyRequests     Request[] @relation("CompanyRequests")
   transporterRequests Request[] @relation("TransporterJobs")
   requestUnlocks      RequestUnlock[]
+
+  supplierProfile      SupplierProfile?
+  serviceRequestsMade  ServiceRequest[]
 }
 
 model Request {
@@ -87,4 +90,94 @@ model RequestUnlock {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([requestId, userId])
+}
+
+// ─── Borsa Servizi ────────────────────────────────────────────────
+// Marketplace di servizi per aziende di trasporto: officine, telonai,
+// gommisti, soccorso stradale, carrozzerie, lavaggio mezzi.
+
+model SupplierProfile {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique
+  ragioneSociale String
+  partitaIva     String?
+  createdAt      DateTime @default(now())
+
+  user  User                   @relation(fields: [userId], references: [id])
+  aree  SupplierServiceArea[]
+  quotes ServiceQuote[]
+  unlocks ServiceContactUnlock[]
+}
+
+model SupplierServiceArea {
+  id         Int    @id @default(autoincrement())
+  supplierId Int
+  categoria  String
+  provincia  String
+
+  supplier SupplierProfile @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@unique([supplierId, categoria, provincia])
+}
+
+model ServiceRequest {
+  id            Int       @id @default(autoincrement())
+  transporterId Int
+  categoria     String
+  posizione     String
+  provincia     String
+  marcaVeicolo  String
+  tipoVeicolo   String
+  descrizione   String
+  urgenza       String
+  scadenza      DateTime
+  stato         String    @default("APERTA")
+  assignedQuoteId Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  transporter User                   @relation(fields: [transporterId], references: [id])
+  fotos       ServiceRequestPhoto[]
+  quotes      ServiceQuote[]
+  unlocks     ServiceContactUnlock[]
+}
+
+model ServiceRequestPhoto {
+  id        Int      @id @default(autoincrement())
+  requestId Int
+  url       String
+  createdAt DateTime @default(now())
+
+  request ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+}
+
+model ServiceQuote {
+  id            Int      @id @default(autoincrement())
+  requestId     Int
+  supplierId    Int
+  priceCents    Int
+  tempi         String
+  disponibilita String
+  createdAt     DateTime @default(now())
+
+  request  ServiceRequest  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  supplier SupplierProfile @relation(fields: [supplierId], references: [id])
+
+  @@unique([requestId, supplierId])
+}
+
+model ServiceContactUnlock {
+  id                    Int      @id @default(autoincrement())
+  requestId             Int
+  supplierId            Int
+  amountCents           Int?
+  stripeSessionId       String?
+  stripePaymentIntentId String?
+  paidAt                DateTime @default(now())
+  createdAt             DateTime @default(now())
+
+  request  ServiceRequest  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  supplier SupplierProfile @relation(fields: [supplierId], references: [id])
+
+  @@unique([requestId, supplierId])
 }

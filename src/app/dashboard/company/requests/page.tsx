@@ -86,17 +86,17 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
   return (
     <section className="space-y-6">
       {showCreated && (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-slate-800 shadow-sm">
+        <div className="rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm text-neutral-700 shadow-sm">
           Richiesta creata correttamente. Gestiscila dall&apos;elenco qui sotto.
         </div>
       )}
 
-      <div className="card space-y-3">
+      <div className="card animate-fadeUp space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Richieste inviate</p>
-            <h1 className="text-3xl font-semibold text-[#0f172a]">Pubblica, monitora e aggiorna le spedizioni</h1>
-            <p className="text-sm leading-relaxed text-[#475569]">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">Richieste inviate</p>
+            <h1>Pubblica, monitora e aggiorna le spedizioni</h1>
+            <p className="text-sm leading-relaxed text-neutral-600">
               Tutte le tue richieste di trasporto in un unico posto, pronte per contattare trasportatori verificati.
             </p>
           </div>
@@ -104,12 +104,12 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
         <div className="flex flex-wrap items-center gap-3">
           <Link
             href="/dashboard/company/new-request"
-            className="btn btn-primary"
+            className="btn-primary min-h-[44px]"
           >
             Pubblica una nuova spedizione
           </Link>
-          <p className="text-xs text-[#64748b]">Le richieste sono visibili solo a trasportatori registrati.</p>
-          <div className="inline-flex items-center gap-2 rounded-full bg-[#fff8ed] px-3 py-1 text-[11px] font-semibold text-[#92400e] ring-1 ring-[#f5c76a]">
+          <p className="text-xs text-neutral-500">Le richieste sono visibili solo a trasportatori registrati.</p>
+          <div className="inline-flex items-center gap-2 rounded-full bg-accent-50/60 px-3 py-1 text-[11px] font-semibold text-accent-700 ring-1 ring-accent-200">
             Commissione 2% – una tantum
           </div>
         </div>
@@ -119,11 +119,11 @@ export default async function CompanyRequestsPage({ searchParams }: { searchPara
         <div className="space-y-1">
           <p className="alert-warning">{loadError}</p>
           {process.env.NODE_ENV !== "production" && loadErrorDetails ? (
-            <p className="text-xs text-slate-600">Dettaglio errore: {loadErrorDetails}</p>
+            <p className="text-xs text-neutral-600">Dettaglio errore: {loadErrorDetails}</p>
           ) : null}
         </div>
       ) : companyRequests.length === 0 ? (
-        <div className="card text-sm leading-relaxed text-[#475569]">
+        <div className="card text-sm leading-relaxed text-neutral-600">
           Nessuna richiesta presente. Pubblica la prima per ricevere contatti diretti.
         </div>
       ) : (

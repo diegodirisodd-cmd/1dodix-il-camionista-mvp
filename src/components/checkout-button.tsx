@@ -45,15 +45,12 @@ export function CheckoutButton({
     }
   };
 
-  const baseClasses =
-    "inline-flex items-center justify-center rounded-full px-4 py-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2";
   const stylesByVariant: Record<typeof variant, string> = {
-    primary:
-      "bg-gradient-to-r from-[#f5c76a] to-[#f29f58] text-[#0f172a] shadow-sm hover:brightness-95 focus:ring-[#f5c76a]",
-    ghost: "text-[#0f172a] underline-offset-4 hover:underline focus:ring-slate-900",
+    primary: "btn-primary min-h-[44px] px-5 py-3",
+    ghost: "btn-ghost min-h-[44px] underline-offset-4 hover:underline",
   };
 
-  const classes = `${baseClasses} ${stylesByVariant[variant]} ${className}`.trim();
+  const classes = `${stylesByVariant[variant]} ${className}`.trim();
 
   return (
     <div className="space-y-2">
@@ -61,12 +58,12 @@ export function CheckoutButton({
         {loading ? "Reindirizzamento..." : label}
       </button>
       {variant === "primary" && (
-        <p className="text-xs font-medium text-[#64748b]">
+        <p className="text-xs font-medium text-neutral-500">
           Pagamenti sicuri con Stripe • Commissione applicata solo allo sblocco
         </p>
       )}
       {error && (
-        <p className="text-xs font-semibold text-red-600" role="alert">
+        <p className="text-xs font-semibold text-danger" role="alert">
           {error} — se il problema persiste apri la pagina fatturazione ({billingDestinationForRole(role)})
         </p>
       )}

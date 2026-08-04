@@ -29,12 +29,12 @@ export default async function TransporterAcceptedPage() {
 
   return (
     <section className="space-y-6">
-      <div className="card space-y-3">
+      <div className="card animate-fadeUp space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">Trasporti accettati</p>
-            <h1 className="text-3xl font-semibold text-[#0f172a]">Le tue richieste già prese in carico</h1>
-            <p className="text-sm leading-relaxed text-[#475569]">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">Trasporti accettati</p>
+            <h1>Le tue richieste già prese in carico</h1>
+            <p className="text-sm leading-relaxed text-neutral-600">
               Qui trovi l&apos;elenco delle tratte che hai accettato, con lo stato sempre aggiornato.
             </p>
           </div>

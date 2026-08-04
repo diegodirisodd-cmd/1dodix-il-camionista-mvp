@@ -149,7 +149,7 @@ export function RequestForm({
     <form className="space-y-6" onSubmit={handleSubmit}>
       {/* === SEZIONE 1: TRATTA E DATE === */}
       <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#0b3c5d]">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">
           Tratta e date
         </p>
       </div>
@@ -183,7 +183,7 @@ export function RequestForm({
           <input
             required
             type="date"
-            className="input-field"
+            className="input-field stat-mono"
             value={form.pickupDate}
             onChange={(e) => updateField("pickupDate", e.target.value)}
           />
@@ -192,7 +192,7 @@ export function RequestForm({
           <span className="label">Data consegna desiderata</span>
           <input
             type="date"
-            className="input-field"
+            className="input-field stat-mono"
             value={form.deliveryDate}
             onChange={(e) => updateField("deliveryDate", e.target.value)}
           />
@@ -203,7 +203,7 @@ export function RequestForm({
             type="number"
             min="0"
             step="1"
-            className="input-field"
+            className="input-field stat-mono"
             value={distanceKm}
             onChange={(e) => setDistanceKm(e.target.value)}
             placeholder="Es. 580"
@@ -212,19 +212,19 @@ export function RequestForm({
       </div>
 
       {hasEstimate && (
-        <div className="rounded-lg bg-slate-100 p-4 text-sm text-slate-700">
+        <div className="rounded-lg bg-neutral-100 p-4 text-sm text-neutral-600">
           <p className="font-semibold">Stima budget consigliato</p>
           <p className="mt-1">
-            Da <strong>&euro;{minBudget.toFixed(0)}</strong> a{" "}
-            <strong>&euro;{maxBudget.toFixed(0)}</strong>{" "}
-            <span className="text-xs text-slate-500">(1,20&ndash;1,50 &euro;/km)</span>
+            Da <strong className="stat-mono">&euro;{minBudget.toFixed(0)}</strong> a{" "}
+            <strong className="stat-mono">&euro;{maxBudget.toFixed(0)}</strong>{" "}
+            <span className="text-xs text-neutral-500">(1,20&ndash;1,50 &euro;/km)</span>
           </p>
         </div>
       )}
 
       {/* === SEZIONE 2: DETTAGLI CARICO === */}
       <div className="space-y-1 pt-2">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#0b3c5d]">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">
           Dettagli carico
         </p>
       </div>
@@ -268,7 +268,7 @@ export function RequestForm({
             type="number"
             min="0"
             step="1"
-            className="input-field"
+            className="input-field stat-mono"
             value={form.weight}
             onChange={(e) => updateField("weight", e.target.value)}
             placeholder="Es. 12000"
@@ -289,7 +289,7 @@ export function RequestForm({
             type="number"
             min="0"
             step="1"
-            className="input-field"
+            className="input-field stat-mono"
             value={form.palletCount}
             onChange={(e) => updateField("palletCount", e.target.value)}
             placeholder="Es. 24"
@@ -305,7 +305,7 @@ export function RequestForm({
           checked={form.isAdr}
           onChange={(e) => updateField("isAdr", e.target.checked)}
         />
-        <label htmlFor="isAdr" className="text-sm font-medium text-[#0f172a]">
+        <label htmlFor="isAdr" className="text-sm font-medium text-textStrong">
           Merce ADR / pericolosa
         </label>
       </div>
@@ -322,7 +322,7 @@ export function RequestForm({
 
       {/* === SEZIONE 3: ECONOMIA === */}
       <div className="space-y-1 pt-2">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#0b3c5d]">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">
           Budget e pagamento
         </p>
       </div>
@@ -334,12 +334,12 @@ export function RequestForm({
             required
             type="number"
             min="1"
-            className="input-field"
+            className="input-field stat-mono"
             value={form.price}
             onChange={(e) => updateField("price", e.target.value)}
             placeholder="Es. 1200"
           />
-          <span className="text-xs text-[#64748b]">
+          <span className="text-xs text-neutral-500">
             Commissione applicata solo allo sblocco contatti: 2% + IVA
           </span>
         </label>
@@ -361,7 +361,7 @@ export function RequestForm({
 
       {/* === SEZIONE 4: CONTATTO RITIRO === */}
       <div className="space-y-1 pt-2">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#0b3c5d]">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">
           Referente ritiro
         </p>
       </div>
@@ -390,7 +390,7 @@ export function RequestForm({
 
       {/* === SEZIONE 5: NOTE === */}
       <div className="space-y-1 pt-2">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#0b3c5d]">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">
           Note aggiuntive
         </p>
       </div>
@@ -410,17 +410,17 @@ export function RequestForm({
       {success && <p className="alert-success">{success}</p>}
 
       {!subscriptionActive && (
-        <div className="rounded-lg border border-[#f5c76a] bg-[#fffdf7] p-3 text-xs font-medium text-[#475569]">
-          <p className="text-[#0f172a]">
+        <div className="rounded-lg border border-accent-200 bg-accent-50/40 p-3 text-xs font-medium text-neutral-600">
+          <p className="text-textStrong">
             La pubblicazione oltre la prima richiesta richiede lo sblocco con commissione.
           </p>
-          <p className="text-[#64748b]">
+          <p className="text-neutral-500">
             La prima richiesta &egrave; gratuita, poi puoi sbloccare i contatti per ogni richiesta.
           </p>
         </div>
       )}
 
-      <button type="submit" disabled={loading} className="btn-primary">
+      <button type="submit" disabled={loading} className="btn-primary min-h-[44px] w-full sm:w-auto">
         {loading ? "Pubblicazione..." : "Pubblica richiesta"}
       </button>
 

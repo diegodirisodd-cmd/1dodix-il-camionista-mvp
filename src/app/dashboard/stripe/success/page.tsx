@@ -102,7 +102,7 @@ function StripeSuccessContent() {
   if (status === "error") {
     return (
       <section className="space-y-4 p-6">
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger">
           <p className="font-semibold">Attenzione</p>
           <p className="mt-1">{errorMessage}</p>
         </div>
@@ -123,11 +123,11 @@ function StripeSuccessContent() {
 
   return (
     <section className="space-y-4 p-6">
-      <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-[#0f172a]">
+      <div className="rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm text-textStrong">
         <p className="font-semibold">
           Pagamento completato con successo!
         </p>
-        <p className="mt-1 text-emerald-600">
+        <p className="mt-1 text-success">
           Verrai reindirizzato automaticamente tra pochi secondi...
         </p>
       </div>

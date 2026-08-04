@@ -7,6 +7,7 @@ type RouteUser = {
 export function getDashboardPath(role: Role) {
   if (role === "COMPANY") return "/dashboard/company";
   if (role === "TRANSPORTER") return "/dashboard/transporter";
+  if (role === "SUPPLIER") return "/dashboard/supplier";
   return "/dashboard/admin";
 }
 
