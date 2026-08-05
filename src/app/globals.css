@@ -71,8 +71,10 @@ a {
 
 @layer components {
   /* ── Buttons ─────────────────────────────────────────────── */
+  /* min-h-[44px]: target touch minimo su mobile, come da docs/design-system.md.
+     Sta qui e non sulle singole istanze cosi' vale ovunque per costruzione. */
   .btn-primary {
-    @apply relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 px-4 py-2 text-sm font-semibold text-white shadow-glow transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-glow active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:translate-y-0 disabled:from-neutral-300 disabled:to-neutral-300 disabled:shadow-none;
+    @apply relative inline-flex min-h-[44px] items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 px-4 py-2 text-sm font-semibold text-white shadow-glow transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-glow active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:translate-y-0 disabled:from-neutral-300 disabled:to-neutral-300 disabled:shadow-none;
   }
 
   .btn-primary::after {
@@ -85,11 +87,11 @@ a {
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-lg border border-brand-300/60 bg-transparent px-4 py-2 text-sm font-semibold text-brand-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-400 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:border-neutral-200 disabled:text-neutral-400;
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-lg border border-brand-300/60 bg-transparent px-4 py-2 text-sm font-semibold text-brand-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-400 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:border-neutral-200 disabled:text-neutral-400;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold text-textStrong transition-colors duration-150 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold text-textStrong transition-colors duration-150 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
   }
 
   /* ── Cards ───────────────────────────────────────────────── */

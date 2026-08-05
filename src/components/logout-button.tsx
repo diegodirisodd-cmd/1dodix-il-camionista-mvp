@@ -32,8 +32,8 @@ export function LogoutButton({ variant = "dark" }: { variant?: "dark" | "light" 
 
   const buttonClass =
     variant === "light"
-      ? "inline-flex items-center rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/40"
-      : "inline-flex items-center rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-semibold text-textStrong shadow-sm transition-colors duration-150 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-200";
+      ? "inline-flex min-h-[44px] items-center rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/40"
+      : "inline-flex min-h-[44px] items-center rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-semibold text-textStrong shadow-sm transition-colors duration-150 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-200";
 
   return (
     <div className="space-y-2">

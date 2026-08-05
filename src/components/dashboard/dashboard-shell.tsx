@@ -43,7 +43,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
           <button
             type="button"
             onClick={() => setMobileOpen((prev) => !prev)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-neutral-200 bg-card text-textStrong shadow-sm"
+            className="flex h-11 w-11 items-center justify-center rounded-lg border border-neutral-200 bg-card text-textStrong shadow-sm"
             aria-expanded={mobileOpen}
             aria-label="Apri navigazione"
           >

@@ -186,7 +186,10 @@ export default function LoginPage() {
               </div>
               <div className="mt-1 flex items-center justify-between gap-3">
                 <p className="text-xs text-neutral-500">Minimo 6 caratteri.</p>
-                <Link href="/reset-password" className="text-xs font-semibold text-accent-600 hover:underline">
+                <Link
+                  href="/reset-password"
+                  className="inline-flex min-h-[44px] items-center text-xs font-semibold text-accent-600 hover:underline"
+                >
                   Password dimenticata?
                 </Link>
               </div>

@@ -262,7 +262,7 @@ export function SupplierProfileForm() {
                         onClick={() => toggleProvince(categoria, provincia)}
                         aria-pressed={active}
                         className={clsx(
-                          "stat-mono h-9 w-11 rounded-md border text-xs font-semibold transition-all duration-150",
+                          "stat-mono h-11 w-12 sm:h-9 sm:w-11 rounded-md border text-xs font-semibold transition-all duration-150",
                           active
                             ? "border-steel-500 bg-steel-500 text-white"
                             : "border-neutral-200 bg-white text-neutral-500 hover:border-steel-300 hover:text-steel-700",
