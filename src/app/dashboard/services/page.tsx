@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { ServicesBoard } from "@/components/services/services-board";
 import { getSessionUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { SERVICE_CATEGORY_LABELS, SERVICE_CATEGORY_VALUES } from "@/lib/service-categories";
 import { canRequestServices, type Role } from "@/lib/roles";
 
@@ -18,6 +19,15 @@ export default async function ServicesBoardPage() {
   if (!isRequester && user.role !== "SUPPLIER") {
     redirect("/dashboard");
   }
+
+  // Serve a distinguere i due stati vuoti del fornitore: profilo da compilare
+  // oppure profilo a posto ma nessuna richiesta aperta compatibile.
+  const supplierHasAreas =
+    user.role === "SUPPLIER"
+      ? (await prisma.supplierServiceArea.count({
+          where: { supplier: { userId: user.id } },
+        })) > 0
+      : false;
 
   return (
     <section className="space-y-6">
@@ -50,7 +60,7 @@ export default async function ServicesBoardPage() {
         </div>
       </div>
 
-      <ServicesBoard role={user.role as Role} />
+      <ServicesBoard role={user.role as Role} supplierHasAreas={supplierHasAreas} />
     </section>
   );
 }

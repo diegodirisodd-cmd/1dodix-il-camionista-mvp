@@ -51,10 +51,23 @@ export function ServiceRequestForm() {
             method: "POST",
             body: formData,
           });
-          const data = (await response.json()) as UploadedPhoto & { error?: string };
+          const data = (await response.json().catch(() => null)) as
+            | (UploadedPhoto & { error?: string })
+            | null;
 
           if (!response.ok) {
-            setError(data?.error ?? "Caricamento della foto non riuscito.");
+            // 503 = le env var Supabase non sono configurate. Non e' colpa
+            // dell'utente e non gli impedisce di pubblicare: diciamoglielo.
+            setError(
+              response.status === 503
+                ? "Le foto non sono ancora attivabili su questo ambiente. Puoi pubblicare lo stesso: descrivi il problema nel testo e le aggiungerai piu' avanti."
+                : data?.error ?? "Caricamento della foto non riuscito.",
+            );
+            return;
+          }
+
+          if (!data?.path) {
+            setError("Caricamento della foto non riuscito.");
             return;
           }
 
