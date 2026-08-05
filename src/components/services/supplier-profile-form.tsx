@@ -158,7 +158,7 @@ export function SupplierProfileForm() {
       <div className="card space-y-5">
         <div className="space-y-1">
           <h2>Dati dell&apos;attività</h2>
-          <p>Il nome che i trasportatori vedono sui tuoi preventivi.</p>
+          <p>Il nome che i clienti vedono sui tuoi preventivi.</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">

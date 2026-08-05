@@ -3,6 +3,11 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, emailShell } from "@/lib/email";
+import {
+  SERVICE_CATEGORY_LABELS,
+  formatCents,
+  type ServiceCategory,
+} from "@/lib/service-categories";
 
 type QuotePayload = {
   priceCents?: number | string;
@@ -98,7 +103,13 @@ export async function POST(request: Request, { params }: { params: { id: string 
         subject: "Hai ricevuto un nuovo preventivo su DodiX",
         html: emailShell(
           "Nuovo preventivo ricevuto",
-          `<p>${supplierProfile.ragioneSociale} ha inviato un preventivo per la tua richiesta di servizio.</p>`,
+          `<p>${supplierProfile.ragioneSociale} ha inviato un preventivo per la tua richiesta
+              <strong>#${requestId}</strong> (${
+                SERVICE_CATEGORY_LABELS[serviceRequest.categoria as ServiceCategory] ??
+                serviceRequest.categoria
+              }).</p>
+           <p><strong>Prezzo proposto:</strong> ${formatCents(priceCents)} (IVA esclusa)<br />
+              <strong>Tempi di intervento:</strong> ${tempi}</p>`,
           `${baseUrl}/dashboard/services/${requestId}`,
           "Confronta le offerte",
         ),

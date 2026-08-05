@@ -73,7 +73,7 @@ export async function POST(request: Request) {
   }
 
   // Il path include l'id utente: rende immediato risalire al proprietario e
-  // tiene separati i file di trasportatori diversi dentro lo stesso bucket.
+  // tiene separati i file di utenti diversi dentro lo stesso bucket.
   const path = `${user.id}/${randomUUID()}.${EXTENSION_BY_TYPE[file.type] ?? "bin"}`;
 
   try {
