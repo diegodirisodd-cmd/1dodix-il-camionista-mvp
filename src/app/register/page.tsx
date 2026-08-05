@@ -193,7 +193,12 @@ export default function RegisterPage() {
                 </button>
                 <span className="text-sm text-neutral-300">
                   Hai già un account?{" "}
-                  <Link className="text-accent-300 underline" href="/login">Accedi</Link>
+                  <Link
+                    className="inline-flex min-h-[44px] items-center px-1 text-accent-300 underline"
+                    href="/login"
+                  >
+                    Accedi
+                  </Link>
                 </span>
               </div>
             </form>

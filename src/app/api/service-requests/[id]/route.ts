@@ -57,9 +57,9 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     return NextResponse.json({ error: "Non autorizzato" }, { status: 403 });
   }
 
-  // Il trasportatore vede il contatto del fornitore solo per il preventivo
-  // che ha scelto; il fornitore vede il contatto del trasportatore solo se
-  // ha sbloccato quella specifica richiesta (o se è già stato assegnato).
+  // Chi ha pubblicato vede il contatto del fornitore solo per il preventivo
+  // che ha scelto; il fornitore vede il contatto del cliente solo se ha
+  // sbloccato quella specifica richiesta (o se è già stato assegnato).
   const unlockedForThisSupplier = supplierProfileId
     ? serviceRequest.unlocks.some((u: { supplierId: number }) => u.supplierId === supplierProfileId)
     : false;
@@ -74,15 +74,15 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     isOwner || isAdmin || unlockedForThisSupplier || isAssignedSupplier;
 
   // Un fornitore vede solo il proprio preventivo tra i dettagli economici altrui;
-  // il trasportatore (proprietario) vede tutti i preventivi ricevuti.
+  // chi ha pubblicato (proprietario) vede tutti i preventivi ricevuti.
   const visibleQuotes =
     isOwner || isAdmin
       ? serviceRequest.quotes
       : serviceRequest.quotes.filter((q: { supplierId: number }) => q.supplierId === supplierProfileId);
 
-  // Simmetrico al mascheramento del trasportatore: il proprietario vede i
-  // recapiti del fornitore solo per il preventivo che ha effettivamente scelto
-  // (il fornitore, dal canto suo, paga per vedere quelli del trasportatore).
+  // Simmetrico al mascheramento del cliente: il proprietario vede i recapiti
+  // del fornitore solo per il preventivo che ha effettivamente scelto (il
+  // fornitore, dal canto suo, paga per vedere quelli del cliente).
   const sanitizedQuotes = visibleQuotes.map((quote) => {
     const canSeeSupplierContact =
       isAdmin ||

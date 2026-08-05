@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { OnboardingSteps } from "./onboarding-steps";
 import { getSessionUser } from "@/lib/auth";
 import { routeForUser } from "@/lib/navigation";
+
+export const metadata: Metadata = {
+  title: "Completa l'onboarding",
+  description:
+    "Configura il tuo profilo DodiX in pochi passaggi e accedi alla dashboard del tuo ruolo.",
+};
 
 export default async function OnboardingPage() {
   const user = await getSessionUser();

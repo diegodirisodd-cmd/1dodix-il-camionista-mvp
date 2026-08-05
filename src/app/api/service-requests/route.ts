@@ -9,7 +9,9 @@ import {
   isServiceCategory,
   isUrgencyLevel,
   SERVICE_CATEGORY_LABELS,
+  URGENCY_LABELS,
   type ServiceCategory,
+  type UrgencyLevel,
 } from "@/lib/service-categories";
 
 type ServiceRequestPayload = {
@@ -183,7 +185,13 @@ export async function POST(request: Request) {
     });
 
     // Notifica via email ai fornitori compatibili per categoria + provincia.
-    void notifyMatchingSuppliers(created.id, categoria as ServiceCategory, provincia);
+    void notifyMatchingSuppliers(
+      created.id,
+      categoria as ServiceCategory,
+      provincia,
+      urgenza as UrgencyLevel,
+      scadenzaDate,
+    );
 
     return NextResponse.json(created, { status: 201 });
   } catch (error) {
@@ -196,6 +204,8 @@ async function notifyMatchingSuppliers(
   requestId: number,
   categoria: ServiceCategory,
   provincia: string,
+  urgenza: UrgencyLevel,
+  scadenza: Date,
 ) {
   try {
     const areas = await prisma.supplierServiceArea.findMany({
@@ -214,7 +224,9 @@ async function notifyMatchingSuppliers(
     const html = emailShell(
       "Nuova richiesta di servizio compatibile",
       `<p>È stata pubblicata una nuova richiesta per <strong>${SERVICE_CATEGORY_LABELS[categoria]}</strong> in provincia di ${provincia}.</p>
-       <p>Accedi alla tua area fornitore per vedere i dettagli e inviare un preventivo.</p>`,
+       <p><strong>Urgenza:</strong> ${URGENCY_LABELS[urgenza]}<br />
+          <strong>Intervento entro il:</strong> ${scadenza.toLocaleDateString("it-IT")}</p>
+       <p>Accedi alla tua area fornitore per vedere i dettagli e inviare un preventivo. Inviare un preventivo è gratuito.</p>`,
       `${baseUrl}/dashboard/services/${requestId}`,
       "Vedi la richiesta",
     );

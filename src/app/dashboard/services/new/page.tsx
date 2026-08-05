@@ -1,9 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { ServiceRequestForm } from "@/components/services/service-request-form";
 import { getSessionUser } from "@/lib/auth";
 import { canRequestServices } from "@/lib/roles";
+
+export const metadata: Metadata = {
+  title: "Cerco un servizio",
+  description:
+    "Pubblica una richiesta di intervento al mezzo e ricevi preventivi dai fornitori della zona in cui ti trovi.",
+};
 
 export default async function NewServiceRequestPage() {
   const user = await getSessionUser();

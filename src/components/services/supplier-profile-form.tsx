@@ -158,7 +158,7 @@ export function SupplierProfileForm() {
       <div className="card space-y-5">
         <div className="space-y-1">
           <h2>Dati dell&apos;attività</h2>
-          <p>Il nome che i trasportatori vedono sui tuoi preventivi.</p>
+          <p>Il nome che i clienti vedono sui tuoi preventivi.</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -262,7 +262,7 @@ export function SupplierProfileForm() {
                         onClick={() => toggleProvince(categoria, provincia)}
                         aria-pressed={active}
                         className={clsx(
-                          "stat-mono h-9 w-11 rounded-md border text-xs font-semibold transition-all duration-150",
+                          "stat-mono h-11 w-12 sm:h-9 sm:w-11 rounded-md border text-xs font-semibold transition-all duration-150",
                           active
                             ? "border-steel-500 bg-steel-500 text-white"
                             : "border-neutral-200 bg-white text-neutral-500 hover:border-steel-300 hover:text-steel-700",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 
@@ -20,11 +20,15 @@ import { type ServiceRequestItem } from "./types";
 
 type ServicesBoardProps = {
   role: Role;
+  // Solo per i fornitori: distingue "profilo non ancora configurato" da
+  // "nessuna richiesta compatibile in questo momento". Sono due vuoti diversi
+  // e chiedono due azioni diverse.
+  supplierHasAreas?: boolean;
 };
 
 const OPEN_STATES: ServiceRequestStatus[] = ["APERTA", "IN_TRATTATIVA", "ASSEGNATA"];
 
-export function ServicesBoard({ role }: ServicesBoardProps) {
+export function ServicesBoard({ role, supplierHasAreas = false }: ServicesBoardProps) {
   const [items, setItems] = useState<ServiceRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -32,37 +36,30 @@ export function ServicesBoard({ role }: ServicesBoardProps) {
 
   const isRequester = canRequestServices(role);
 
-  useEffect(() => {
-    let isMounted = true;
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/service-requests");
 
-    async function loadRequests() {
-      try {
-        const response = await fetch("/api/service-requests");
-
-        if (!response.ok) {
-          const body = (await response.json().catch(() => null)) as { error?: string } | null;
-          throw new Error(body?.error ?? "Impossibile caricare le richieste");
-        }
-
-        const data = (await response.json()) as ServiceRequestItem[];
-        if (!isMounted) return;
-        setItems(data);
-        setLoadError(null);
-      } catch (error) {
-        if (!isMounted) return;
-        console.error("[ServicesBoard] load failed", error);
-        setLoadError(error instanceof Error ? error.message : "Impossibile caricare le richieste");
-      } finally {
-        if (isMounted) setLoading(false);
+      if (!response.ok) {
+        const body = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(body?.error ?? "Impossibile caricare le richieste");
       }
+
+      const data = (await response.json()) as ServiceRequestItem[];
+      setItems(data);
+      setLoadError(null);
+    } catch (error) {
+      console.error("[ServicesBoard] load failed", error);
+      setLoadError(error instanceof Error ? error.message : "Impossibile caricare le richieste");
+    } finally {
+      setLoading(false);
     }
-
-    void loadRequests();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   const visibleItems = useMemo(() => {
     if (statusFilter === "TUTTE") return items;
@@ -86,6 +83,26 @@ export function ServicesBoard({ role }: ServicesBoardProps) {
     );
   }
 
+  // Un errore di caricamento non deve somigliare a un elenco vuoto: contatori
+  // a zero e "nessuna richiesta" farebbero credere che non ci sia nulla.
+  if (loadError) {
+    return (
+      <div className="card space-y-4">
+        <div className="space-y-1">
+          <h2>Non riesco a caricare le richieste</h2>
+          <p>
+            Il caricamento non e&apos; andato a buon fine, quindi non e&apos; detto che non ci sia
+            nulla: e&apos; solo che al momento non riusciamo a leggerlo.
+          </p>
+        </div>
+        <p className="alert-danger">{loadError}</p>
+        <button type="button" className="btn-primary" onClick={() => void load()}>
+          Riprova
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-3">
@@ -96,8 +113,6 @@ export function ServicesBoard({ role }: ServicesBoardProps) {
           value={counters.quotes}
         />
       </div>
-
-      {loadError && <p className="alert-danger">{loadError}</p>}
 
       {isRequester && (
         <div className="flex flex-wrap gap-2">
@@ -117,7 +132,11 @@ export function ServicesBoard({ role }: ServicesBoardProps) {
       )}
 
       {visibleItems.length === 0 ? (
-        <EmptyState role={role} filtered={statusFilter !== "TUTTE"} />
+        <EmptyState
+          role={role}
+          filtered={statusFilter !== "TUTTE"}
+          supplierHasAreas={supplierHasAreas}
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {visibleItems.map((item, index) => (
@@ -245,7 +264,15 @@ function FilterChip({
   );
 }
 
-function EmptyState({ role, filtered }: { role: Role; filtered: boolean }) {
+function EmptyState({
+  role,
+  filtered,
+  supplierHasAreas,
+}: {
+  role: Role;
+  filtered: boolean;
+  supplierHasAreas: boolean;
+}) {
   if (filtered) {
     return <div className="card-muted text-sm text-neutral-600">Nessuna richiesta con questo stato.</div>;
   }
@@ -265,12 +292,28 @@ function EmptyState({ role, filtered }: { role: Role; filtered: boolean }) {
     );
   }
 
+  if (!supplierHasAreas) {
+    return (
+      <div className="card-muted space-y-3">
+        <h3>Non ricevi ancora richieste</h3>
+        <p>
+          Non hai ancora indicato quali servizi offri e in quali province intervieni. Finche&apos; il
+          profilo resta vuoto non ti arriva nessuna richiesta, nemmeno per email.
+        </p>
+        <Link href="/dashboard/supplier/profile" className="btn-primary">
+          Imposta servizi e zone
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="card-muted space-y-3">
-      <h3>Nessuna richiesta compatibile</h3>
+      <h3>Nessuna richiesta aperta in questo momento</h3>
       <p>
-        Le richieste ti vengono mostrate in base alle categorie e alle province che copri. Se non vedi
-        nulla, controlla le zone servite nel tuo profilo.
+        Il tuo profilo e&apos; configurato: appena qualcuno pubblica una richiesta in una delle tue
+        categorie e province la trovi qui, e ti avvisiamo anche per email. Se vuoi ricevere di piu&apos;,
+        allarga le zone servite.
       </p>
       <Link href="/dashboard/supplier/profile" className="btn-secondary">
         Gestisci zone servite

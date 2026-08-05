@@ -1,6 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { ScrollReveal } from "@/components/scroll-reveal";
+
+export const metadata: Metadata = {
+  // Titolo assoluto: il template del root layout non si applica al segmento in
+  // cui e' definito, quindi la home deve portarsi dietro il nome del prodotto.
+  title: "DodiX – Il Camionista · Logistica B2B senza intermediari",
+  description:
+    "Aziende e trasportatori si incontrano su DodiX: richieste di trasporto strutturate, contatti diretti e verificati, nessuna gara al ribasso.",
+};
 
 const valueProps = [
   {
@@ -67,7 +76,9 @@ export default function HomePage() {
             {stats.map((stat) => (
               <div key={stat.label}>
                 <p className="stat-mono text-2xl font-semibold text-white md:text-3xl">{stat.value}</p>
-                <p className="mt-1 text-xs uppercase tracking-wide text-neutral-300/80">{stat.label}</p>
+                <p className="mt-1 text-[11px] uppercase leading-tight text-neutral-300/80 sm:text-xs sm:tracking-wide">
+                  {stat.label}
+                </p>
               </div>
             ))}
           </div>
