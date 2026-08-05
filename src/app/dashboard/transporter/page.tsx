@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -5,6 +6,12 @@ import { ScrollReveal } from "@/components/scroll-reveal";
 import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { hasActiveSubscription } from "@/lib/subscription";
+
+export const metadata: Metadata = {
+  title: "Dashboard trasportatore",
+  description:
+    "Richieste di trasporto disponibili, tratte accettate e servizi per il mezzo sulla Borsa Servizi.",
+};
 
 export default async function TransporterDashboardPage() {
   const user = await getSessionUser();

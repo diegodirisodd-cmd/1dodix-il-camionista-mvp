@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -6,6 +7,12 @@ import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { hasActiveSubscription } from "@/lib/subscription";
+
+export const metadata: Metadata = {
+  title: "Dashboard azienda",
+  description:
+    "Pubblica richieste di trasporto, monitora le spedizioni e gestisci i contatti con i trasportatori.",
+};
 
 export default async function CompanyDashboardPage() {
   const user = await getSessionUser();

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -6,6 +7,12 @@ import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SERVICE_CATEGORY_LABELS, SERVICE_CATEGORY_VALUES } from "@/lib/service-categories";
 import { canRequestServices, type Role } from "@/lib/roles";
+
+export const metadata: Metadata = {
+  title: "Borsa Servizi",
+  description:
+    "Richieste di intervento al mezzo: officine, telonai, gommisti, soccorso stradale, carrozzerie e lavaggio. Pubblicare è gratuito.",
+};
 
 export default async function ServicesBoardPage() {
   const user = await getSessionUser();

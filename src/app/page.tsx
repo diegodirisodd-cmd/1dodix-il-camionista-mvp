@@ -1,6 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { ScrollReveal } from "@/components/scroll-reveal";
+
+export const metadata: Metadata = {
+  // Titolo assoluto: il template del root layout non si applica al segmento in
+  // cui e' definito, quindi la home deve portarsi dietro il nome del prodotto.
+  title: "DodiX – Il Camionista · Logistica B2B senza intermediari",
+  description:
+    "Aziende e trasportatori si incontrano su DodiX: richieste di trasporto strutturate, contatti diretti e verificati, nessuna gara al ribasso.",
+};
 
 const valueProps = [
   {

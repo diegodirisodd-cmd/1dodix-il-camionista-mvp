@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { SectionCard } from "@/components/dashboard/section-card";
@@ -14,6 +15,12 @@ import {
   type ServiceRequestStatus,
   type UrgencyLevel,
 } from "@/lib/service-categories";
+
+export const metadata: Metadata = {
+  title: "Pannello di controllo",
+  description:
+    "Vista in sola lettura di utenti, richieste di trasporto, richieste di servizio e fornitori iscritti.",
+};
 
 type UserSummary = {
   id: number;

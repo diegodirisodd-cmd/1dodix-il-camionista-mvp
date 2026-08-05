@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { SupplierProfileForm } from "@/components/services/supplier-profile-form";
 import { getSessionUser } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Servizi offerti e zone servite",
+  description:
+    "Scegli le categorie di servizio che offri e le province in cui intervieni: determinano quali richieste ricevi.",
+};
 
 export default async function SupplierProfilePage() {
   const user = await getSessionUser();

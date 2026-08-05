@@ -23,8 +23,14 @@ const jbMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DodiX – Il Camionista",
-  description: "SaaS logistico B2B per aziende e trasportatori con controlli di accesso, richieste strutturate e contatti verificati.",
+  // Il template fa sì che ogni pagina debba dichiarare solo il proprio titolo:
+  // il suffisso del prodotto lo aggiunge Next.
+  title: {
+    default: "DodiX – Il Camionista",
+    template: "%s · DodiX",
+  },
+  description:
+    "Piattaforma B2B di logistica: aziende e trasportatori si incontrano senza intermediari, con contatti verificati e la Borsa Servizi per officine, telonai e gommisti.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

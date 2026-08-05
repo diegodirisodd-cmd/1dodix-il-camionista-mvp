@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -10,6 +11,12 @@ import {
   getServiceUnlockTotalCents,
   type ServiceCategory,
 } from "@/lib/service-categories";
+
+export const metadata: Metadata = {
+  title: "Area fornitore",
+  description:
+    "Le tue coperture, i preventivi inviati e i lavori assegnati sulla Borsa Servizi DodiX.",
+};
 
 export default async function SupplierDashboardPage() {
   const user = await getSessionUser();
