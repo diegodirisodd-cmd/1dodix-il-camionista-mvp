@@ -7,6 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Durable webhook inbox. No automatic replies or business actions are run yet.
+model WhatsAppWebhookReceipt {
+  id            String   @id
+  wabaId        String
+  phoneNumberId String
+  payload       Json
+  receivedAt    DateTime @default(now())
+
+  @@index([receivedAt])
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique

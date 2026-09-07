@@ -36,6 +36,9 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
+      - name: WhatsApp webhook tests
+        run: npm run test:whatsapp
+
       - name: Lint
         run: npm run lint
 
