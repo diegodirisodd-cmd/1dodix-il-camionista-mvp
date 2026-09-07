@@ -139,6 +139,13 @@ npm run dev
 3. **Verifica stato in app**
    - Dopo il pagamento, torna su `/dashboard`: il badge deve mostrare "Abbonamento attivo" e le funzionalità premium devono risultare sbloccate.
 
+## WhatsApp Cloud API
+
+Il webhook `/api/whatsapp/webhook` verifica Meta e conserva gli eventi firmati
+nel database. La configurazione Vercel/Meta, la migrazione aggiuntiva e la prova
+di ricezione sono descritte in [docs/whatsapp-webhook.md](docs/whatsapp-webhook.md).
+Non invia messaggi o notifiche automatiche. Test: `npm run test:whatsapp`.
+
 ## Note
 - Il database SQLite è locale al progetto (file `dev.db`) e non è incluso nel controllo versione.
 - Il cookie JWT viene firmato con `AUTH_SECRET`; assicurati di mantenere la chiave segreta e rigenerarla per ambienti diversi.
