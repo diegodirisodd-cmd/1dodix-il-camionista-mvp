@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   // cui e' definito, quindi la home deve portarsi dietro il nome del prodotto.
   title: "DodiX – Il Camionista · Logistica B2B senza intermediari",
   description:
-    "Aziende e trasportatori si incontrano su DodiX: richieste di trasporto strutturate, contatti diretti e verificati, nessuna gara al ribasso.",
+    "La borsa carichi e servizi per il trasporto: aziende e trasportatori si incontrano senza intermediari, e officine, telonai, gommisti e soccorso stradale rispondono alle richieste della Borsa Servizi.",
 };
 
 const valueProps = [
@@ -38,7 +38,16 @@ const companyPoints = [
 const transporterPoints = [
   "Ricevi un WhatsApp appena esce un carico",
   "Accedi a richieste reali, pubblicate da aziende registrate",
-  "Nessun abbonamento: paghi il 2% solo se sblocchi un contatto",
+  "Cerchi un servizio per il mezzo? Lo chiedi nella Borsa Servizi",
+];
+
+// Terzo pubblico della piattaforma, oltre ad aziende e trasportatori: i
+// fornitori della Borsa Servizi. Volutamente niente elenco chiuso di mestieri
+// nel titolo della card, perche' le categorie sono destinate a crescere.
+const supplierPoints = [
+  "Ricevi le richieste della tua zona e della tua categoria",
+  "Rispondi con un preventivo: prezzo, tempi e disponibilità",
+  "Iscrizione gratuita, paghi solo per sbloccare il contatto",
 ];
 
 // Nessun contatore di volumi qui: con i numeri attuali comunicherebbe una
@@ -58,8 +67,9 @@ export default function HomePage() {
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">
             Logistica B2B
           </p>
-          <h1 className="mt-4 max-w-2xl text-4xl text-white md:text-6xl">
-            Dove aziende e trasportatori si incontrano. Senza intermediari.
+          <h1 className="mt-4 max-w-3xl text-3xl text-white sm:text-4xl md:text-5xl">
+            DodiX, la borsa carichi e servizi dove aziende e trasportatori si
+            incontrano. Senza intermediari.
           </h1>
           <p className="mt-4 max-w-xl text-base text-neutral-200/85 md:text-lg">
             Le aziende pubblicano i carichi, i trasportatori li ricevono su WhatsApp
@@ -81,8 +91,10 @@ export default function HomePage() {
           <div className="mt-10 grid grid-cols-3 gap-4 border-t border-white/10 pt-6">
             {stats.map((stat) => (
               <div key={stat.label}>
+                {/* text-lg sotto sm: a 390px tre colonne non reggono "WhatsApp"
+                    a text-2xl e la parola veniva tagliata dal bordo. */}
                 <p
-                  className={`text-2xl font-semibold text-white md:text-3xl ${
+                  className={`text-lg font-semibold text-white sm:text-2xl md:text-3xl ${
                     stat.mono ? "stat-mono" : ""
                   }`}
                 >
@@ -110,9 +122,9 @@ export default function HomePage() {
           ))}
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-2">
+        <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <ScrollReveal>
-            <div className="card card-hover h-full space-y-4">
+            <div className="card card-hover flex h-full flex-col space-y-4">
               <div className="space-y-2">
                 <h2>Sei un&apos;azienda che deve spedire?</h2>
                 <p>Pubblica incarichi e ricevi contatti verificati in modo diretto e misurabile.</p>
@@ -125,14 +137,14 @@ export default function HomePage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/register?role=company" className="btn-primary w-fit">
+              <Link href="/register?role=company" className="btn-primary mt-auto w-fit">
                 Registrati ora
               </Link>
             </div>
           </ScrollReveal>
 
           <ScrollReveal delayMs={100}>
-            <div className="card card-hover h-full space-y-4">
+            <div className="card card-hover flex h-full flex-col space-y-4">
               <div className="space-y-2">
                 <h2>Sei un trasportatore?</h2>
                 <p>
@@ -148,7 +160,30 @@ export default function HomePage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/register?role=transporter" className="btn-secondary w-fit">
+              <Link href="/register?role=transporter" className="btn-secondary mt-auto w-fit">
+                Registrati ora
+              </Link>
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal delayMs={200}>
+            <div className="card card-hover flex h-full flex-col space-y-4">
+              <div className="space-y-2">
+                <h2>Offri servizi per i mezzi pesanti?</h2>
+                <p>
+                  Telonai, officine, gommisti, soccorso stradale, carrozzerie e lavaggi:
+                  le richieste arrivano a te, tu rispondi con un preventivo.
+                </p>
+              </div>
+              <ul className="space-y-2 text-sm leading-relaxed text-neutral-600">
+                {supplierPoints.map((point) => (
+                  <li key={point} className="flex items-start gap-3">
+                    <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-accent-500" aria-hidden />
+                    {point}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/register?role=supplier" className="btn-secondary mt-auto w-fit">
                 Registrati ora
               </Link>
             </div>
@@ -159,8 +194,8 @@ export default function HomePage() {
           <div className="card-contrast bg-road space-y-4 text-center">
             <h2 className="text-white">Inizia ora su DodiX – Il Camionista</h2>
             <p className="mx-auto max-w-xl text-neutral-200/85">
-              Iscrizione gratuita, avvisi WhatsApp sui nuovi carichi e contatto diretto
-              con chi spedisce.
+              Carichi da trasportare e servizi per il mezzo, con iscrizione gratuita e
+              contatto diretto fra le parti.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <Link href="/register" className="btn-primary px-6 py-3 text-base">
