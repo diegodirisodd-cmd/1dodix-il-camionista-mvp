@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 const highlights = [
-  "Pubblica richieste in pochi minuti",
-  "Ricevi offerte da trasportatori verificati",
+  "Avviso WhatsApp appena esce un carico",
+  "Iscrizione gratuita, nessun abbonamento: il 2% solo a contatto sbloccato",
+  "Contatto diretto con chi spedisce, senza intermediari",
   "Officine e fornitori per il mezzo nella Borsa Servizi",
 ];
 

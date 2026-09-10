@@ -212,6 +212,14 @@ export default function RegisterPage() {
                 <span>Trasportatore: cerca carichi e servizi per il mezzo. Azienda: pubblica richieste di trasporto. Fornitore: risponde alle richieste di Borsa Servizi.</span>
               </li>
               <li className="flex items-start gap-3">
+                <span className="badge">WhatsApp</span>
+                <span>I trasportatori ricevono un messaggio appena viene pubblicato un nuovo carico, senza dover controllare la piattaforma.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="badge">Costi</span>
+                <span>Iscrizione e abbonamento gratuiti. Una commissione del 2% solo quando sblocchi il contatto di un carico.</span>
+              </li>
+              <li className="flex items-start gap-3">
                 <span className="badge">Contatti</span>
                 <span>Verificati e diretti, senza call center o intermediari.</span>
               </li>
