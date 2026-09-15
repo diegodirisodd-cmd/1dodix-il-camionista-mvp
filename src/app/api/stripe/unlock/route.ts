@@ -51,6 +51,15 @@ export async function POST(req: Request) {
     const totaleEuro = commission + iva;
     const unitAmountCents = Math.round(totaleEuro * 100);
 
+    // Uno sblocco a importo nullo o negativo non e' un pagamento: rifiutalo
+    // invece di aprire un checkout che segnerebbe i contatti come pagati.
+    if (!Number.isFinite(unitAmountCents) || unitAmountCents <= 0) {
+      return NextResponse.json(
+        { error: "Importo di sblocco non valido." },
+        { status: 400 },
+      );
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],

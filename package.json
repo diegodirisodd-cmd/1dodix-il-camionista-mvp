@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test:whatsapp": "node scripts/test-whatsapp.cjs",
+    "test:privacy": "node scripts/test-request-privacy.cjs",
     "postinstall": "prisma generate"
   },
   "dependencies": {

@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import { AcceptedTransportsList } from "@/components/requests/accepted-transports-list";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { redactRequestContacts } from "@/lib/request-privacy";
+import { type Role } from "@/lib/roles";
+import { getUnlockStatesForRequests } from "@/lib/unlocks";
 
 export default async function TransporterAcceptedPage() {
   const user = await getSessionUser();
@@ -23,9 +26,18 @@ export default async function TransporterAcceptedPage() {
       cargo: true,
       price: true,
       createdAt: true,
+      companyId: true,
       company: { select: { email: true } },
     },
   });
+
+  // Accettare una tratta non paga la commissione: l'email dell'azienda resta
+  // nascosta finche' il trasportatore non ha sbloccato quella richiesta.
+  const unlockStates = await getUnlockStatesForRequests(
+    acceptedRequests.map((request) => request.id),
+    user.id,
+    user.role as Role,
+  );
 
   return (
     <section className="space-y-6">
@@ -42,10 +54,19 @@ export default async function TransporterAcceptedPage() {
       </div>
 
       <AcceptedTransportsList
-        requests={acceptedRequests.map((request) => ({
-          ...request,
-          createdAt: request.createdAt.toISOString(),
-        }))}
+        requests={acceptedRequests.map((request) => {
+          const unlockedForCurrentUser =
+            unlockStates.get(request.id)?.unlockedByMe ?? false;
+          const safe = redactRequestContacts(
+            request,
+            { id: user.id, role: user.role },
+            unlockedForCurrentUser,
+          );
+          return {
+            ...safe,
+            createdAt: request.createdAt.toISOString(),
+          };
+        })}
       />
     </section>
   );
