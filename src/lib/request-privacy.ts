@@ -31,16 +31,19 @@ const EMPTY_STATE: RequestUnlockState = {
  * Where clause della lista richieste, per ruolo.
  *
  * - COMPANY: solo le proprie richieste.
- * - TRANSPORTER: la bacheca mostra solo carichi ancora liberi e aperti, mai
- *   quelli già assegnati, completati o annullati.
+ * - TRANSPORTER: la bacheca mostra solo carichi ancora liberi, mai quelli già
+ *   assegnati, completati o annullati. COMPANY_PAID resta visibile: è un
+ *   carico senza trasportatore su cui l'azienda ha già pagato la commissione.
  * - ADMIN (o altro): nessun filtro.
  */
+export const TRANSPORTER_BOARD_STATUSES = ["OPEN", "COMPANY_PAID"];
+
 export function requestsWhereClauseForRole(role: string, userId: number) {
   if (role === "COMPANY") {
     return { companyId: userId };
   }
   if (role === "TRANSPORTER") {
-    return { transporterId: null, status: "OPEN" };
+    return { transporterId: null, status: { in: TRANSPORTER_BOARD_STATUSES } };
   }
   return undefined;
 }

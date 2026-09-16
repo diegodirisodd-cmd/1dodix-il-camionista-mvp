@@ -6,6 +6,7 @@ const {
   canViewRequestContacts,
   redactRequestContacts,
   requestsWhereClauseForRole,
+  TRANSPORTER_BOARD_STATUSES,
 } = require(path.join(process.env.PRIVACY_TEST_BUILD, "request-privacy.js"));
 
 const COMPANY_ID = 7;
@@ -42,10 +43,15 @@ function asJson(payload) {
 }
 
 test("la bacheca trasportatore filtra su carichi liberi e ancora aperti", () => {
+  // COMPANY_PAID resta in bacheca: nessun trasportatore assegnato, e la
+  // commissione dell'azienda e' gia' stata pagata.
   assert.deepEqual(requestsWhereClauseForRole("TRANSPORTER", TRANSPORTER_ID), {
     transporterId: null,
-    status: "OPEN",
+    status: { in: ["OPEN", "COMPANY_PAID"] },
   });
+  assert.ok(!TRANSPORTER_BOARD_STATUSES.includes("COMPLETED"));
+  assert.ok(!TRANSPORTER_BOARD_STATUSES.includes("CANCELLED"));
+  assert.ok(!TRANSPORTER_BOARD_STATUSES.includes("TRANSPORTER_PAID"));
   assert.deepEqual(requestsWhereClauseForRole("COMPANY", COMPANY_ID), {
     companyId: COMPANY_ID,
   });
