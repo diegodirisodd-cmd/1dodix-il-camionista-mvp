@@ -80,6 +80,14 @@ export async function POST(req: Request) {
     // Importo fisso (non una percentuale come per le richieste di trasporto):
     // il prezzo di listino è IVA esclusa, in checkout si addebita IVA inclusa.
     const unitAmountCents = getServiceUnlockTotalCents();
+
+    if (!Number.isFinite(unitAmountCents) || unitAmountCents <= 0) {
+      return NextResponse.json(
+        { error: "Importo di sblocco non valido." },
+        { status: 400 },
+      );
+    }
+
     const categoriaLabel =
       SERVICE_CATEGORY_LABELS[serviceRequest.categoria as ServiceCategory] ??
       serviceRequest.categoria;

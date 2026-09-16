@@ -99,7 +99,6 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       priceCents={requestRecord.price}
       createdAt={requestRecord.createdAt.toISOString()}
       acceptedAt={requestRecord.acceptedAt ? requestRecord.acceptedAt.toISOString() : null}
-      companyEmail={requestRecord.company.email}
       companyName={requestRecord.company.companyName ?? null}
       contactEmail={
         showContacts

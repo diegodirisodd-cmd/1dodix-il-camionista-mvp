@@ -39,6 +39,9 @@ jobs:
       - name: WhatsApp webhook tests
         run: npm run test:whatsapp
 
+      - name: Request contacts privacy tests
+        run: npm run test:privacy
+
       - name: Lint
         run: npm run lint
 

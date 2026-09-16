@@ -61,6 +61,19 @@ export async function POST(req: Request) {
         : session.payment_intent?.id ?? null;
     const amountCents = session.amount_total ?? null;
 
+    // Guardia sblocco: una sessione a importo nullo (o negativo) non paga la
+    // commissione, quindi non puo' sbloccare i contatti.
+    if (amountCents === null || amountCents <= 0) {
+      console.error("STRIPE CONFIRM: importo non valido", {
+        sessionId: session.id,
+        amountCents,
+      });
+      return NextResponse.json(
+        { error: "Importo pagamento non valido" },
+        { status: 400 },
+      );
+    }
+
     await prisma.requestUnlock.upsert({
       where: {
         requestId_userId: { requestId, userId },

@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import {
+  buildRequestsListPayload,
+  requestsWhereClauseForRole,
+} from "@/lib/request-privacy";
 import { type Role } from "@/lib/roles";
 import { getUnlockStatesForRequests } from "@/lib/unlocks";
 
@@ -36,12 +40,7 @@ export async function GET() {
   }
 
   try {
-    const whereClause =
-      user.role === "COMPANY"
-        ? { companyId: user.id }
-        : user.role === "TRANSPORTER"
-          ? { transporterId: null }
-          : undefined;
+    const whereClause = requestsWhereClauseForRole(user.role, user.id);
 
     const requests = await prisma.request.findMany({
       where: whereClause,
@@ -76,18 +75,12 @@ export async function GET() {
       user.role as Role,
     );
 
-    const enriched = requests.map((r) => {
-      const state = unlockStates.get(r.id) ?? {
-        unlockedByMe: false,
-        unlockedByOther: false,
-        bothUnlocked: false,
-      };
-      return {
-        ...r,
-        unlockedForCurrentUser: state.unlockedByMe,
-        unlockedByOtherParty: state.unlockedByOther,
-        bothPartiesUnlocked: state.bothUnlocked,
-      };
+    // I contatti azienda escono dal select solo per chi ha sbloccato la
+    // richiesta (o ne e' il proprietario): la redazione vive nel payload
+    // builder per non poter essere dimenticata qui.
+    const enriched = buildRequestsListPayload(requests, unlockStates, {
+      id: user.id,
+      role: user.role,
     });
 
     return NextResponse.json(enriched);

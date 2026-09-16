@@ -51,7 +51,6 @@ type RequestDetailViewProps = {
   priceCents: number;
   createdAt: string;
   acceptedAt: string | null;
-  companyEmail: string;
   companyName?: string | null;
   contactEmail: string | null;
   contactPhone: string | null;
@@ -104,7 +103,6 @@ export function RequestDetailView({
   priceCents,
   createdAt,
   acceptedAt,
-  companyEmail,
   companyName,
   contactEmail,
   contactPhone,

@@ -10,7 +10,8 @@ type AcceptedRequest = {
   cargo: string | null;
   price: number;
   createdAt: string;
-  company: { email: string };
+  // null finche' il trasportatore non ha sbloccato i contatti della richiesta.
+  company: { email?: string | null } | null;
 };
 
 type AcceptedTransportsListProps = {
@@ -70,7 +71,7 @@ export function AcceptedTransportsList({ requests }: AcceptedTransportsListProps
                 </td>
                 <td className="text-neutral-600">{request.cargo ?? "—"}</td>
                 <td className="stat-mono font-semibold text-textStrong">{formatCurrency(request.price)}</td>
-                <td className="text-neutral-600">{request.company.email}</td>
+                <td className="text-neutral-600">{request.company?.email ?? "Contatti da sbloccare"}</td>
                 <td className="text-neutral-600">
                   <span className="badge-verified">
                     {isCompleted ? "Completato" : "Trasporto accettato"}

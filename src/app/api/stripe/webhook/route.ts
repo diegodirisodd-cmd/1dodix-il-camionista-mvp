@@ -88,6 +88,16 @@ export async function POST(req: NextRequest) {
         : session.payment_intent?.id ?? null;
     const amountCents = session.amount_total ?? null;
 
+    // Guardia sblocco: senza un importo effettivamente incassato non si
+    // segnano i contatti come pagati.
+    if (amountCents === null || amountCents <= 0) {
+      console.error("[WEBHOOK] importo sblocco non valido", {
+        sessionId: session.id,
+        amountCents,
+      });
+      return NextResponse.json({ received: true });
+    }
+
     await prisma.requestUnlock.upsert({
       where: {
         requestId_userId: {
@@ -165,6 +175,16 @@ async function handleServiceContactUnlock(session: Stripe.Checkout.Session) {
       ? session.payment_intent
       : session.payment_intent?.id ?? null;
 
+  const amountCents = session.amount_total ?? null;
+
+  if (amountCents === null || amountCents <= 0) {
+    console.error("[WEBHOOK] importo sblocco servizio non valido", {
+      sessionId: session.id,
+      amountCents,
+    });
+    return;
+  }
+
   try {
     await prisma.serviceContactUnlock.upsert({
       where: {
@@ -176,12 +196,12 @@ async function handleServiceContactUnlock(session: Stripe.Checkout.Session) {
       create: {
         requestId: serviceRequestId,
         supplierId: supplierProfileId,
-        amountCents: session.amount_total ?? null,
+        amountCents,
         stripeSessionId: session.id,
         stripePaymentIntentId,
       },
       update: {
-        amountCents: session.amount_total ?? null,
+        amountCents,
         stripeSessionId: session.id,
         stripePaymentIntentId,
         paidAt: new Date(),
