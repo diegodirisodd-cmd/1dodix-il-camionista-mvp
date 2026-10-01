@@ -30,3 +30,15 @@ drop trigger if exists on_service_unlock_notify on public."ServiceContactUnlock"
 create trigger on_service_unlock_notify
   after insert on public."ServiceContactUnlock"
   for each row execute function public.notify_contact_unlock('SERVICE');
+
+-- Deduplica: al massimo un avviso per sblocco (la Edge Function inserisce qui
+-- prima di inviare; un secondo inserimento fallisce con 409 e non invia).
+create table if not exists public."WhatsappUnlockNotice" (
+  kind text not null check (kind in ('LOAD','SERVICE')),
+  "unlockId" integer not null,
+  "createdAt" timestamptz not null default now(),
+  primary key (kind, "unlockId")
+);
+alter table public."WhatsappUnlockNotice" enable row level security;
+alter table public."WhatsappUnlockNotice" force row level security;
+revoke all on public."WhatsappUnlockNotice" from anon, authenticated;

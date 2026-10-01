@@ -6,6 +6,8 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 // Chiamata dai trigger AFTER INSERT sulle due tabelle: l'upsert del webhook Stripe e
 // di /api/stripe/confirm inserisce una sola volta, quindi parte un solo messaggio.
 // Il payload contiene solo l'id dello sblocco: tutti i dati vengono riletti dal DB.
+// Chiamate ripetute o esterne sono innocue: ogni sblocco produce al massimo un
+// messaggio, sempre e solo alla controparte registrata (vedi claimNotice).
 
 const WA_TOKEN = Deno.env.get("WHATSAPP_TOKEN") ?? "";
 const PHONE_ID = Deno.env.get("WHATSAPP_PHONE_ID") ?? "1223790424131412";
@@ -82,13 +84,34 @@ async function sendWhatsApp(toPhone: string, params: string[]) {
 
 async function logNotification(requestId: number | null, userId: number | null, phone: string, status: string, messageId: string | null, errorMessage: string | null) {
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/WhatsappNotification`, {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/WhatsappNotification`, {
       method: "POST",
       headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
       body: JSON.stringify({ requestId, userId, phoneNumber: phone, status, messageId, errorMessage, createdAt: new Date().toISOString() }),
     });
+    if (!r.ok) console.error("log notification failed:", r.status, await r.text());
   } catch (e) {
     console.error("log error:", e);
+  }
+}
+
+// Un solo avviso per sblocco: la chiave primaria (kind, unlockId) di
+// WhatsappUnlockNotice fa fallire con 409 ogni chiamata successiva, quindi
+// richiamare la funzione con lo stesso unlockId non reinvia nulla.
+async function claimNotice(kind: string, unlockId: number): Promise<"claimed" | "duplicate" | "error"> {
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/WhatsappUnlockNotice`, {
+      method: "POST",
+      headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({ kind, unlockId }),
+    });
+    if (r.ok) return "claimed";
+    if (r.status === 409) return "duplicate";
+    console.error("claim notice failed:", r.status, await r.text());
+    return "error";
+  } catch (e) {
+    console.error("claim notice error:", e);
+    return "error";
   }
 }
 
@@ -174,6 +197,10 @@ Deno.serve(async (req: Request) => {
     if (!plan.recipient.whatsappOptIn) return json({ skipped: "destinatario senza opt-in WhatsApp" });
     const to = SANDBOX_ONLY ? SANDBOX_TEST_NUMBER : normalizePhone(plan.recipient.phone);
     if (!to) return json({ skipped: "destinatario senza telefono" });
+
+    const claim = await claimNotice(kind, unlockId);
+    if (claim === "duplicate") return json({ skipped: "avviso già inviato" });
+    if (claim === "error") return json({ error: "impossibile registrare l'avviso" }, 500);
 
     const params = [plan.subject, clean(displayName(plan.payer), 100), displayPhone(plan.payer.phone)];
     const send = await sendWhatsApp(to, params);
