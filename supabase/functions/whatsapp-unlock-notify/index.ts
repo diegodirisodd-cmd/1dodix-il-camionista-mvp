@@ -127,6 +127,13 @@ const finishNotice = (kind: string, unlockId: number, status: "sent" | "failed" 
 
 type Plan = {
   recipient: User; payer: User; subject: string;
+  // Stesse regole del sito: i contatti di chi ha pagato si mostrano solo se il
+  // destinatario ha diritto a vederli (carichi: ha pagato anche lui; servizi:
+  // ha assegnato il lavoro a quel fornitore). Altrimenti nome e telefono
+  // restano nascosti, così il messaggio non regala lo sblocco.
+  revealContacts: boolean;
+  payerLabel: string;
+  hiddenPhoneText: string;
   logRequestId: number | null; // FK su Request: null per Borsa Servizi
   createdAt: string;
 };
@@ -145,8 +152,14 @@ async function planLoad(unlockId: number): Promise<Plan | string> {
   const recipient = recipientId && recipientId !== unlock.userId ? await getUser(recipientId) : null;
   if (!payer || !recipient) return "controparte non disponibile";
 
+  const recipientUnlock = await rest<{ id: number }>(
+    `RequestUnlock?requestId=eq.${req.id}&userId=eq.${recipient.id}&select=id&limit=1`);
+
   return {
     recipient, payer, logRequestId: req.id, createdAt: unlock.createdAt,
+    revealContacts: recipientUnlock.length > 0,
+    payerLabel: role === "TRANSPORTER" ? "un trasportatore iscritto a DodiX" : "l'azienda che ha pubblicato il carico",
+    hiddenPhoneText: "lo vedi su www.dodix.it dopo aver sbloccato anche tu",
     subject: clean(`carico ${req.pickup ?? "-"} → ${req.delivery ?? "-"}`, 120),
   };
 }
@@ -155,8 +168,8 @@ async function planService(unlockId: number): Promise<Plan | string> {
   const unlock = (await rest<{ requestId: number; supplierId: number; createdAt: string }>(
     `ServiceContactUnlock?id=eq.${unlockId}&select=requestId,supplierId,createdAt`))[0];
   if (!unlock) return "sblocco servizio non trovato";
-  const sr = (await rest<{ transporterId: number; categoria: string; posizione: string | null }>(
-    `ServiceRequest?id=eq.${unlock.requestId}&select=transporterId,categoria,posizione`))[0];
+  const sr = (await rest<{ transporterId: number; categoria: string; posizione: string | null; assignedQuoteId: number | null }>(
+    `ServiceRequest?id=eq.${unlock.requestId}&select=transporterId,categoria,posizione,assignedQuoteId`))[0];
   const supplier = (await rest<{ userId: number; ragioneSociale: string | null }>(
     `SupplierProfile?id=eq.${unlock.supplierId}&select=userId,ragioneSociale`))[0];
   if (!sr || !supplier) return "richiesta o fornitore non trovati";
@@ -166,9 +179,21 @@ async function planService(unlockId: number): Promise<Plan | string> {
   if (!payer || !recipient) return "controparte non disponibile";
   if (supplier.ragioneSociale) payer.companyName = supplier.ragioneSociale;
 
+  // Il trasportatore vede telefono/email del fornitore solo dopo avergli
+  // assegnato il lavoro; il nome del fornitore è già visibile nei preventivi.
+  let assignedToPayer = false;
+  if (sr.assignedQuoteId) {
+    const quote = (await rest<{ supplierId: number }>(
+      `ServiceQuote?id=eq.${sr.assignedQuoteId}&select=supplierId`))[0];
+    assignedToPayer = quote?.supplierId === unlock.supplierId;
+  }
+
   const categoria = (sr.categoria || "servizio").replace(/_/g, " ").toLowerCase();
   return {
     recipient, payer, logRequestId: null, createdAt: unlock.createdAt,
+    revealContacts: assignedToPayer,
+    payerLabel: clean(displayName(payer), 100),
+    hiddenPhoneText: "lo vedi su www.dodix.it se gli assegni il lavoro",
     subject: clean(`richiesta di servizio (${categoria}${sr.posizione ? ", " + sr.posizione : ""})`, 120),
   };
 }
@@ -219,7 +244,9 @@ Deno.serve(async (req: Request) => {
     if (!claim.ok) return json({ error: "impossibile prenotare l'avviso" }, 500);
     if (claim.data !== true) return json({ skipped: "avviso già inviato, in corso o tentativi esauriti" });
 
-    const params = [plan.subject, clean(displayName(plan.payer), 100), displayPhone(plan.payer.phone)];
+    const params = plan.revealContacts
+      ? [plan.subject, clean(displayName(plan.payer), 100), displayPhone(plan.payer.phone)]
+      : [plan.subject, plan.payerLabel, plan.hiddenPhoneText];
     let send: { ok: boolean; status: number; data: any };
     try {
       send = await sendWhatsApp(to, params);
