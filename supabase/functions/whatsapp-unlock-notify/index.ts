@@ -13,6 +13,9 @@ const WA_TOKEN = Deno.env.get("WHATSAPP_TOKEN") ?? "";
 const PHONE_ID = Deno.env.get("WHATSAPP_PHONE_ID") ?? "1223790424131412";
 const TEMPLATE_NAME = Deno.env.get("WHATSAPP_UNLOCK_TEMPLATE") ?? "contatto_sbloccato";
 const TEMPLATE_LANG = Deno.env.get("WHATSAPP_TEMPLATE_LANG") ?? "it";
+// Carichi, destinatario che non ha ancora pagato: invito a sbloccare (2 parametri:
+// chi ha pagato, quale carico). Finché Meta non lo approva si ricade su TEMPLATE_NAME.
+const PENDING_TEMPLATE_NAME = Deno.env.get("WHATSAPP_UNLOCK_PENDING_TEMPLATE") ?? "sblocco_in_attesa";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SB_SERVICE_ROLE_KEY") ?? "";
 const SANDBOX_ONLY = (Deno.env.get("SANDBOX_ONLY") ?? "true") === "true";
@@ -66,14 +69,14 @@ async function getUser(id: number | null | undefined): Promise<User | null> {
   return (await rest<User>(`User?id=eq.${id}&select=${USER_COLS}`))[0] ?? null;
 }
 
-async function sendWhatsApp(toPhone: string, params: string[]) {
+async function sendWhatsApp(toPhone: string, params: string[], templateName: string = TEMPLATE_NAME) {
   const r = await fetch(`https://graph.facebook.com/v25.0/${PHONE_ID}/messages`, {
     method: "POST",
     headers: { Authorization: `Bearer ${WA_TOKEN}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       messaging_product: "whatsapp", to: toPhone, type: "template",
       template: {
-        name: TEMPLATE_NAME, language: { code: TEMPLATE_LANG },
+        name: templateName, language: { code: TEMPLATE_LANG },
         components: [{ type: "body", parameters: params.map((p) => ({ type: "text", text: p })) }],
       },
     }),
@@ -134,6 +137,7 @@ type Plan = {
   revealContacts: boolean;
   payerLabel: string;
   hiddenPhoneText: string;
+  usePendingTemplate: boolean; // carichi: il destinatario deve ancora sbloccare
   logRequestId: number | null; // FK su Request: null per Borsa Servizi
   createdAt: string;
 };
@@ -160,6 +164,7 @@ async function planLoad(unlockId: number): Promise<Plan | string> {
     revealContacts: recipientUnlock.length > 0,
     payerLabel: role === "TRANSPORTER" ? "un trasportatore iscritto a DodiX" : "l'azienda che ha pubblicato il carico",
     hiddenPhoneText: "lo vedi su www.dodix.it dopo aver sbloccato anche tu",
+    usePendingTemplate: recipientUnlock.length === 0,
     subject: clean(`carico ${req.pickup ?? "-"} → ${req.delivery ?? "-"}`, 120),
   };
 }
@@ -194,6 +199,7 @@ async function planService(unlockId: number): Promise<Plan | string> {
     revealContacts: assignedToPayer,
     payerLabel: clean(displayName(payer), 100),
     hiddenPhoneText: "lo vedi su www.dodix.it se gli assegni il lavoro",
+    usePendingTemplate: false,
     subject: clean(`richiesta di servizio (${categoria}${sr.posizione ? ", " + sr.posizione : ""})`, 120),
   };
 }
@@ -207,6 +213,13 @@ Deno.serve(async (req: Request) => {
 
   try {
     const payload = await req.json().catch(() => ({}));
+
+    // Ping di prova del modello "sblocco_in_attesa" al numero di test.
+    if (payload?.test === "pending") {
+      const send = await sendWhatsApp(SANDBOX_TEST_NUMBER, ["un trasportatore iscritto a DodiX", "carico Brescia (BS) → Angri (SA)"], PENDING_TEMPLATE_NAME);
+      await logNotification(null, null, SANDBOX_TEST_NUMBER, send.ok ? "sent" : "failed", send.data?.messages?.[0]?.id ?? null, send.ok ? null : JSON.stringify(send.data?.error ?? send.data));
+      return json({ mode: "ping", template: PENDING_TEMPLATE_NAME, result: send });
+    }
 
     // Ping di prova: invia il template con dati finti al numero di test.
     if (payload?.test === true) {
@@ -247,11 +260,20 @@ Deno.serve(async (req: Request) => {
     const params = plan.revealContacts
       ? [plan.subject, clean(displayName(plan.payer), 100), displayPhone(plan.payer.phone)]
       : [plan.subject, plan.payerLabel, plan.hiddenPhoneText];
+    const trySend = async (p: string[], template?: string) => {
+      try {
+        return await sendWhatsApp(to, p, template);
+      } catch (e) {
+        return { ok: false, status: 0, data: { error: String(e) } as any };
+      }
+    };
     let send: { ok: boolean; status: number; data: any };
-    try {
-      send = await sendWhatsApp(to, params);
-    } catch (e) {
-      send = { ok: false, status: 0, data: { error: String(e) } };
+    if (plan.usePendingTemplate) {
+      send = await trySend([plan.payerLabel, plan.subject], PENDING_TEMPLATE_NAME);
+      // 132001 = modello inesistente/non approvato: si usa quello generico.
+      if (!send.ok && send.data?.error?.code === 132001) send = await trySend(params);
+    } else {
+      send = await trySend(params);
     }
     const messageId = send.data?.messages?.[0]?.id ?? null;
     const errorMsg = send.ok ? null : JSON.stringify(send.data?.error ?? send.data);
