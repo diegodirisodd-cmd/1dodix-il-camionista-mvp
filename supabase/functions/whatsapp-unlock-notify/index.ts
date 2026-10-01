@@ -99,7 +99,7 @@ async function logNotification(requestId: number | null, userId: number | null, 
 // pending -> sending -> sent | failed | skipped. claim_unlock_notice prenota
 // l'invio in modo atomico, quindi trigger, retry e chiamate ripetute non
 // producono mai due messaggi; un "failed" viene ritentato dal cron ogni 10 min
-// (retry_unlock_notices, max 6 tentativi entro 48 ore).
+// (retry_unlock_notices, attesa crescente, max 12 tentativi entro 48 ore).
 async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<{ ok: boolean; data: T | null }> {
   try {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {

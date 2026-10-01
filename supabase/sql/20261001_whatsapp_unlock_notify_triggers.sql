@@ -51,7 +51,7 @@ alter table public."WhatsappUnlockNotice"
   add column if not exists "updatedAt" timestamptz not null default now();
 
 -- Prenota l'invio in modo atomico: true solo se l'avviso non è già stato
--- inviato/saltato, non è in corso da meno di 2 minuti e ha meno di 6 tentativi.
+-- inviato/saltato, non è in corso da meno di 2 minuti e ha meno di 12 tentativi.
 create or replace function public.claim_unlock_notice(p_kind text, p_unlock_id integer)
 returns boolean
 language plpgsql
@@ -66,7 +66,7 @@ begin
   update "WhatsappUnlockNotice"
      set status = 'sending', attempts = attempts + 1, "updatedAt" = now()
    where kind = p_kind and "unlockId" = p_unlock_id
-     and attempts < 6
+     and attempts < 12
      and (status in ('pending', 'failed')
           or (status = 'sending' and "updatedAt" < now() - interval '2 minutes'))
   returning true into ok;
@@ -96,7 +96,8 @@ grant execute on function public.finish_unlock_notice(text, integer, text, text)
 
 -- Rete di sicurezza: ogni 10 minuti ritenta gli sblocchi delle ultime 48 ore
 -- il cui avviso non risulta inviato o saltato (Meta giù, timeout, template
--- non ancora approvato...). Massimo 6 tentativi per sblocco.
+-- non ancora approvato...). Attesa crescente tra i tentativi (10, 20, 30...
+-- minuti): 12 tentativi coprono circa 11 ore.
 create or replace function public.retry_unlock_notices()
 returns integer
 language plpgsql
@@ -115,8 +116,8 @@ begin
     if not exists (
       select 1 from "WhatsappUnlockNotice" w
        where w.kind = r.kind and w."unlockId" = r.id
-         and (w.status in ('sent', 'skipped') or w.attempts >= 6
-              or (w.status = 'sending' and w."updatedAt" > now() - interval '2 minutes'))
+         and (w.status in ('sent', 'skipped') or w.attempts >= 12
+              or w."updatedAt" > now() - make_interval(mins => greatest(2, 10 * w.attempts) - 1))
     ) then
       perform net.http_post(
         'https://jluadyrdvitmunfzfpjt.supabase.co/functions/v1/whatsapp-unlock-notify',
