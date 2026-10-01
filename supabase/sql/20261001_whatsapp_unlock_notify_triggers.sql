@@ -42,3 +42,96 @@ create table if not exists public."WhatsappUnlockNotice" (
 alter table public."WhatsappUnlockNotice" enable row level security;
 alter table public."WhatsappUnlockNotice" force row level security;
 revoke all on public."WhatsappUnlockNotice" from anon, authenticated;
+
+-- Stato e ritentativi: pending -> sending -> sent | failed | skipped.
+alter table public."WhatsappUnlockNotice"
+  add column if not exists status text not null default 'pending',
+  add column if not exists attempts integer not null default 0,
+  add column if not exists "lastError" text,
+  add column if not exists "updatedAt" timestamptz not null default now();
+
+-- Prenota l'invio in modo atomico: true solo se l'avviso non è già stato
+-- inviato/saltato, non è in corso da meno di 2 minuti e ha meno di 6 tentativi.
+create or replace function public.claim_unlock_notice(p_kind text, p_unlock_id integer)
+returns boolean
+language plpgsql
+security definer
+set search_path to 'public', 'pg_temp'
+as $$
+declare ok boolean;
+begin
+  insert into "WhatsappUnlockNotice"(kind, "unlockId") values (p_kind, p_unlock_id)
+  on conflict (kind, "unlockId") do nothing;
+
+  update "WhatsappUnlockNotice"
+     set status = 'sending', attempts = attempts + 1, "updatedAt" = now()
+   where kind = p_kind and "unlockId" = p_unlock_id
+     and attempts < 6
+     and (status in ('pending', 'failed')
+          or (status = 'sending' and "updatedAt" < now() - interval '2 minutes'))
+  returning true into ok;
+
+  return coalesce(ok, false);
+end;
+$$;
+
+-- Registra l'esito; non declassa mai un avviso già "sent".
+create or replace function public.finish_unlock_notice(p_kind text, p_unlock_id integer, p_status text, p_error text)
+returns void
+language sql
+security definer
+set search_path to 'public', 'pg_temp'
+as $$
+  insert into "WhatsappUnlockNotice"(kind, "unlockId", status, "lastError")
+  values (p_kind, p_unlock_id, p_status, p_error)
+  on conflict (kind, "unlockId") do update
+    set status = excluded.status, "lastError" = excluded."lastError", "updatedAt" = now()
+    where "WhatsappUnlockNotice".status <> 'sent';
+$$;
+
+revoke all on function public.claim_unlock_notice(text, integer) from public, anon, authenticated;
+revoke all on function public.finish_unlock_notice(text, integer, text, text) from public, anon, authenticated;
+grant execute on function public.claim_unlock_notice(text, integer) to service_role;
+grant execute on function public.finish_unlock_notice(text, integer, text, text) to service_role;
+
+-- Rete di sicurezza: ogni 10 minuti ritenta gli sblocchi delle ultime 48 ore
+-- il cui avviso non risulta inviato o saltato (Meta giù, timeout, template
+-- non ancora approvato...). Massimo 6 tentativi per sblocco.
+create or replace function public.retry_unlock_notices()
+returns integer
+language plpgsql
+security definer
+set search_path to 'public', 'pg_temp'
+as $$
+declare r record; n integer := 0;
+begin
+  for r in
+    select 'LOAD' as kind, u.id from "RequestUnlock" u
+     where u."createdAt" > (now() at time zone 'utc') - interval '48 hours'
+    union all
+    select 'SERVICE', s.id from "ServiceContactUnlock" s
+     where s."createdAt" > (now() at time zone 'utc') - interval '48 hours'
+  loop
+    if not exists (
+      select 1 from "WhatsappUnlockNotice" w
+       where w.kind = r.kind and w."unlockId" = r.id
+         and (w.status in ('sent', 'skipped') or w.attempts >= 6
+              or (w.status = 'sending' and w."updatedAt" > now() - interval '2 minutes'))
+    ) then
+      perform net.http_post(
+        'https://jluadyrdvitmunfzfpjt.supabase.co/functions/v1/whatsapp-unlock-notify',
+        jsonb_build_object('kind', r.kind, 'unlockId', r.id),
+        '{}'::jsonb,
+        jsonb_build_object('Content-Type', 'application/json'),
+        10000
+      );
+      n := n + 1;
+    end if;
+  end loop;
+  return n;
+end;
+$$;
+
+revoke all on function public.retry_unlock_notices() from public, anon, authenticated;
+
+select cron.schedule('dodix_unlock_notice_retry', '*/10 * * * *', 'select public.retry_unlock_notices()');

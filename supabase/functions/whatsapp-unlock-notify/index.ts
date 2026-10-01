@@ -7,7 +7,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 // di /api/stripe/confirm inserisce una sola volta, quindi parte un solo messaggio.
 // Il payload contiene solo l'id dello sblocco: tutti i dati vengono riletti dal DB.
 // Chiamate ripetute o esterne sono innocue: ogni sblocco produce al massimo un
-// messaggio, sempre e solo alla controparte registrata (vedi claimNotice).
+// messaggio inviato, sempre e solo alla controparte registrata (vedi claimNotice).
 
 const WA_TOKEN = Deno.env.get("WHATSAPP_TOKEN") ?? "";
 const PHONE_ID = Deno.env.get("WHATSAPP_PHONE_ID") ?? "1223790424131412";
@@ -17,7 +17,7 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SB_SERVICE_ROLE_KEY") ?? "";
 const SANDBOX_ONLY = (Deno.env.get("SANDBOX_ONLY") ?? "true") === "true";
 const SANDBOX_TEST_NUMBER = "393921489852";
-const MAX_AGE_MS = 15 * 60 * 1000; // ignora sblocchi vecchi: niente reinvii su chiamate ripetute
+const MAX_AGE_MS = 48 * 60 * 60 * 1000; // finestra entro cui un avviso fallito viene ancora ritentato
 
 type User = {
   id: number; phone: string | null; role: string; companyName: string | null;
@@ -95,25 +95,35 @@ async function logNotification(requestId: number | null, userId: number | null, 
   }
 }
 
-// Un solo avviso per sblocco: la chiave primaria (kind, unlockId) di
-// WhatsappUnlockNotice fa fallire con 409 ogni chiamata successiva, quindi
-// richiamare la funzione con lo stesso unlockId non reinvia nulla.
-async function claimNotice(kind: string, unlockId: number): Promise<"claimed" | "duplicate" | "error"> {
+// Stato dell'avviso in WhatsappUnlockNotice (una riga per sblocco):
+// pending -> sending -> sent | failed | skipped. claim_unlock_notice prenota
+// l'invio in modo atomico, quindi trigger, retry e chiamate ripetute non
+// producono mai due messaggi; un "failed" viene ritentato dal cron ogni 10 min
+// (retry_unlock_notices, max 6 tentativi entro 48 ore).
+async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<{ ok: boolean; data: T | null }> {
   try {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/WhatsappUnlockNotice`, {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
       method: "POST",
-      headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
-      body: JSON.stringify({ kind, unlockId }),
+      headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(args),
     });
-    if (r.ok) return "claimed";
-    if (r.status === 409) return "duplicate";
-    console.error("claim notice failed:", r.status, await r.text());
-    return "error";
+    if (!r.ok) {
+      console.error("rpc", fn, r.status, await r.text());
+      return { ok: false, data: null };
+    }
+    const text = await r.text();
+    return { ok: true, data: text ? (JSON.parse(text) as T) : null };
   } catch (e) {
-    console.error("claim notice error:", e);
-    return "error";
+    console.error("rpc error", fn, e);
+    return { ok: false, data: null };
   }
 }
+
+const claimNotice = (kind: string, unlockId: number) =>
+  rpc<boolean>("claim_unlock_notice", { p_kind: kind, p_unlock_id: unlockId });
+
+const finishNotice = (kind: string, unlockId: number, status: "sent" | "failed" | "skipped", error: string | null) =>
+  rpc<null>("finish_unlock_notice", { p_kind: kind, p_unlock_id: unlockId, p_status: status, p_error: error });
 
 type Plan = {
   recipient: User; payer: User; subject: string;
@@ -188,24 +198,37 @@ Deno.serve(async (req: Request) => {
     const plan = kind === "LOAD" ? await planLoad(unlockId) : await planService(unlockId);
     if (typeof plan === "string") {
       console.log(`skip ${kind} ${unlockId}: ${plan}`);
+      // "controparte non disponibile" riguarda uno sblocco reale: lo segniamo
+      // perché resti visibile; per id inesistenti non si scrive nulla.
+      if (plan === "controparte non disponibile") await finishNotice(kind, unlockId, "skipped", plan);
       return json({ skipped: plan });
     }
 
     const createdMs = new Date(plan.createdAt + (plan.createdAt.endsWith("Z") ? "" : "Z")).getTime();
     if (!Number.isFinite(createdMs) || Date.now() - createdMs > MAX_AGE_MS) return json({ skipped: "sblocco non recente" });
 
-    if (!plan.recipient.whatsappOptIn) return json({ skipped: "destinatario senza opt-in WhatsApp" });
+    const skip = async (reason: string) => {
+      await finishNotice(kind, unlockId, "skipped", reason);
+      return json({ skipped: reason });
+    };
+    if (!plan.recipient.whatsappOptIn) return await skip("destinatario senza opt-in WhatsApp");
     const to = SANDBOX_ONLY ? SANDBOX_TEST_NUMBER : normalizePhone(plan.recipient.phone);
-    if (!to) return json({ skipped: "destinatario senza telefono" });
+    if (!to) return await skip("destinatario senza telefono");
 
     const claim = await claimNotice(kind, unlockId);
-    if (claim === "duplicate") return json({ skipped: "avviso già inviato" });
-    if (claim === "error") return json({ error: "impossibile registrare l'avviso" }, 500);
+    if (!claim.ok) return json({ error: "impossibile prenotare l'avviso" }, 500);
+    if (claim.data !== true) return json({ skipped: "avviso già inviato, in corso o tentativi esauriti" });
 
     const params = [plan.subject, clean(displayName(plan.payer), 100), displayPhone(plan.payer.phone)];
-    const send = await sendWhatsApp(to, params);
+    let send: { ok: boolean; status: number; data: any };
+    try {
+      send = await sendWhatsApp(to, params);
+    } catch (e) {
+      send = { ok: false, status: 0, data: { error: String(e) } };
+    }
     const messageId = send.data?.messages?.[0]?.id ?? null;
     const errorMsg = send.ok ? null : JSON.stringify(send.data?.error ?? send.data);
+    await finishNotice(kind, unlockId, send.ok ? "sent" : "failed", errorMsg);
     await logNotification(plan.logRequestId, plan.recipient.id, to, send.ok ? "sent" : "failed", messageId, errorMsg);
     console.log(`WA unlock ${kind} ${unlockId} -> ${to}: ${send.ok ? "sent" : "failed"} (${send.status})`);
 
