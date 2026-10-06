@@ -12,6 +12,7 @@ function StripeSuccessContent() {
 
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [errorMessage, setErrorMessage] = useState("");
+  const [notice, setNotice] = useState<string | null>(null);
 
   const requestPath = useMemo(() => {
     if (!requestId || !role) return null;
@@ -48,6 +49,8 @@ function StripeSuccessContent() {
         if (cancelled) return;
 
         if (response.ok) {
+          const data = (await response.json().catch(() => ({}))) as { applied?: boolean; message?: string | null };
+          if (data.applied === false && data.message) setNotice(data.message);
           setStatus("success");
         } else {
           const data = (await response.json().catch(() => ({}))) as {
@@ -77,14 +80,14 @@ function StripeSuccessContent() {
   }, [sessionId, requestId, role]);
 
   useEffect(() => {
-    if (status !== "success" || !requestPath) return;
+    if (status !== "success" || !requestPath || notice) return;
 
     const timer = window.setTimeout(() => {
       router.push(requestPath);
     }, 2500);
 
     return () => window.clearTimeout(timer);
-  }, [status, requestPath, router]);
+  }, [status, requestPath, router, notice]);
 
   if (status === "loading") {
     return (
@@ -124,12 +127,8 @@ function StripeSuccessContent() {
   return (
     <section className="space-y-4 p-6">
       <div className="rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm text-textStrong">
-        <p className="font-semibold">
-          Pagamento completato con successo!
-        </p>
-        <p className="mt-1 text-success">
-          Verrai reindirizzato automaticamente tra pochi secondi...
-        </p>
+        <p className="font-semibold">{notice ? "Pagamento ricevuto" : "Pagamento completato"}</p>
+        <p className="mt-1 text-neutral-600">{notice ?? "Ti riportiamo al carico tra pochi secondi..."}</p>
       </div>
       <button
         type="button"
@@ -138,7 +137,7 @@ function StripeSuccessContent() {
           requestPath ? router.push(requestPath) : router.back()
         }
       >
-        Vai ai dettagli ora
+        Torna al carico
       </button>
     </section>
   );

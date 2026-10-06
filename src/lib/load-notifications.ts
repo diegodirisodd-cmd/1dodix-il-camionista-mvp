@@ -103,3 +103,22 @@ export function notifyCancelled(transporter: Person, load: Load) {
     "Vai alla bacheca",
   );
 }
+
+export function notifyConfirmedToCompany(
+  company: Person,
+  load: Load,
+  transporterName: string,
+  phone: string | null,
+  email: string,
+) {
+  return send(
+    company,
+    `Confermato: ${load.pickup} → ${load.delivery}`,
+    "Il trasportatore ha confermato",
+    `<p>${hello(company)}</p><p><b>${esc(transporterName)}</b> ha confermato il carico <b>${route(load)}</b>. Ecco i suoi contatti:</p><p>${
+      phone ? `Telefono: <b>${esc(phone)}</b><br>` : ""
+    }Email: <b>${esc(email)}</b></p>`,
+    `${SITE}/dashboard/company/requests/${load.id}`,
+    "Apri il carico",
+  );
+}

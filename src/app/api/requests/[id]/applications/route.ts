@@ -1,17 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { getSessionUser } from "@/lib/auth";
+import { MAX_PRICE_EUR, MIN_PRICE_EUR, parseEuroToCents, priceOutOfRange } from "@/lib/catalog";
 import { displayName } from "@/lib/load-flow";
 import { notifyNewApplication } from "@/lib/load-notifications";
 import { prisma } from "@/lib/prisma";
 import { APPLICATION_STATUS, canApply, maskContacts } from "@/lib/request-flow";
-
-function parseEuroToCents(value: unknown): number | null {
-  if (value === null || value === undefined || value === "") return null;
-  const n = typeof value === "number" ? value : Number(String(value).replace(/\./g, "").replace(",", "."));
-  if (!Number.isFinite(n) || n <= 0) return NaN;
-  return Math.round(n * 100);
-}
 
 /** Il trasportatore si candida (gratis) o aggiorna la propria candidatura. */
 export async function POST(req: Request, { params }: { params: { id: string } }) {
@@ -41,8 +35,14 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   }
 
   const body = (await req.json().catch(() => null)) as { price?: unknown; message?: unknown } | null;
-  const priceCents = parseEuroToCents(body?.price);
-  if (Number.isNaN(priceCents)) return NextResponse.json({ error: "Prezzo non valido." }, { status: 400 });
+  const hasPrice = body?.price !== null && body?.price !== undefined && body?.price !== "";
+  const priceCents = hasPrice ? parseEuroToCents(body?.price) : null;
+  if (hasPrice && (priceCents === null || priceOutOfRange(priceCents))) {
+    return NextResponse.json(
+      { error: `Prezzo non valido: indica un importo fra ${MIN_PRICE_EUR} e ${MAX_PRICE_EUR.toLocaleString("it-IT")} €.` },
+      { status: 400 },
+    );
+  }
   const rawMessage = typeof body?.message === "string" ? body.message.trim().slice(0, 1000) : "";
   // Il messaggio di candidatura segue le stesse regole della chat.
   const message = rawMessage ? maskContacts(rawMessage).text : null;

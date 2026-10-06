@@ -53,16 +53,21 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       where: { requestId, status: APPLICATION_STATUS.PENDING },
       select: { transporter: { select: { email: true, firstName: true, companyName: true } } },
     });
-    await prisma.$transaction([
-      prisma.request.update({
-        where: { id: requestId },
+    const cancelled = await prisma.$transaction(async (tx) => {
+      const r = await tx.request.updateMany({
+        where: { id: requestId, status: REQUEST_STATUS.OPEN },
         data: { status: REQUEST_STATUS.CANCELLED, cancelledAt: new Date() },
-      }),
-      prisma.application.updateMany({
+      });
+      if (r.count === 0) return false;
+      await tx.application.updateMany({
         where: { requestId, status: APPLICATION_STATUS.PENDING },
         data: { status: APPLICATION_STATUS.REJECTED },
-      }),
-    ]);
+      });
+      return true;
+    });
+    if (!cancelled) {
+      return NextResponse.json({ error: "Il carico è appena cambiato di stato: ricarica la pagina." }, { status: 409 });
+    }
     const info = await prisma.request.findUnique({ where: { id: requestId }, select: { id: true, pickup: true, delivery: true } });
     if (info) await Promise.all(pending.map((p) => notifyCancelled(p.transporter, info)));
     return NextResponse.json({ ok: true });

@@ -105,3 +105,31 @@ export function formatPlace(city: string | null | undefined, province: string | 
   if (!city) return fallback;
   return province ? `${city} (${province})` : city;
 }
+
+/** Limiti del prezzo di un trasporto, in euro. */
+export const MIN_PRICE_EUR = 50;
+export const MAX_PRICE_EUR = 100000;
+
+/**
+ * Legge un importo in euro scritto all'italiana o all'inglese:
+ * "1.200" -> 1200, "1.200,50" -> 1200.5, "950,50" -> 950.5, "950.50" -> 950.5.
+ * Ritorna i centesimi, oppure null se non e' un numero valido.
+ */
+export function parseEuroToCents(input: unknown): number | null {
+  if (typeof input === "number") return Number.isFinite(input) && input > 0 ? Math.round(input * 100) : null;
+  if (typeof input !== "string") return null;
+  let s = input.replace(/[€\s]/g, "");
+  if (!s) return null;
+  if (s.includes(",")) {
+    s = s.replace(/\./g, "").replace(",", ".");
+  } else if (/^\d{1,3}(\.\d{3})+$/.test(s)) {
+    s = s.replace(/\./g, "");
+  }
+  if (!/^\d+(\.\d{1,2})?$/.test(s)) return null;
+  const n = Number(s);
+  return Number.isFinite(n) && n > 0 ? Math.round(n * 100) : null;
+}
+
+export function priceOutOfRange(cents: number) {
+  return cents < MIN_PRICE_EUR * 100 || cents > MAX_PRICE_EUR * 100;
+}

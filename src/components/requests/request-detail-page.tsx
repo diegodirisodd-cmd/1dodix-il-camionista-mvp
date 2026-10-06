@@ -198,7 +198,8 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
     pickupDate: load.pickupDate?.toISOString() ?? null,
     deliveryDate: load.deliveryDate?.toISOString() ?? null,
     priceCents: load.price,
-    agreedPriceCents: load.agreedPrice,
+    // Il prezzo concordato lo vedono solo le due parti dell'accordo.
+    agreedPriceCents: isOwner || iAmAssigned || user.role === "ADMIN" ? load.agreedPrice : null,
     distanceKm: load.distanceKm ? Number(load.distanceKm) : null,
     cargo: load.cargo,
     cargoType: load.cargoType,
@@ -224,9 +225,20 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
             phone: load.company.phone,
             pickupContact: load.pickupContact,
             pickupPhone: load.pickupPhone,
+            pickupAddress: load.pickupAddress,
+            deliveryAddress: load.deliveryAddress,
           }
         : null,
     },
+    ownerDetails:
+      isOwner || user.role === "ADMIN"
+        ? {
+            pickupAddress: load.pickupAddress,
+            deliveryAddress: load.deliveryAddress,
+            pickupContact: load.pickupContact,
+            pickupPhone: load.pickupPhone,
+          }
+        : null,
     canApply: canApply(load),
     companyPaid,
     candidates,

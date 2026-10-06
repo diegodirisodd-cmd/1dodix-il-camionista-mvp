@@ -1,87 +1,10 @@
 import { NextResponse } from "next/server";
 
 import { getSessionUser } from "@/lib/auth";
-import { estimateRoadKm, formatPlace } from "@/lib/catalog";
+import { MAX_PRICE_EUR, MIN_PRICE_EUR, estimateRoadKm, formatPlace, parseEuroToCents, priceOutOfRange } from "@/lib/catalog";
 import { findPlace } from "@/lib/places";
 import { prisma } from "@/lib/prisma";
-import {
-  buildRequestsListPayload,
-  requestsWhereClauseForRole,
-} from "@/lib/request-privacy";
-import { type Role } from "@/lib/roles";
-import { getUnlockStatesForRequests } from "@/lib/unlocks";
-
-export async function GET() {
-  const user = await getSessionUser();
-  const pathname = "/api/requests";
-
-  if (!user) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
-
-  try {
-    const whereClause = requestsWhereClauseForRole(user.role, user.id);
-
-    const requests = await prisma.request.findMany({
-      where: whereClause,
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        pickup: true,
-        delivery: true,
-        cargo: true,
-        cargoType: true,
-        price: true,
-        createdAt: true,
-        pickupDate: true,
-        deliveryDate: true,
-        vehicleType: true,
-        weight: true,
-        palletCount: true,
-        isAdr: true,
-        distanceKm: true,
-        transporterId: true,
-        unlockedByCompany: true,
-        unlockedByTransporter: true,
-        companyId: true,
-        contactsUnlocked: true,
-        company: { select: { email: true, phone: true, companyName: true } },
-      },
-    });
-
-    const unlockStates = await getUnlockStatesForRequests(
-      requests.map((r) => r.id),
-      user.id,
-      user.role as Role,
-    );
-
-    // I contatti azienda escono dal select solo per chi ha sbloccato la
-    // richiesta (o ne e' il proprietario): la redazione vive nel payload
-    // builder per non poter essere dimenticata qui.
-    const enriched = buildRequestsListPayload(requests, unlockStates, {
-      id: user.id,
-      role: user.role,
-    });
-
-    return NextResponse.json(enriched);
-  } catch (error) {
-    console.error("[Requests API] load failed", {
-      pathname,
-      userId: user.id,
-      role: user.role,
-      error,
-    });
-
-    if (error instanceof Error) {
-      console.error(error.message, error.stack);
-    }
-
-    return NextResponse.json(
-      { error: "Impossibile caricare le richieste" },
-      { status: 500 },
-    );
-  }
-}
+import { maskContacts } from "@/lib/request-flow";
 
 function toNumberOrNull(val: unknown): number | null {
   if (val === null || val === undefined || val === "") return null;
@@ -97,6 +20,13 @@ function toDateOrNull(val: unknown): Date | null {
 
 function str(val: unknown, max = 500): string | null {
   return typeof val === "string" && val.trim() ? val.trim().slice(0, max) : null;
+}
+
+// Testi visibili a tutti i trasportatori: niente telefoni o email, che
+// saltano lo scambio contatti dopo la conferma (vanno nei campi referente).
+function publicText(val: unknown, max: number): string | null {
+  const v = str(val, max);
+  return v ? maskContacts(v).text : null;
 }
 
 export async function POST(request: Request) {
@@ -118,8 +48,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Scegli i comuni di ritiro e consegna dall'elenco." }, { status: 400 });
   }
 
-  const price = toNumberOrNull(body.price);
-  if (!price || price <= 0) return NextResponse.json({ error: "Prezzo non valido" }, { status: 400 });
+  const priceCents = parseEuroToCents(body.price);
+  if (priceCents === null || priceOutOfRange(priceCents)) {
+    return NextResponse.json(
+      { error: `Prezzo non valido: indica un importo fra ${MIN_PRICE_EUR} e ${MAX_PRICE_EUR.toLocaleString("it-IT")} €.` },
+      { status: 400 },
+    );
+  }
 
   const pickupDate = toDateOrNull(body.pickupDate);
   if (!pickupDate) return NextResponse.json({ error: "Indica la data di ritiro." }, { status: 400 });
@@ -147,7 +82,7 @@ export async function POST(request: Request) {
         pickupAddress: str(body.pickupAddress, 200),
         deliveryAddress: str(body.deliveryAddress, 200),
         distanceKm: estimateRoadKm(pickupPlace, deliveryPlace),
-        price: Math.round(price * 100),
+        price: priceCents,
         pickupDate,
         deliveryDate: toDateOrNull(body.deliveryDate),
         vehicleType: str(body.vehicleType, 40),
@@ -155,10 +90,10 @@ export async function POST(request: Request) {
         cargo: cargoType,
         weight,
         palletCount: palletCount !== null ? Math.round(palletCount) : null,
-        volume: str(body.volume, 100),
+        volume: publicText(body.volume, 100),
         isAdr: body.isAdr === true,
         paymentTerms: str(body.paymentTerms, 40),
-        description: str(body.description, 2000),
+        description: publicText(body.description, 2000),
         pickupContact: str(body.pickupContact, 100),
         pickupPhone: str(body.pickupPhone, 40),
       },

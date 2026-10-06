@@ -62,8 +62,21 @@ export type LoadDetailData = {
     place: string | null;
     vatVerified: boolean;
     memberSince: string;
-    contacts: { email: string; phone: string | null; pickupContact: string | null; pickupPhone: string | null } | null;
+    contacts: {
+      email: string;
+      phone: string | null;
+      pickupContact: string | null;
+      pickupPhone: string | null;
+      pickupAddress: string | null;
+      deliveryAddress: string | null;
+    } | null;
   };
+  ownerDetails: {
+    pickupAddress: string | null;
+    deliveryAddress: string | null;
+    pickupContact: string | null;
+    pickupPhone: string | null;
+  } | null;
   canApply: boolean;
   companyPaid: boolean;
   candidates: CandidateSummary[];
@@ -149,6 +162,22 @@ export function LoadDetail({ data }: { data: LoadDetailData }) {
               <Info label="Pagamento" value={data.paymentTerms ? PAYMENT_LABELS[data.paymentTerms] ?? data.paymentTerms : null} />
             </div>
             {data.cargo && data.cargo !== data.cargoType && <Info label="Note carico" value={data.cargo} />}
+            {data.ownerDetails &&
+              (data.ownerDetails.pickupAddress ||
+                data.ownerDetails.deliveryAddress ||
+                data.ownerDetails.pickupContact ||
+                data.ownerDetails.pickupPhone) && (
+                <div className="rounded-lg bg-neutral-50 p-3 text-sm text-neutral-600">
+                  <p className="table-meta">Visibili al trasportatore solo dopo la conferma</p>
+                  {data.ownerDetails.pickupAddress && <p>Ritiro: {data.ownerDetails.pickupAddress}</p>}
+                  {data.ownerDetails.deliveryAddress && <p>Consegna: {data.ownerDetails.deliveryAddress}</p>}
+                  {(data.ownerDetails.pickupContact || data.ownerDetails.pickupPhone) && (
+                    <p>
+                      Referente: {data.ownerDetails.pickupContact ?? ""} {data.ownerDetails.pickupPhone ?? ""}
+                    </p>
+                  )}
+                </div>
+              )}
             {data.description && (
               <div>
                 <p className="table-meta">Istruzioni</p>
@@ -182,6 +211,12 @@ export function LoadDetail({ data }: { data: LoadDetailData }) {
                     <p className="pt-1 text-neutral-600">
                       Referente al ritiro: {data.company.contacts.pickupContact ?? ""} {data.company.contacts.pickupPhone ?? ""}
                     </p>
+                  )}
+                  {data.company.contacts.pickupAddress && (
+                    <p className="text-neutral-600">Indirizzo di ritiro: {data.company.contacts.pickupAddress}</p>
+                  )}
+                  {data.company.contacts.deliveryAddress && (
+                    <p className="text-neutral-600">Indirizzo di consegna: {data.company.contacts.deliveryAddress}</p>
                   )}
                 </div>
               ) : (
@@ -433,7 +468,9 @@ function TransporterPanel({ data }: { data: LoadDetailData }) {
     <div className="card-muted space-y-1 text-sm text-neutral-600">
       <p className="font-semibold text-textStrong">{APPLICATION_STATUS_LABELS[app.status] ?? app.status}</p>
       <p>
-        {app.status === "REJECTED"
+        {app.status === "REJECTED" && data.status === "CANCELLED"
+          ? "L'azienda ha annullato il carico. Non hai pagato nulla."
+          : app.status === "REJECTED"
           ? "Il carico è stato assegnato a un altro trasportatore. Non hai pagato nulla."
           : app.status === "RELEASED"
             ? "Non hai confermato entro 24 ore e l'azienda ha scelto un altro trasportatore."
@@ -589,7 +626,11 @@ function CompanyPanel({ data }: { data: LoadDetailData }) {
               method="PATCH"
               body={{ action: "cancel" }}
               variant="ghost"
-              confirm="Annulli il carico? I candidati verranno avvisati che non è più disponibile."
+              confirm={
+                data.companyPaid
+                  ? "Annulli il carico? I candidati verranno avvisati. La commissione che hai già pagato per questo carico non viene rimborsata."
+                  : "Annulli il carico? I candidati verranno avvisati che non è più disponibile."
+              }
               confirmLabel="Sì, annulla"
             />
           )}

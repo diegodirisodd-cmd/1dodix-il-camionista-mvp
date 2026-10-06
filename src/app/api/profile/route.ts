@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { REGIONS, VEHICLE_TYPES } from "@/lib/catalog";
 import { prisma } from "@/lib/prisma";
+import { maskContacts } from "@/lib/request-flow";
 import { checkItalianVat, normalizeItalianPhone } from "@/lib/vies";
 
 const TEXT_FIELDS = ["firstName", "lastName", "companyName", "address", "city", "province", "zipCode", "contactPerson"] as const;
@@ -49,7 +50,8 @@ export async function PUT(request: Request) {
   for (const field of TEXT_FIELDS) {
     if (field in body) {
       const v = typeof body[field] === "string" ? (body[field] as string).trim().slice(0, 200) : "";
-      data[field] = v || null;
+      // Nomi e ragione sociale si vedono prima della conferma: niente contatti dentro.
+      data[field] = v ? (field === "address" || field === "zipCode" ? v : maskContacts(v).text) : null;
     }
   }
   if (typeof data.province === "string") data.province = (data.province as string).toUpperCase().slice(0, 2);

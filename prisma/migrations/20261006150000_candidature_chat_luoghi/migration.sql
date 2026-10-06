@@ -91,11 +91,29 @@ ALTER TABLE "Review" FORCE ROW LEVEL SECURITY;
 REVOKE ALL ON "Application", "Message", "Review" FROM anon, authenticated;
 
 -- Stati del vecchio modello (doppio pagamento alla cieca) -> nuovo modello.
--- COMPLETED con entrambi i pagamenti = contatti scambiati = CONFIRMED.
-UPDATE "Request" r SET "status" = 'CONFIRMED', "confirmedAt" = COALESCE(r."updatedAt", now())
- WHERE r."status" = 'COMPLETED'
+-- COMPLETED con entrambi i pagamenti = contatti scambiati = CONFIRMED, con la
+-- candidatura scelta ricostruita perche' entrambe le parti vedano il carico.
+INSERT INTO "Application" ("requestId", "transporterId", "status", "selectedAt", "createdAt", "updatedAt")
+SELECT r."id", r."transporterId", 'SELECTED', COALESCE(r."acceptedAt", r."updatedAt"), r."createdAt", now()
+  FROM "Request" r
+ WHERE r."status" = 'COMPLETED' AND r."transporterId" IS NOT NULL
    AND EXISTS (SELECT 1 FROM "RequestUnlock" u WHERE u."requestId" = r."id" AND u."userRole" = 'COMPANY')
-   AND EXISTS (SELECT 1 FROM "RequestUnlock" u WHERE u."requestId" = r."id" AND u."userRole" = 'TRANSPORTER');
--- Tutti gli altri stati intermedi del vecchio flusso non sono piu' raggiungibili.
+   AND EXISTS (SELECT 1 FROM "RequestUnlock" u WHERE u."requestId" = r."id" AND u."userRole" = 'TRANSPORTER')
+ON CONFLICT ("requestId", "transporterId") DO NOTHING;
+
+UPDATE "Request" r
+   SET "status" = 'CONFIRMED',
+       "confirmedAt" = COALESCE(r."updatedAt", now()),
+       "agreedPrice" = r."price",
+       "selectedApplicationId" = a."id"
+  FROM "Application" a
+ WHERE r."status" = 'COMPLETED' AND a."requestId" = r."id" AND a."transporterId" = r."transporterId";
+
+-- COMPANY_PAID: nessun trasportatore, l'azienda ha gia' pagato -> torna OPEN
+-- e potra' scegliere un candidato senza pagare di nuovo.
+UPDATE "Request" SET "status" = 'OPEN' WHERE "status" = 'COMPANY_PAID' AND "transporterId" IS NULL;
+
+-- Tutto il resto del vecchio flusso (COMPLETED senza entrambi i pagamenti,
+-- TRANSPORTER_PAID) non e' piu' raggiungibile.
 UPDATE "Request" SET "status" = 'CANCELLED', "cancelledAt" = now()
  WHERE "status" IN ('COMPLETED', 'COMPANY_PAID', 'TRANSPORTER_PAID');

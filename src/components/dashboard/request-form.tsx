@@ -4,7 +4,16 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { PlaceInput, type PlaceValue } from "@/components/loads/place-input";
-import { CARGO_TYPES, PAYMENT_TERMS, VEHICLE_TYPES, estimateRoadKm } from "@/lib/catalog";
+import {
+  CARGO_TYPES,
+  MAX_PRICE_EUR,
+  MIN_PRICE_EUR,
+  PAYMENT_TERMS,
+  VEHICLE_TYPES,
+  estimateRoadKm,
+  parseEuroToCents,
+  priceOutOfRange,
+} from "@/lib/catalog";
 import { calculateCommission, formatCurrency } from "@/lib/commission";
 
 const INITIAL = {
@@ -41,7 +50,7 @@ export function RequestForm({ onSuccessRedirect }: { onSuccessRedirect?: string 
   const [error, setError] = useState<string | null>(null);
 
   const km = useMemo(() => (pickup && delivery ? estimateRoadKm(pickup, delivery) : null), [pickup, delivery]);
-  const priceCents = Math.round(Number(form.price.replace(",", ".")) * 100) || 0;
+  const priceCents = parseEuroToCents(form.price) ?? 0;
   const commission = priceCents > 0 ? calculateCommission(priceCents).total : 0;
 
   function set<K extends keyof typeof INITIAL>(key: K, value: (typeof INITIAL)[K]) {
@@ -55,8 +64,8 @@ export function RequestForm({ onSuccessRedirect }: { onSuccessRedirect?: string 
       setError("Scegli i comuni di ritiro e consegna dall'elenco.");
       return;
     }
-    if (priceCents <= 0) {
-      setError("Indica il prezzo che offri per il trasporto.");
+    if (priceCents <= 0 || priceOutOfRange(priceCents)) {
+      setError(`Indica un prezzo fra ${MIN_PRICE_EUR} e ${MAX_PRICE_EUR.toLocaleString("it-IT")} €.`);
       return;
     }
     setLoading(true);
@@ -77,7 +86,7 @@ export function RequestForm({ onSuccessRedirect }: { onSuccessRedirect?: string 
           palletCount: form.palletCount || null,
           volume: form.volume || null,
           isAdr: form.isAdr,
-          price: priceCents / 100,
+          price: form.price,
           paymentTerms: form.paymentTerms || null,
           description: form.description || null,
           pickupContact: form.pickupContact || null,

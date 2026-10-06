@@ -9,6 +9,7 @@ import { REQUEST_STATUS, maskContacts } from "@/lib/request-flow";
 const NOTIFY_GAP_MS = 30 * 60 * 1000;
 
 async function loadThread(applicationId: number, userId: number) {
+  if (!Number.isInteger(applicationId) || applicationId <= 0) return null;
   const app = await prisma.application.findUnique({
     where: { id: applicationId },
     select: {

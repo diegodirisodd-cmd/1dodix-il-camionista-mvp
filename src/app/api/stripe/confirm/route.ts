@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Pagamento non applicabile: " + (result.reason ?? "") }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, applied: result.applied, refunded: result.refunded ?? false, message: result.reason ?? null });
   } catch (error: unknown) {
     console.error("STRIPE CONFIRM ERROR:", error);
     return NextResponse.json({ error: "Errore nella conferma del pagamento." }, { status: 500 });

@@ -40,8 +40,13 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       if (app.status !== APPLICATION_STATUS.PENDING) {
         return NextResponse.json({ error: "Questa candidatura non si può più ritirare." }, { status: 409 });
       }
-      await prisma.application.update({ where: { id: app.id }, data: { status: APPLICATION_STATUS.WITHDRAWN } });
-      return NextResponse.json({ ok: true });
+      const done = await prisma.application.updateMany({
+        where: { id: app.id, status: APPLICATION_STATUS.PENDING },
+        data: { status: APPLICATION_STATUS.WITHDRAWN },
+      });
+      return done.count === 1
+        ? NextResponse.json({ ok: true })
+        : NextResponse.json({ error: "Questa candidatura non si può più ritirare." }, { status: 409 });
     }
     case "decline": {
       if (!isCandidate) return NextResponse.json({ error: "Non autorizzato" }, { status: 403 });

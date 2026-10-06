@@ -8,7 +8,7 @@ const output = mkdtempSync(path.join(tmpdir(), "dodix-flow-tests-"));
 let code = 1;
 try {
   const compile = spawnSync(process.execPath, [
-    require.resolve("typescript/bin/tsc"), "src/lib/request-flow.ts",
+    require.resolve("typescript/bin/tsc"), "src/lib/request-flow.ts", "src/lib/catalog.ts",
     "--outDir", output, "--module", "commonjs", "--target", "ES2020",
     "--lib", "ES2020,DOM", "--strict", "--skipLibCheck", "--types", "node",
   ], { cwd: root, stdio: "inherit" });

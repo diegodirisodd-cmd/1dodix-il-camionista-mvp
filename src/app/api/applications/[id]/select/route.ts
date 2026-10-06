@@ -60,7 +60,8 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
       return NextResponse.json({ error: "Pagamenti non configurati." }, { status: 500 });
     }
 
-    const { total } = calculateCommission(effectivePriceCents(app.request.price, app.priceCents));
+    const priceCents = effectivePriceCents(app.request.price, app.priceCents);
+    const { total } = calculateCommission(priceCents);
     if (total < 50) return NextResponse.json({ error: "Importo della commissione non valido." }, { status: 400 });
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
@@ -68,8 +69,12 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
+      // Il checkout scade presto: un pagamento vecchio non deve arrivare a
+      // situazione cambiata (in quel caso viene comunque rimborsato).
+      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
       metadata: {
         kind: "SELECT_APPLICATION",
+        priceCents: String(priceCents),
         applicationId: String(app.id),
         requestId: String(app.request.id),
         userId: String(user.id),

@@ -88,6 +88,8 @@ export function maskContacts(text: string): { text: string; masked: boolean } {
     input.replace(re, (match) => {
       // Non oscurare numeri brevi come prezzi o pesi ("1.200", "33 pallet").
       if (label === "telefono" && match.replace(/\D/g, "").length < 8) return match;
+      // Ne' date come 12/10/2026 o 12-10-2026.
+      if (label === "telefono" && /^\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}$/.test(match.trim())) return match;
       masked = true;
       return `[${label} visibile dopo la conferma]`;
     });
