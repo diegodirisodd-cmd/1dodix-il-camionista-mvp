@@ -130,10 +130,10 @@ async function recordUnlock(
 }
 
 /** Rimborsa un pagamento che non ha prodotto nulla (doppio, tardivo, carico cambiato). */
-async function refund(session: Stripe.Checkout.Session, reason: string) {
+async function refund(session: Stripe.Checkout.Session, reason: string): Promise<boolean> {
   const pi = paymentIntentId(session);
   console.warn("[load-flow] rimborso", { session: session.id, reason });
-  if (!pi || !process.env.STRIPE_SECRET_KEY) return;
+  if (!pi || !process.env.STRIPE_SECRET_KEY) return false;
   try {
     const { default: StripeCtor } = await import("stripe");
     const stripe = new StripeCtor(process.env.STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
@@ -141,9 +141,22 @@ async function refund(session: Stripe.Checkout.Session, reason: string) {
       { payment_intent: pi, reason: "requested_by_customer", metadata: { dodix_reason: reason } },
       { idempotencyKey: `dodix-refund-${pi}` },
     );
+    return true;
   } catch (e) {
-    console.error("[load-flow] rimborso NON riuscito: da fare a mano su Stripe", { session: session.id, pi, e });
+    console.error("[load-flow] rimborso NON riuscito", { session: session.id, pi, e });
+    return false;
   }
+}
+
+const REFUND_PENDING =
+  "Il rimborso non è ancora partito: riproviamo in automatico. Se entro 24 ore non lo vedi, scrivici.";
+
+/** Esito di un pagamento da rimborsare: se il rimborso fallisce, ok=false cosi' Stripe ritenta il webhook. */
+async function refundOutcome(session: Stripe.Checkout.Session, internalReason: string, userMessage: string): Promise<CheckoutOutcome> {
+  const done = await refund(session, internalReason);
+  return done
+    ? { ok: true, applied: false, refunded: true, reason: userMessage }
+    : { ok: false, applied: false, refunded: false, reason: REFUND_PENDING };
 }
 
 /**
@@ -191,8 +204,11 @@ export async function applyLoadCheckout(session: Stripe.Checkout.Session): Promi
     });
 
     if (result.recorded === "duplicate") {
-      await refund(session, "commissione azienda gia' pagata per questo carico");
-      return { ok: true, applied: false, refunded: true, reason: "Avevi già pagato la commissione per questo carico: questo pagamento ti viene rimborsato." };
+      return refundOutcome(
+        session,
+        "commissione azienda gia' pagata per questo carico",
+        "Avevi già pagato la commissione per questo carico: questo pagamento ti viene rimborsato.",
+      );
     }
     if (result.assigned && result.recorded === "created") await afterAssign(applicationId);
     if (!result.assigned && result.recorded === "created") {
@@ -236,16 +252,13 @@ export async function applyLoadCheckout(session: Stripe.Checkout.Session): Promi
     });
 
     if (result === "duplicate" || result === "stale") {
-      await refund(session, result === "duplicate" ? "conferma gia' pagata" : "carico non piu' assegnato");
-      return {
-        ok: true,
-        applied: false,
-        refunded: true,
-        reason:
-          result === "duplicate"
-            ? "Avevi già confermato questo carico: questo pagamento ti viene rimborsato."
-            : "Il carico non era più assegnato a te quando il pagamento è arrivato: ti viene rimborsato.",
-      };
+      return refundOutcome(
+        session,
+        result === "duplicate" ? "conferma gia' pagata" : "carico non piu' assegnato",
+        result === "duplicate"
+          ? "Avevi già confermato questo carico: questo pagamento ti viene rimborsato."
+          : "Il carico non era più assegnato a te quando il pagamento è arrivato: ti viene rimborsato.",
+      );
     }
 
     if (result === "confirmed") {
@@ -279,8 +292,7 @@ export async function applyLoadCheckout(session: Stripe.Checkout.Session): Promi
   // stato usato), nessun effetto; altrimenti non sblocca nulla: rimborso.
   const used = await prisma.requestUnlock.findFirst({ where: { stripeSessionId: session.id }, select: { id: true } });
   if (used) return { ok: true, applied: true };
-  await refund(session, "checkout del vecchio modello");
-  return { ok: true, applied: false, refunded: true, reason: "Pagamento non più necessario: ti viene rimborsato." };
+  return refundOutcome(session, "checkout del vecchio modello", "Pagamento non più necessario: ti viene rimborsato.");
 }
 
 /**

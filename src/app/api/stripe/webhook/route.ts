@@ -57,6 +57,11 @@ export async function POST(req: NextRequest) {
     const result = await applyLoadCheckout(session);
     if (!result.ok) {
       console.error("[WEBHOOK] pagamento carico non applicato", { sessionId: session.id, reason: result.reason });
+      // Un rimborso dovuto ma non riuscito: rispondere con errore fa
+      // ritentare il webhook a Stripe (il rimborso e' idempotente).
+      if (result.refunded === false) {
+        return NextResponse.json({ error: "rimborso in sospeso" }, { status: 500 });
+      }
     }
   }
 

@@ -4,7 +4,7 @@ import { getSessionUser } from "@/lib/auth";
 import { MAX_PRICE_EUR, MIN_PRICE_EUR, estimateRoadKm, formatPlace, parseEuroToCents, priceOutOfRange } from "@/lib/catalog";
 import { findPlace } from "@/lib/places";
 import { prisma } from "@/lib/prisma";
-import { maskContacts } from "@/lib/request-flow";
+import { isPickupPast, maskContacts } from "@/lib/request-flow";
 
 function toNumberOrNull(val: unknown): number | null {
   if (val === null || val === undefined || val === "") return null;
@@ -58,6 +58,12 @@ export async function POST(request: Request) {
 
   const pickupDate = toDateOrNull(body.pickupDate);
   if (!pickupDate) return NextResponse.json({ error: "Indica la data di ritiro." }, { status: 400 });
+  // Stessa regola della bacheca: un ritiro gia' passato non lo vedrebbe nessuno.
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  if (pickupDate < startOfToday || isPickupPast(pickupDate)) {
+    return NextResponse.json({ error: "La data di ritiro non può essere nel passato." }, { status: 400 });
+  }
 
   const weight = toNumberOrNull(body.weight);
   const palletCount = toNumberOrNull(body.palletCount);

@@ -38,6 +38,9 @@ export async function POST(req: Request) {
 
     const result = await applyLoadCheckout(session);
     if (!result.ok) {
+      if (result.refunded === false) {
+        return NextResponse.json({ success: true, applied: false, refunded: false, message: result.reason });
+      }
       return NextResponse.json({ error: "Pagamento non applicabile: " + (result.reason ?? "") }, { status: 400 });
     }
 
