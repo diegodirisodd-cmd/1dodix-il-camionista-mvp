@@ -38,6 +38,7 @@ model User {
   country       String? @default("IT")
   contactPerson String?
   avatarUrl     String?
+  whatsappOptIn Boolean @default(false)
 
   companyRequests     Request[] @relation("CompanyRequests")
   transporterRequests Request[] @relation("TransporterJobs")
