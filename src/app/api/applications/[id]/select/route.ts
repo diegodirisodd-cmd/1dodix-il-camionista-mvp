@@ -71,7 +71,7 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
       payment_method_types: ["card"],
       // Il checkout scade presto: un pagamento vecchio non deve arrivare a
       // situazione cambiata (in quel caso viene comunque rimborsato).
-      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
+      expires_at: Math.floor(Date.now() / 1000) + 35 * 60,
       metadata: {
         kind: "SELECT_APPLICATION",
         priceCents: String(priceCents),

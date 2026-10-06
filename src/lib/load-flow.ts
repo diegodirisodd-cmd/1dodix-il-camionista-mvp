@@ -146,6 +146,15 @@ async function refund(session: Stripe.Checkout.Session, reason: string) {
   }
 }
 
+/**
+ * Blocca la riga del carico fino a fine transazione: webhook Stripe e pagina
+ * di conferma arrivano quasi insieme per la stessa sessione e devono essere
+ * applicati uno dopo l'altro, non in parallelo.
+ */
+async function lockRequest(tx: Tx, requestId: number) {
+  await tx.$queryRaw`SELECT "id" FROM "Request" WHERE "id" = ${requestId} FOR UPDATE`;
+}
+
 export type CheckoutOutcome = { ok: boolean; applied: boolean; refunded?: boolean; reason?: string };
 
 /**
@@ -172,6 +181,7 @@ export async function applyLoadCheckout(session: Stripe.Checkout.Session): Promi
     if (!Number.isInteger(applicationId)) return { ok: false, applied: false, reason: "candidatura mancante" };
 
     const result = await prisma.$transaction(async (tx) => {
+      await lockRequest(tx, requestId);
       const req = await tx.request.findUnique({ where: { id: requestId }, select: { companyId: true } });
       if (!req || req.companyId !== userId) return { recorded: "duplicate" as const, assigned: false };
       const recorded = await recordUnlock(tx, requestId, userId, "COMPANY", session);
@@ -196,6 +206,7 @@ export async function applyLoadCheckout(session: Stripe.Checkout.Session): Promi
 
   if (role === "TRANSPORTER") {
     const result = await prisma.$transaction(async (tx) => {
+      await lockRequest(tx, requestId);
       const existing = await tx.requestUnlock.findUnique({
         where: { requestId_userId: { requestId, userId } },
         select: { stripeSessionId: true },
@@ -264,7 +275,10 @@ export async function applyLoadCheckout(session: Stripe.Checkout.Session): Promi
     return { ok: true, applied: true };
   }
 
-  // Sessioni del vecchio modello rimaste aperte: nessun effetto, rimborso.
+  // Sessioni del vecchio modello. Se il pagamento e' gia' registrato (era
+  // stato usato), nessun effetto; altrimenti non sblocca nulla: rimborso.
+  const used = await prisma.requestUnlock.findFirst({ where: { stripeSessionId: session.id }, select: { id: true } });
+  if (used) return { ok: true, applied: true };
   await refund(session, "checkout del vecchio modello");
   return { ok: true, applied: false, refunded: true, reason: "Pagamento non più necessario: ti viene rimborsato." };
 }
