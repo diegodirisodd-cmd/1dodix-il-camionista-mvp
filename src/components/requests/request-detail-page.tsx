@@ -1,143 +1,249 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { RequestDetailView } from "@/components/requests/request-detail-view";
+import { LoadDetail, type LoadDetailData, type CandidateSummary } from "@/components/loads/load-detail";
 import { getSessionUser } from "@/lib/auth";
+import { calculateCommission } from "@/lib/commission";
+import { displayName } from "@/lib/load-flow";
 import { routeForUser } from "@/lib/navigation";
-import { sanitizeSensitiveContacts } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
-import { type Role } from "@/lib/roles";
-import { getUnlockState } from "@/lib/unlocks";
+import { APPLICATION_STATUS, REQUEST_STATUS, canApply, effectivePriceCents } from "@/lib/request-flow";
 
 type RequestDetailPageProps = {
   requestId: number;
   backHref: string;
 };
 
-function getContactEmail({
-  role,
-  companyEmail,
-  transporterEmail,
-}: {
-  role: Role;
-  companyEmail: string;
-  transporterEmail: string | null;
-}) {
-  if (role === "TRANSPORTER") return companyEmail;
-  if (role === "COMPANY") return transporterEmail;
-  return companyEmail;
+function NotAvailable({ title, text, backHref }: { title: string; text: string; backHref: string }) {
+  return (
+    <section className="card space-y-3">
+      <h1 className="text-2xl">{title}</h1>
+      <p className="text-sm text-neutral-600">{text}</p>
+      <Link href={backHref} className="btn-secondary min-h-[44px] w-fit">
+        Torna indietro
+      </Link>
+    </section>
+  );
 }
 
-function getContactPhone({
-  role,
-  companyPhone,
-  transporterPhone,
-}: {
-  role: Role;
-  companyPhone: string | null;
-  transporterPhone: string | null;
-}) {
-  if (role === "TRANSPORTER") return companyPhone;
-  if (role === "COMPANY") return transporterPhone;
-  return companyPhone;
+async function transporterStats(ids: number[]) {
+  if (ids.length === 0) return new Map<number, { delivered: number; rating: number | null; reviews: number }>();
+  const [delivered, ratings] = await Promise.all([
+    prisma.request.groupBy({
+      by: ["transporterId"],
+      where: { transporterId: { in: ids }, status: REQUEST_STATUS.DELIVERED },
+      _count: { _all: true },
+    }),
+    prisma.review.groupBy({
+      by: ["targetId"],
+      where: { targetId: { in: ids } },
+      _avg: { rating: true },
+      _count: { _all: true },
+    }),
+  ]);
+  const map = new Map<number, { delivered: number; rating: number | null; reviews: number }>();
+  for (const id of ids) map.set(id, { delivered: 0, rating: null, reviews: 0 });
+  for (const d of delivered) if (d.transporterId) map.get(d.transporterId)!.delivered = d._count._all;
+  for (const r of ratings) {
+    const entry = map.get(r.targetId)!;
+    entry.rating = r._avg.rating;
+    entry.reviews = r._count._all;
+  }
+  return map;
 }
 
 export async function RequestDetailPage({ requestId, backHref }: RequestDetailPageProps) {
   const user = await getSessionUser();
+  if (!user) redirect("/login");
 
-  if (!user) {
-    redirect("/login");
+  if (!Number.isInteger(requestId)) {
+    return <NotAvailable title="Carico non valido" text="L'indirizzo della pagina non è corretto." backHref={backHref} />;
   }
+  if (!["COMPANY", "TRANSPORTER", "ADMIN"].includes(user.role)) redirect(routeForUser(user.role));
 
-  if (!Number.isFinite(requestId)) {
-    return (
-      <section className="space-y-4">
-        <h1 className="text-2xl font-semibold text-textStrong">Richiesta non valida</h1>
-        <p className="text-sm text-neutral-600">L&apos;identificativo della richiesta non è valido.</p>
-      </section>
-    );
-  }
-
-  if (!["COMPANY", "TRANSPORTER", "ADMIN"].includes(user.role)) {
-    redirect(routeForUser(user.role));
-  }
-
-  const requestRecord = await prisma.request.findUnique({
+  const load = await prisma.request.findUnique({
     where: { id: requestId },
-    include: { company: true, transporter: true },
+    include: {
+      company: {
+        select: {
+          id: true,
+          companyName: true,
+          firstName: true,
+          lastName: true,
+          city: true,
+          province: true,
+          vatVerified: true,
+          email: true,
+          phone: true,
+          createdAt: true,
+        },
+      },
+    },
   });
 
-  if (!requestRecord) {
+  if (!load) {
+    return <NotAvailable title="Carico non trovato" text="Il carico non esiste o è stato rimosso." backHref={backHref} />;
+  }
+
+  const isOwner = user.role === "COMPANY" && load.companyId === user.id;
+  if (user.role === "COMPANY" && !isOwner) redirect("/dashboard/company/requests");
+
+  const myApplication =
+    user.role === "TRANSPORTER"
+      ? await prisma.application.findUnique({
+          where: { requestId_transporterId: { requestId, transporterId: user.id } },
+        })
+      : null;
+
+  // Un trasportatore vede i carichi aperti e quelli a cui ha partecipato.
+  if (user.role === "TRANSPORTER" && load.status !== REQUEST_STATUS.OPEN && !myApplication) {
     return (
-      <section className="space-y-4">
-        <h1 className="text-2xl font-semibold text-textStrong">Richiesta non trovata</h1>
-        <p className="text-sm text-neutral-600">La richiesta non esiste oppure non è più disponibile.</p>
-      </section>
+      <NotAvailable
+        title="Carico non più disponibile"
+        text="Questo carico è già stato assegnato o è stato chiuso dall'azienda."
+        backHref={backHref}
+      />
     );
   }
 
-  const assignedToSelf = user.role === "TRANSPORTER" && requestRecord.transporterId === user.id;
-  const assignedToOther =
-    user.role === "TRANSPORTER" &&
-    requestRecord.transporterId !== null &&
-    requestRecord.transporterId !== user.id;
+  const contactsOpen = load.status === REQUEST_STATUS.CONFIRMED || load.status === REQUEST_STATUS.DELIVERED;
+  const iAmAssigned = user.role === "TRANSPORTER" && load.transporterId === user.id;
 
-  const unlockState = await getUnlockState(requestRecord.id, user.id, user.role as Role);
-  const showContacts = unlockState.bothUnlocked && unlockState.unlockedByMe;
+  const companyPaid = isOwner
+    ? Boolean(
+        await prisma.requestUnlock.findUnique({
+          where: { requestId_userId: { requestId, userId: user.id } },
+          select: { id: true },
+        }),
+      )
+    : false;
 
-  const sanitized = sanitizeSensitiveContacts(
-    requestRecord,
-    { id: user.id, role: user.role },
-    unlockState,
-  );
+  let candidates: CandidateSummary[] = [];
+  if (isOwner || user.role === "ADMIN") {
+    const apps = await prisma.application.findMany({
+      where: { requestId, status: { not: APPLICATION_STATUS.WITHDRAWN } },
+      orderBy: { createdAt: "asc" },
+      include: {
+        transporter: {
+          select: {
+            id: true,
+            companyName: true,
+            firstName: true,
+            lastName: true,
+            province: true,
+            city: true,
+            vehicleTypes: true,
+            serviceRegions: true,
+            vatVerified: true,
+            createdAt: true,
+            email: true,
+            phone: true,
+          },
+        },
+        _count: { select: { messages: { where: { senderId: { not: user.id }, readAt: null } } } },
+      },
+    });
+    const stats = await transporterStats(apps.map((a) => a.transporterId));
+    candidates = apps.map((a) => {
+      const isChosen = load.transporterId === a.transporterId && a.status === APPLICATION_STATUS.SELECTED;
+      const showContacts = contactsOpen && load.transporterId === a.transporterId;
+      return {
+        applicationId: a.id,
+        status: a.status,
+        name: displayName(a.transporter),
+        place: a.transporter.city
+          ? `${a.transporter.city}${a.transporter.province ? ` (${a.transporter.province})` : ""}`
+          : a.transporter.province ?? null,
+        vehicleTypes: a.transporter.vehicleTypes,
+        serviceRegions: a.transporter.serviceRegions,
+        vatVerified: a.transporter.vatVerified,
+        memberSince: a.transporter.createdAt.toISOString(),
+        delivered: stats.get(a.transporterId)?.delivered ?? 0,
+        rating: stats.get(a.transporterId)?.rating ?? null,
+        reviews: stats.get(a.transporterId)?.reviews ?? 0,
+        priceCents: effectivePriceCents(load.price, a.priceCents),
+        proposedDifferentPrice: Boolean(a.priceCents && a.priceCents !== load.price),
+        message: a.message,
+        selectedAt: a.selectedAt?.toISOString() ?? null,
+        unread: a._count.messages,
+        isChosen,
+        commissionCents: calculateCommission(effectivePriceCents(load.price, a.priceCents)).total,
+        contacts: showContacts ? { email: a.transporter.email, phone: a.transporter.phone } : null,
+      };
+    });
+  }
 
-  return (
-    <RequestDetailView
-      requestId={requestRecord.id}
-      title={`${requestRecord.pickup} \u2192 ${requestRecord.delivery}`}
-      description={requestRecord.description ?? ""}
-      cargo={requestRecord.cargo ?? null}
-      priceCents={requestRecord.price}
-      createdAt={requestRecord.createdAt.toISOString()}
-      acceptedAt={requestRecord.acceptedAt ? requestRecord.acceptedAt.toISOString() : null}
-      companyName={requestRecord.company.companyName ?? null}
-      contactEmail={
-        showContacts
-          ? getContactEmail({
-              role: user.role as Role,
-              companyEmail: requestRecord.company.email,
-              transporterEmail: requestRecord.transporter?.email ?? null,
-            })
-          : null
-      }
-      contactPhone={
-        showContacts
-          ? getContactPhone({
-              role: user.role as Role,
-              companyPhone: requestRecord.company.phone ?? null,
-              transporterPhone: requestRecord.transporter?.phone ?? null,
-            })
-          : null
-      }
-      transporterEmail={showContacts ? requestRecord.transporter?.email ?? null : null}
-      role={user.role as Role}
-      unlockedForCurrentUser={unlockState.unlockedByMe}
-      unlockedByOtherParty={unlockState.unlockedByOther}
-      bothPartiesUnlocked={unlockState.bothUnlocked}
-      backHref={backHref}
-      assignedToSelf={assignedToSelf}
-      assignedToOther={assignedToOther}
-      pickupDate={requestRecord.pickupDate ? requestRecord.pickupDate.toISOString() : null}
-      deliveryDate={requestRecord.deliveryDate ? requestRecord.deliveryDate.toISOString() : null}
-      cargoType={requestRecord.cargoType ?? null}
-      weight={requestRecord.weight ? Number(requestRecord.weight) : null}
-      volume={requestRecord.volume ?? null}
-      palletCount={requestRecord.palletCount ?? null}
-      vehicleType={requestRecord.vehicleType ?? null}
-      isAdr={requestRecord.isAdr}
-      paymentTerms={requestRecord.paymentTerms ?? null}
-      pickupContact={sanitized.pickupContact ?? null}
-      pickupPhone={sanitized.pickupPhone ?? null}
-      distanceKm={requestRecord.distanceKm ? Number(requestRecord.distanceKm) : null}
-    />
-  );
+  let myUnread = 0;
+  if (myApplication) {
+    myUnread = await prisma.message.count({
+      where: { applicationId: myApplication.id, senderId: { not: user.id }, readAt: null },
+    });
+  }
+
+  const companyContactsVisible = contactsOpen && (iAmAssigned || user.role === "ADMIN");
+  const reviewByMe = await prisma.review.findUnique({
+    where: { requestId_authorId: { requestId, authorId: user.id } },
+    select: { rating: true },
+  });
+
+  const data: LoadDetailData = {
+    id: load.id,
+    role: user.role as LoadDetailData["role"],
+    backHref,
+    status: load.status,
+    pickup: load.pickup,
+    delivery: load.delivery,
+    pickupRegion: load.pickupRegion,
+    deliveryRegion: load.deliveryRegion,
+    pickupDate: load.pickupDate?.toISOString() ?? null,
+    deliveryDate: load.deliveryDate?.toISOString() ?? null,
+    priceCents: load.price,
+    agreedPriceCents: load.agreedPrice,
+    distanceKm: load.distanceKm ? Number(load.distanceKm) : null,
+    cargo: load.cargo,
+    cargoType: load.cargoType,
+    description: load.description,
+    vehicleType: load.vehicleType,
+    weight: load.weight ? Number(load.weight) : null,
+    volume: load.volume,
+    palletCount: load.palletCount,
+    isAdr: load.isAdr,
+    paymentTerms: load.paymentTerms,
+    createdAt: load.createdAt.toISOString(),
+    assignedAt: load.assignedAt?.toISOString() ?? null,
+    company: {
+      name: displayName(load.company),
+      place: load.company.city
+        ? `${load.company.city}${load.company.province ? ` (${load.company.province})` : ""}`
+        : null,
+      vatVerified: load.company.vatVerified,
+      memberSince: load.company.createdAt.toISOString(),
+      contacts: companyContactsVisible
+        ? {
+            email: load.company.email,
+            phone: load.company.phone,
+            pickupContact: load.pickupContact,
+            pickupPhone: load.pickupPhone,
+          }
+        : null,
+    },
+    canApply: canApply(load),
+    companyPaid,
+    candidates,
+    myApplication: myApplication
+      ? {
+          id: myApplication.id,
+          status: myApplication.status,
+          priceCents: myApplication.priceCents,
+          message: myApplication.message,
+          selectedAt: myApplication.selectedAt?.toISOString() ?? null,
+          unread: myUnread,
+        }
+      : null,
+    iAmAssigned,
+    myCommissionCents: calculateCommission(load.agreedPrice ?? load.price).total,
+    reviewedByMe: reviewByMe?.rating ?? null,
+  };
+
+  return <LoadDetail data={data} />;
 }

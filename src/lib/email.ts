@@ -49,11 +49,17 @@ export async function sendEmail({ to, subject, html }: SendEmailInput) {
   }
 }
 
-export function emailShell(title: string, bodyHtml: string, ctaHref?: string, ctaLabel?: string) {
+export function emailShell(
+  title: string,
+  bodyHtml: string,
+  ctaHref?: string,
+  ctaLabel?: string,
+  subtitle = "Borsa Servizi",
+) {
   return `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px">
     <div style="background:linear-gradient(135deg,#0b3c5d,#1d6fa5);border-radius:12px;padding:30px;color:#fff;text-align:center;margin-bottom:24px">
       <h1 style="margin:0;font-size:24px">DodiX</h1>
-      <p style="margin:4px 0 0;font-size:13px;opacity:.8">Borsa Servizi</p>
+      <p style="margin:4px 0 0;font-size:13px;opacity:.8">${subtitle}</p>
     </div>
     <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px">
       <h2 style="color:#0f172a;font-size:20px;margin:0 0 16px">${title}</h2>
