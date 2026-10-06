@@ -201,21 +201,15 @@ export function RequestDetailView({
       );
       if (!confirmed) return;
 
-      const response = await fetch(
-        role === "COMPANY" ? "/api/stripe/checkout" : "/api/stripe/unlock",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(
-            role === "COMPANY"
-              ? { requestId, userRole: "company", amount: totalCents }
-              : { requestId },
-          ),
-        },
-      );
+      const response = await fetch("/api/stripe/unlock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId }),
+      });
 
       if (!response.ok) {
-        alert("Impossibile avviare il pagamento per lo sblocco contatti.");
+        const data = (await response.json().catch(() => null)) as { error?: string } | null;
+        alert(data?.error ?? "Impossibile avviare il pagamento per lo sblocco contatti.");
         return;
       }
 
@@ -389,7 +383,7 @@ export function RequestDetailView({
               <div className="rounded-xl border border-neutral-200 bg-white p-4 text-sm text-textStrong shadow-sm">
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Sblocca contatti</p>
-                  <p className="text-sm text-neutral-600">Commissione di servizio applicata solo a trasporto concluso.</p>
+                  <p className="text-sm text-neutral-600">Commissione una tantum, pagata ora con carta. I contatti si vedono quando ha pagato anche l'altra parte.</p>
                 </div>
                 <div className="mt-4 space-y-2 rounded-lg bg-neutral-50 p-3">
                   <div className="flex items-center justify-between text-xs text-neutral-600">
