@@ -232,7 +232,7 @@ export async function applyLoadCheckout(session: Stripe.Checkout.Session): Promi
         where: { requestId_userId: { requestId, userId } },
         select: { stripeSessionId: true },
       });
-      if (existing) return existing.stripeSessionId === session.id ? "same" : "duplicate";
+      if (existing && existing.stripeSessionId !== session.id) return "duplicate";
 
       const now = new Date();
       const updated = await tx.request.updateMany({
@@ -245,10 +245,12 @@ export async function applyLoadCheckout(session: Stripe.Checkout.Session): Promi
           unlockedByTransporter: true,
         },
       });
+      // Gia' registrato con questa sessione: conferma gia' applicata.
+      if (updated.count === 0 && existing) return "same";
       // Il carico non e' (piu') assegnato a lui: nessun contatto, rimborso.
       if (updated.count === 0) return "stale";
 
-      await recordUnlock(tx, requestId, userId, "TRANSPORTER", session);
+      if (!existing) await recordUnlock(tx, requestId, userId, "TRANSPORTER", session);
       await tx.application.updateMany({
         where: { requestId, status: APPLICATION_STATUS.PENDING },
         data: { status: APPLICATION_STATUS.REJECTED },
