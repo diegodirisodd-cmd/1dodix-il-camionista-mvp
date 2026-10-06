@@ -80,7 +80,17 @@ export function PlaceInput({
           search(e.target.value);
         }}
         onFocus={() => results.length > 0 && setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        onBlur={() => {
+          // Se il testo scritto corrisponde a un comune (o c'e' un solo
+          // suggerimento), lo scegliamo noi: niente errore "scegli dall'elenco".
+          if (!value && results.length > 0) {
+            const typed = text.replace(/\([A-Za-z]{2}\)\s*$/, "").trim().toLowerCase();
+            const exact = results.find((r) => r.city.toLowerCase() === typed);
+            if (exact) pick(exact);
+            else if (results.length === 1) pick(results[0]);
+          }
+          setTimeout(() => setOpen(false), 150);
+        }}
         onKeyDown={(e) => {
           if (!open || results.length === 0) return;
           if (e.key === "ArrowDown") {

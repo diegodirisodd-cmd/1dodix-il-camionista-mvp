@@ -213,7 +213,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
     createdAt: load.createdAt.toISOString(),
     assignedAt: load.assignedAt?.toISOString() ?? null,
     company: {
-      name: displayName(load.company),
+      name: displayName(load.company, "Azienda DodiX"),
       place: load.company.city
         ? `${load.company.city}${load.company.province ? ` (${load.company.province})` : ""}`
         : null,

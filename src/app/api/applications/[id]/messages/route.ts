@@ -92,7 +92,9 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   });
 
   if (!last || Date.now() - last.createdAt.getTime() > NOTIFY_GAP_MS) {
-    const sender = thread.isCompany ? thread.app.request.company : thread.app.transporter;
+    const sender = thread.isCompany
+      ? { ...thread.app.request.company, role: "COMPANY" }
+      : { ...thread.app.transporter, role: "TRANSPORTER" };
     const recipient = thread.isCompany ? thread.app.transporter : thread.app.request.company;
     await notifyNewMessage(recipient, thread.app.request, displayName(sender), thread.isCompany ? "TRANSPORTER" : "COMPANY");
   }

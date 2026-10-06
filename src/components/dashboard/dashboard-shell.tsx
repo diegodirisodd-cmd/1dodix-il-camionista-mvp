@@ -65,7 +65,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
 
             <div className="rounded-xl border border-white/20 bg-white/10 px-3 py-3 text-xs text-white/80 shadow-sm">
               <p className="font-semibold text-white">Come funziona</p>
-              <p className="mt-1 leading-relaxed">
+              <p className="mt-1 text-xs leading-relaxed text-white/80">
                 Pubblicare e candidarsi è gratis. Dopo la scelta pagano entrambi il 2% + IVA e si scambiano i contatti.
               </p>
             </div>
@@ -87,7 +87,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
                 <p className="text-base font-semibold text-textStrong">{pageLabel}</p>
               </div>
               <div className="flex items-center gap-3 text-sm text-neutral-600">
-                <LogoutButton variant="light" />
+                <LogoutButton />
               </div>
             </div>
             {children}

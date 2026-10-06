@@ -97,7 +97,7 @@ export function ChatThread({
                     : "max-w-[85%] rounded-2xl rounded-bl-sm border border-neutral-200 bg-white px-3 py-2 text-sm text-textStrong"
                 }
               >
-                <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                <p className={`whitespace-pre-wrap break-words ${m.mine ? "text-white" : "text-textStrong"}`}>{m.body}</p>
                 <p className={m.mine ? "mt-1 text-[10px] text-white/60" : "mt-1 text-[10px] text-neutral-400"}>
                   {formatDateTime(m.createdAt)}
                   {m.mine && m.readAt ? " · letto" : ""}

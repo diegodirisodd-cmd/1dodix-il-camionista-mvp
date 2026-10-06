@@ -47,7 +47,7 @@ export default async function ProfilePage({ searchParams }: { searchParams?: { b
       </div>
       <ProfileForm initial={p} welcome={welcome} />
       <div className="pt-2">
-        <LogoutButton variant="light" />
+        <LogoutButton />
       </div>
     </section>
   );

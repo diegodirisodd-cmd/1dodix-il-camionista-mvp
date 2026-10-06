@@ -13,15 +13,20 @@ import { notifyConfirmedToCompany, notifyNotSelected, notifyReleased, notifySele
 
 type Tx = Prisma.TransactionClient;
 
-export function displayName(u: {
-  companyName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-}) {
+export function displayName(
+  u: {
+    companyName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    role?: string | null;
+  },
+  fallback?: string,
+) {
   return (
     u.companyName?.trim() ||
     [u.firstName, u.lastName].filter(Boolean).join(" ").trim() ||
-    "Trasportatore DodiX"
+    fallback ||
+    (u.role === "COMPANY" ? "Azienda DodiX" : "Trasportatore DodiX")
   );
 }
 
@@ -199,7 +204,7 @@ export async function applyLoadCheckout(session: Stripe.Checkout.Session): Promi
       if (!req || req.companyId !== userId) return { recorded: "duplicate" as const, assigned: false };
       const recorded = await recordUnlock(tx, requestId, userId, "COMPANY", session);
       if (recorded === "duplicate") return { recorded, assigned: false };
-      const assigned = recorded === "created" ? await assignInTx(tx, applicationId, expectedPrice) : false;
+      const assigned = await assignInTx(tx, applicationId, expectedPrice);
       return { recorded, assigned };
     });
 
@@ -210,7 +215,7 @@ export async function applyLoadCheckout(session: Stripe.Checkout.Session): Promi
         "Avevi già pagato la commissione per questo carico: questo pagamento ti viene rimborsato.",
       );
     }
-    if (result.assigned && result.recorded === "created") await afterAssign(applicationId);
+    if (result.assigned) await afterAssign(applicationId);
     if (!result.assigned && result.recorded === "created") {
       // Pagato ma il candidato non era piu' disponibile (ritirato, prezzo
       // cambiato, carico gia' assegnato): il pagamento resta valido per
