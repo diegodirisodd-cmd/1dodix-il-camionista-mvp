@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { ActionButton } from "@/components/loads/action-button";
@@ -241,7 +240,6 @@ export function LoadDetail({ data }: { data: LoadDetailData }) {
 /* ───────────────────────── Trasportatore ───────────────────────── */
 
 function ApplyForm({ data, editing, onCancel }: { data: LoadDetailData; editing?: boolean; onCancel?: () => void }) {
-  const router = useRouter();
   const mine = data.myApplication;
   const [mode, setMode] = useState<"accept" | "propose">(mine?.priceCents ? "propose" : "accept");
   const [price, setPrice] = useState(mine?.priceCents ? String(mine.priceCents / 100) : "");
@@ -264,7 +262,7 @@ function ApplyForm({ data, editing, onCancel }: { data: LoadDetailData; editing?
         setError(body.error ?? "Candidatura non inviata.");
       } else {
         onCancel?.();
-        router.refresh();
+        window.location.reload();
       }
     } catch {
       setError("Connessione non riuscita.");
@@ -654,7 +652,6 @@ function CompanyPanel({ data }: { data: LoadDetailData }) {
 /* ───────────────────────── Recensione ───────────────────────── */
 
 function ReviewBox({ data, targetLabel }: { data: LoadDetailData; targetLabel: string }) {
-  const router = useRouter();
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -676,7 +673,7 @@ function ReviewBox({ data, targetLabel }: { data: LoadDetailData; targetLabel: s
     const body = (await res.json().catch(() => ({}))) as { error?: string };
     setLoading(false);
     if (!res.ok) return setError(body.error ?? "Recensione non salvata.");
-    router.refresh();
+    window.location.reload();
   }
 
   return (

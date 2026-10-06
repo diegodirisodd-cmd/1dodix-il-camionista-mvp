@@ -1,7 +1,6 @@
 "use client";
 
 import clsx from "clsx";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type ActionButtonProps = {
@@ -34,7 +33,6 @@ export function ActionButton({
   className,
   onDone,
 }: ActionButtonProps) {
-  const router = useRouter();
   const [asking, setAsking] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +58,7 @@ export function ActionButton({
       }
       setAsking(false);
       onDone?.(data);
-      router.refresh();
+      window.location.reload();
     } catch {
       setError("Connessione non riuscita. Riprova.");
     }
