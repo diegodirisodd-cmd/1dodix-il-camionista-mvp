@@ -106,6 +106,9 @@ model Request {
   deliveryRegion   String?
   deliveryLat      Float?
   deliveryLng      Float?
+  // Indirizzi precisi: visibili solo dopo la conferma di entrambi.
+  pickupAddress    String?
+  deliveryAddress  String?
 
   // Ciclo di vita: OPEN -> ASSIGNED (azienda ha scelto e pagato) ->
   // CONFIRMED (ha pagato anche il trasportatore, contatti visibili) ->

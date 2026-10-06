@@ -15,10 +15,6 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  if (!user.onboardingCompleted) {
-    redirect("/onboarding");
-  }
-
   return (
     <DashboardShell user={{ ...user, role: user.role as any }}>
       {children}

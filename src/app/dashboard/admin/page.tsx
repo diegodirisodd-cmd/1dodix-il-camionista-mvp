@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { SectionCard } from "@/components/dashboard/section-card";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { StatusBadge, UrgencyBadge } from "@/components/services/service-badges";
-import { SubscriptionBadge } from "@/components/subscription-badge";
 import { getSessionUser } from "@/lib/auth";
 import { formatCurrency } from "@/lib/commission";
 import { prisma } from "@/lib/prisma";
@@ -70,10 +69,6 @@ export default async function AdminDashboardPage() {
 
   if (!user) {
     redirect("/login");
-  }
-
-  if (!user.subscriptionActive) {
-    redirect("/paywall");
   }
 
   if (user.role !== "ADMIN") {
@@ -157,7 +152,6 @@ export default async function AdminDashboardPage() {
               modifica è abilitata in questo MVP.
             </p>
           </div>
-          <SubscriptionBadge active={user.subscriptionActive} className="self-start" />
         </div>
       </div>
 

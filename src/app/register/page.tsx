@@ -31,8 +31,8 @@ export default function RegisterPage() {
           return;
         }
 
-        setResult("Account creato con successo. Completa l'onboarding per iniziare.");
-        router.replace((data?.redirectTo as string) || "/onboarding");
+        setResult("Account creato.");
+        router.replace((data?.redirectTo as string) || "/dashboard");
       } catch (err) {
         console.error("Errore durante la registrazione", err);
         setError("Registrazione non riuscita. Controlla i dati e riprova.");
@@ -55,10 +55,9 @@ export default function RegisterPage() {
               </div>
             </div>
           </div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">Onboarding</p>
-          <h1>Registrati</h1>
+          <h1>Registrati gratis</h1>
           <p className="mx-auto max-w-2xl text-neutral-600">
-            Crea un account con i tuoi dati aziendali per accedere a richieste e contatti.
+            Nessun abbonamento. Si paga il 2% + IVA solo quando un carico viene assegnato.
           </p>
         </header>
 
@@ -67,7 +66,7 @@ export default function RegisterPage() {
             <div className="space-y-1">
               <h3 className="text-white">Dati account</h3>
               <p className="text-sm text-neutral-200/80">
-                Compila i campi obbligatori. I campi con * sono richiesti.
+                Un minuto, cinque campi. Il resto quando ti serve.
               </p>
             </div>
 
@@ -83,9 +82,25 @@ export default function RegisterPage() {
             )}
 
             <form className="space-y-5" action={handleSubmit}>
-              <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-widest text-accent-300">Dati personali</p>
-              </div>
+              <fieldset className="space-y-2">
+                <legend className="text-xs font-semibold uppercase tracking-widest text-accent-300">Chi sei *</legend>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {[
+                    { value: "transporter", title: "Trasportatore", text: "Cerco carichi" },
+                    { value: "company", title: "Azienda", text: "Devo spedire" },
+                    { value: "supplier", title: "Officina / servizi", text: "Lavoro sui mezzi" },
+                  ].map((r) => (
+                    <label
+                      key={r.value}
+                      className="flex min-h-[64px] cursor-pointer flex-col justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-3 transition has-[:checked]:border-accent-500 has-[:checked]:bg-accent-500/15"
+                    >
+                      <input type="radio" name="role" value={r.value} required className="sr-only" />
+                      <span className="font-semibold text-white">{r.title}</span>
+                      <span className="text-xs text-neutral-300">{r.text}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="form-field">
@@ -93,103 +108,36 @@ export default function RegisterPage() {
                   <input className="input-field-dark" id="firstName" name="firstName" type="text" required autoComplete="given-name" />
                 </div>
                 <div className="form-field">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="lastName">Cognome *</label>
-                  <input className="input-field-dark" id="lastName" name="lastName" type="text" required autoComplete="family-name" />
+                  <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="companyName">Azienda / ragione sociale</label>
+                  <input className="input-field-dark" id="companyName" name="companyName" type="text" autoComplete="organization" />
                 </div>
               </div>
 
               <div className="form-field">
-                <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="email">Email *</label>
-                <input className="input-field-dark" id="email" name="email" type="email" required autoComplete="email" />
-                <p className="text-xs text-neutral-300/70">Verrà usata per gli avvisi e il login.</p>
+                <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="phone">Cellulare (WhatsApp) *</label>
+                <input className="input-field-dark" id="phone" name="phone" type="tel" required autoComplete="tel" placeholder="333 1234567" />
+                <p className="text-xs text-neutral-300/70">Ti avvisiamo qui per nuovi carichi, candidature e conferme. Non lo mostriamo a nessuno prima della conferma.</p>
               </div>
 
-              <div className="form-field">
-                <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="password">Password *</label>
-                <input className="input-field-dark" id="password" name="password" type="password" minLength={6} required autoComplete="new-password" />
-                <p className="text-xs text-neutral-300/70">Almeno 6 caratteri.</p>
-              </div>
-
-              <div className="form-field">
-                <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="phone">Telefono</label>
-                <input className="input-field-dark" id="phone" name="phone" type="tel" autoComplete="tel" placeholder="+39 ..." />
-              </div>
-
-              <div className="space-y-1 pt-2">
-                <p className="text-xs font-semibold uppercase tracking-widest text-accent-300">Dati aziendali</p>
-              </div>
-
-              <div className="form-field">
-                <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="companyName">Ragione sociale *</label>
-                <input className="input-field-dark" id="companyName" name="companyName" type="text" required autoComplete="organization" />
-              </div>
-
-              <div className="form-field">
-                <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="vatNumber">Partita IVA *</label>
-                <input className="input-field-dark" id="vatNumber" name="vatNumber" type="text" required placeholder="IT12345678901" pattern="[A-Za-z]{0,2}[0-9]{11,13}" title="Inserisci una partita IVA valida (es. IT12345678901)" />
-              </div>
-
-              <div className="form-field">
-                <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="contactPerson">Persona di contatto</label>
-                <input className="input-field-dark" id="contactPerson" name="contactPerson" type="text" autoComplete="name" />
-              </div>
-
-              <div className="space-y-1 pt-2">
-                <p className="text-xs font-semibold uppercase tracking-widest text-accent-300">Sede operativa</p>
-              </div>
-
-              <div className="form-field">
-                <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="address">Indirizzo *</label>
-                <input className="input-field-dark" id="address" name="address" type="text" required autoComplete="street-address" placeholder="Via Roma 1" />
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-3">
-                <div className="form-field sm:col-span-1">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="city">Città *</label>
-                  <input className="input-field-dark" id="city" name="city" type="text" required autoComplete="address-level2" />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="form-field">
+                  <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="email">Email *</label>
+                  <input className="input-field-dark" id="email" name="email" type="email" required autoComplete="email" />
                 </div>
                 <div className="form-field">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="province">Provincia *</label>
-                  <input className="input-field-dark" id="province" name="province" type="text" required maxLength={2} placeholder="MI" autoComplete="address-level1" />
-                </div>
-                <div className="form-field">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="zipCode">CAP *</label>
-                  <input className="input-field-dark" id="zipCode" name="zipCode" type="text" required pattern="[0-9]{5}" title="Inserisci un CAP valido (5 cifre)" placeholder="20100" autoComplete="postal-code" />
+                  <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="password">Password *</label>
+                  <input className="input-field-dark" id="password" name="password" type="password" minLength={6} required autoComplete="new-password" />
+                  <p className="text-xs text-neutral-300/70">Almeno 6 caratteri.</p>
                 </div>
               </div>
 
-              <div className="form-field">
-                <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="country">Paese</label>
-                <select className="input-field-dark" id="country" name="country" defaultValue="IT" autoComplete="country">
-                  <option value="IT">Italia</option>
-                  <option value="FR">Francia</option>
-                  <option value="DE">Germania</option>
-                  <option value="ES">Spagna</option>
-                  <option value="AT">Austria</option>
-                  <option value="CH">Svizzera</option>
-                </select>
-              </div>
-
-              <div className="space-y-1 pt-2">
-                <p className="text-xs font-semibold uppercase tracking-widest text-accent-300">Tipo account</p>
-              </div>
-
-              <div className="form-field">
-                <label className="text-xs font-semibold uppercase tracking-wide text-neutral-200" htmlFor="role">Ruolo *</label>
-                <select className="input-field-dark" id="role" name="role" required defaultValue="">
-                  <option value="" disabled>Seleziona un ruolo</option>
-                  <option value="company">Azienda (spedisco merce)</option>
-                  <option value="transporter">Trasportatore (trasporto merce)</option>
-                  <option value="supplier">Fornitore di servizi (officina, telonaio, gommista...)</option>
-                </select>
-                <p className="text-xs text-neutral-300/70">
-                  Il ruolo determina la tua dashboard e i permessi disponibili.
-                </p>
-              </div>
+              <p className="text-xs text-neutral-300/80">
+                P.IVA, indirizzo e mezzi li aggiungi dopo dal profilo. Registrandoti accetti di ricevere avvisi WhatsApp da DodiX; puoi disattivarli quando vuoi.
+              </p>
 
               <div className="form-actions justify-between">
                 <button type="submit" disabled={isPending} className="btn-primary w-full sm:w-auto">
-                  {isPending ? "Creazione in corso..." : "Crea account"}
+                  {isPending ? "Creazione in corso..." : "Crea account gratis"}
                 </button>
                 <span className="text-sm text-neutral-300">
                   Hai già un account?{" "}
@@ -209,7 +157,7 @@ export default function RegisterPage() {
             <ul className="space-y-3 text-sm text-neutral-600">
               <li className="flex items-start gap-3">
                 <span className="badge">Ruoli</span>
-                <span>Trasportatore: cerca carichi e servizi per il mezzo. Azienda: pubblica richieste di trasporto. Fornitore: risponde alle richieste di Borsa Servizi.</span>
+                <span>Trasportatore: si candida ai carichi. Azienda: pubblica i carichi e sceglie. Officina / servizi: risponde alle richieste della Borsa Servizi.</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="badge">WhatsApp</span>
@@ -217,7 +165,7 @@ export default function RegisterPage() {
               </li>
               <li className="flex items-start gap-3">
                 <span className="badge">Costi</span>
-                <span>Iscrizione e abbonamento gratuiti. Una commissione del 2% solo quando sblocchi il contatto di un carico.</span>
+                <span>Iscrizione e candidature gratuite. Quando l&apos;azienda sceglie il trasportatore, pagano entrambi il 2% + IVA e si scambiano i contatti.</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="badge">Contatti</span>
@@ -225,11 +173,11 @@ export default function RegisterPage() {
               </li>
               <li className="flex items-start gap-3">
                 <span className="badge">Supporto</span>
-                <span>Assistenza via dashboard per verifiche e aggiornamenti account.</span>
+                <span>Chat interna per chiarire i dettagli prima di decidere.</span>
               </li>
             </ul>
             <div className="rounded-xl border border-steel-200 bg-white px-4 py-3 text-sm text-neutral-600">
-              Dopo la registrazione verrai indirizzato alla dashboard corrispondente al tuo ruolo.
+              Dopo la registrazione: i trasportatori scelgono mezzi e regioni, le aziende pubblicano subito il primo carico.
             </div>
           </div>
         </div>

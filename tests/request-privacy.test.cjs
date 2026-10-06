@@ -43,12 +43,14 @@ function asJson(payload) {
 }
 
 test("la bacheca trasportatore filtra su carichi liberi e ancora aperti", () => {
-  // COMPANY_PAID resta in bacheca: nessun trasportatore assegnato, e la
-  // commissione dell'azienda e' gia' stata pagata.
+  // In bacheca solo i carichi aperti: appena l'azienda sceglie un
+  // trasportatore (ASSIGNED) il carico esce dalla bacheca.
   assert.deepEqual(requestsWhereClauseForRole("TRANSPORTER", TRANSPORTER_ID), {
     transporterId: null,
-    status: { in: ["OPEN", "COMPANY_PAID"] },
+    status: { in: ["OPEN"] },
   });
+  assert.ok(!TRANSPORTER_BOARD_STATUSES.includes("ASSIGNED"));
+  assert.ok(!TRANSPORTER_BOARD_STATUSES.includes("CONFIRMED"));
   assert.ok(!TRANSPORTER_BOARD_STATUSES.includes("COMPLETED"));
   assert.ok(!TRANSPORTER_BOARD_STATUSES.includes("CANCELLED"));
   assert.ok(!TRANSPORTER_BOARD_STATUSES.includes("TRANSPORTER_PAID"));

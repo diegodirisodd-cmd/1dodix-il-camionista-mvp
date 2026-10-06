@@ -13,31 +13,31 @@ export const metadata: Metadata = {
 
 const valueProps = [
   {
-    title: "Avviso WhatsApp immediato",
+    title: "Solo i carichi della tua zona",
     description:
-      "Ogni nuovo carico arriva su WhatsApp appena viene pubblicato. Niente pagine da ricaricare, niente occasioni perse.",
+      "Scegli mezzi e regioni: ti arriva su WhatsApp solo quello che puoi fare davvero. Niente spam da mezza Italia.",
   },
   {
-    title: "Paghi solo se concludi",
+    title: "Paghi solo se ti scelgono",
     description:
-      "Iscrizione e abbonamento gratuiti. Il 2% si paga soltanto quando sblocchi il contatto di un carico.",
+      "Candidarti è gratis. Il 2% + IVA si paga solo quando l'azienda sceglie te e confermi: mai soldi a vuoto.",
   },
   {
-    title: "Contatti diretti",
+    title: "Proponi il tuo prezzo e parla in chat",
     description:
-      "Parli con l'azienda, non con un call center. Nessun intermediario e nessuna gara al ribasso.",
+      "Accetti il prezzo dell'azienda o ne proponi un altro, chiarisci i dettagli in chat, poi vi scambiate i contatti.",
   },
 ];
 
 const companyPoints = [
-  "Il tuo carico arriva su WhatsApp a tutti i trasportatori iscritti",
-  "Pubblichi in pochi minuti, senza intermediari",
-  "Ricevi contatti qualificati, non preventivi al ribasso",
+  "Pubblichi gratis in un minuto: arriva su WhatsApp ai trasportatori della zona",
+  "Ricevi candidature con prezzo, profilo, mezzi e recensioni",
+  "Scegli tu chi far lavorare: paghi il 2% + IVA solo quando scegli",
 ];
 
 const transporterPoints = [
-  "Ricevi un WhatsApp appena esce un carico",
-  "Accedi a richieste reali, pubblicate da aziende registrate",
+  "Ricevi un WhatsApp appena esce un carico nelle tue regioni",
+  "Ti candidi gratis e proponi il tuo prezzo",
   "Cerchi un servizio per il mezzo? Lo chiedi nella Borsa Servizi",
 ];
 
@@ -54,9 +54,9 @@ const supplierPoints = [
 // piattaforma vuota invece di invogliare all'iscrizione. Questi tre dati sono
 // veri a qualsiasi scala e restano validi mentre la piattaforma cresce.
 const stats = [
-  { value: "0€", label: "Iscrizione e abbonamento", mono: true },
-  { value: "2%", label: "Solo a contatto sbloccato", mono: true },
-  { value: "WhatsApp", label: "Avviso a ogni nuovo carico", mono: false },
+  { value: "0€", label: "Iscrizione, abbonamento e candidature", mono: true },
+  { value: "2%", label: "Solo a carico assegnato", mono: true },
+  { value: "WhatsApp", label: "Avvisi solo nelle tue zone", mono: false },
 ];
 
 export default function HomePage() {
