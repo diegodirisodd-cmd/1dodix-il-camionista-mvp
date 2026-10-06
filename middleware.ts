@@ -15,15 +15,20 @@ export async function middleware(request: NextRequest) {
   }
 
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  const toLogin = () => {
+    const url = new URL("/login", request.url);
+    if (isDashboard) url.searchParams.set("next", pathname + request.nextUrl.search);
+    return NextResponse.redirect(url);
+  };
 
   if (!token) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return toLogin();
   }
 
   const session = await verifySessionToken(token);
 
   if (!session) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return toLogin();
   }
 
   const user = await prisma.user.findUnique({
@@ -32,7 +37,7 @@ export async function middleware(request: NextRequest) {
   });
 
   if (!user) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return toLogin();
   }
 
   if (isOnboarding) {

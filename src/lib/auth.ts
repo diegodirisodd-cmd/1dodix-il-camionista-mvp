@@ -74,12 +74,7 @@ export async function getSessionUser() {
 
   if (!user) return null;
 
-  return {
-    ...user,
-    subscriptionActive: true,
-    subscriptionStatus: "active",
-    onboardingCompleted: true,
-  };
+  return user;
 }
 
 export function buildSessionCookie(token: string) {

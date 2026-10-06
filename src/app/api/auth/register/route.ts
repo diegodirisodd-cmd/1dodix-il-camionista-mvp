@@ -7,6 +7,7 @@ import { buildSessionCookie, createSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { routeForUser } from "@/lib/navigation";
 import { type Role, REGISTRABLE_ROLES } from "@/lib/roles";
+import { normalizeItalianPhone } from "@/lib/vies";
 
 export async function POST(request: Request) {
   try {
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
 
     const normalizedEmail = (email as string | undefined)?.toLowerCase().trim();
     const normalizedRole = (role as string | undefined)?.toUpperCase() as Role | undefined;
-    const normalizedPhone = (phone as string | undefined)?.trim() || null;
+    const normalizedPhone = normalizeItalianPhone(typeof phone === "string" ? phone : null);
 
     if (!normalizedEmail || !rawPassword || !normalizedRole) {
       return NextResponse.json(
@@ -41,7 +42,14 @@ export async function POST(request: Request) {
       );
     }
 
-    if (rawPassword.length < 6) {
+    if (!normalizedPhone) {
+      return NextResponse.json(
+        { error: "Inserisci un numero di cellulare valido: serve per gli avvisi WhatsApp." },
+        { status: 400 },
+      );
+    }
+
+    if (typeof rawPassword !== "string" || rawPassword.length < 6) {
       return NextResponse.json(
         { error: "La password deve contenere almeno 6 caratteri." },
         { status: 400 },
@@ -84,6 +92,7 @@ export async function POST(request: Request) {
         zipCode: trimOrNull(zipCode),
         country: trimOrNull(country) || "IT",
         contactPerson: trimOrNull(contactPerson),
+        whatsappOptIn: body.whatsappOptIn !== false,
       },
     });
 
@@ -98,7 +107,12 @@ export async function POST(request: Request) {
         userId: user.id,
         email: user.email,
         role: user.role,
-        redirectTo: routeForUser(user.role as Role),
+        redirectTo:
+          user.role === "TRANSPORTER"
+            ? "/dashboard/transporter/profile?benvenuto=1"
+            : user.role === "COMPANY"
+              ? "/dashboard/company/new-request"
+              : routeForUser(user.role as Role),
       },
       { status: 201 },
     );

@@ -40,9 +40,21 @@ model User {
   avatarUrl     String?
   whatsappOptIn Boolean @default(false)
 
+  // Profilo operativo del trasportatore: mezzi disponibili e regioni in cui
+  // lavora. Servono per la bacheca "Per te" e per gli avvisi WhatsApp mirati.
+  vehicleTypes   String[] @default([])
+  serviceRegions String[] @default([])
+  // P.IVA verificata sul servizio VIES dell'Unione europea.
+  vatVerified    Boolean  @default(false)
+  vatVerifiedAt  DateTime?
+
   companyRequests     Request[] @relation("CompanyRequests")
   transporterRequests Request[] @relation("TransporterJobs")
   requestUnlocks      RequestUnlock[]
+  applications        Application[]
+  messagesSent        Message[]
+  reviewsGiven        Review[]  @relation("ReviewAuthor")
+  reviewsReceived     Review[]  @relation("ReviewTarget")
 
   supplierProfile      SupplierProfile?
   serviceRequestsMade  ServiceRequest[]
@@ -82,9 +94,96 @@ model Request {
   pickupPhone   String?   
   distanceKm    Decimal?  
 
-  company     User  @relation("CompanyRequests", fields: [companyId], references: [id])
-  transporter User? @relation("TransporterJobs", fields: [transporterId], references: [id])
-  unlocks     RequestUnlock[]
+  // Luoghi strutturati (comuni ISTAT). pickup/delivery restano il testo
+  // mostrato e usato dagli avvisi WhatsApp.
+  pickupCity       String?
+  pickupProvince   String?
+  pickupRegion     String?
+  pickupLat        Float?
+  pickupLng        Float?
+  deliveryCity     String?
+  deliveryProvince String?
+  deliveryRegion   String?
+  deliveryLat      Float?
+  deliveryLng      Float?
+  // Indirizzi precisi: visibili solo dopo la conferma di entrambi.
+  pickupAddress    String?
+  deliveryAddress  String?
+
+  // Ciclo di vita: OPEN -> ASSIGNED (azienda ha scelto e pagato) ->
+  // CONFIRMED (ha pagato anche il trasportatore, contatti visibili) ->
+  // DELIVERED. In ogni momento prima di CONFIRMED: CANCELLED.
+  selectedApplicationId Int?
+  agreedPrice           Int?
+  assignedAt            DateTime?
+  confirmedAt           DateTime?
+  deliveredAt           DateTime?
+  cancelledAt           DateTime?
+
+  company      User  @relation("CompanyRequests", fields: [companyId], references: [id])
+  transporter  User? @relation("TransporterJobs", fields: [transporterId], references: [id])
+  unlocks      RequestUnlock[]
+  applications Application[]
+  reviews      Review[]
+
+  @@index([status, pickupRegion])
+}
+
+// Candidatura gratuita di un trasportatore a un carico.
+// Stati: PENDING, SELECTED, REJECTED, WITHDRAWN (ritirata dal trasportatore),
+// DECLINED (scelto ma ha rinunciato), RELEASED (scelto ma non ha confermato
+// in tempo: l'azienda lo ha sostituito).
+model Application {
+  id            Int       @id @default(autoincrement())
+  requestId     Int
+  transporterId Int
+  priceCents    Int?
+  message       String?
+  status        String    @default("PENDING")
+  selectedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  request     Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  transporter User      @relation(fields: [transporterId], references: [id])
+  messages    Message[]
+
+  @@unique([requestId, transporterId])
+  @@index([transporterId])
+}
+
+// Chat interna fra azienda e un candidato. Finche' i contatti non sono
+// sbloccati da entrambi, telefoni ed email nei messaggi vengono oscurati.
+model Message {
+  id            Int       @id @default(autoincrement())
+  applicationId Int
+  senderId      Int
+  body          String
+  readAt        DateTime?
+  createdAt     DateTime  @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  sender      User        @relation(fields: [senderId], references: [id])
+
+  @@index([applicationId, createdAt])
+}
+
+// Recensione lasciata dopo la consegna, una per autore e carico.
+model Review {
+  id        Int      @id @default(autoincrement())
+  requestId Int
+  authorId  Int
+  targetId  Int
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  request Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  author  User    @relation("ReviewAuthor", fields: [authorId], references: [id])
+  target  User    @relation("ReviewTarget", fields: [targetId], references: [id])
+
+  @@unique([requestId, authorId])
+  @@index([targetId])
 }
 
 model RequestUnlock {

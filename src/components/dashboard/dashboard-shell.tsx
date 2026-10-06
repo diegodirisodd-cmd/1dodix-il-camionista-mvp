@@ -5,9 +5,8 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 import { LogoutButton } from "@/components/logout-button";
-import { SubscriptionBadge } from "@/components/subscription-badge";
 import { type Role } from "@/lib/roles";
-import { hasActiveSubscription } from "@/lib/subscription";
+import { ROLE_LABELS } from "@/lib/catalog";
 
 import { SidebarNav, navByRole } from "./sidebar-nav";
 
@@ -15,8 +14,6 @@ type DashboardShellProps = {
   user: {
     email: string;
     role: Role;
-    subscriptionActive: boolean;
-    onboardingCompleted: boolean;
   };
   children: React.ReactNode;
 };
@@ -25,11 +22,12 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const navItems = useMemo(() => navByRole[user.role] ?? [], [user.role]);
-  const subscriptionActive = hasActiveSubscription(user);
 
   const pageLabel = useMemo(() => {
-    const activeItem = navItems.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
-    return activeItem?.label ?? "Panoramica operativa";
+    const activeItem =
+      navItems.find((item) => pathname === item.href) ??
+      navItems.find((item) => pathname.startsWith(`${item.href}/`) && !/^\/dashboard\/(company|transporter|supplier|admin)$/.test(item.href));
+    return activeItem?.label ?? "Area privata";
   }, [navItems, pathname]);
 
   return (
@@ -52,10 +50,6 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
             </svg>
           </button>
         </div>
-        <div className="mt-3 flex items-center justify-between text-sm text-neutral-600">
-          <SubscriptionBadge active={subscriptionActive} role={user.role as any} />
-          <LogoutButton variant="light" />
-        </div>
       </div>
 
       <div className="flex">
@@ -64,15 +58,16 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent-300">Area utente</p>
               <p className="font-display text-lg font-bold leading-tight text-white">{user.email}</p>
-              <p className="text-xs text-neutral-300/80">Ruolo: {user.role}</p>
-              <SubscriptionBadge active={subscriptionActive} role={user.role} className="mt-2" />
+              <p className="text-xs text-neutral-300/80">{ROLE_LABELS[user.role] ?? user.role}</p>
             </div>
 
             <SidebarNav role={user.role} />
 
             <div className="rounded-xl border border-white/20 bg-white/10 px-3 py-3 text-xs text-white/80 shadow-sm">
-              <p className="font-semibold text-white">Supporto</p>
-              <p className="mt-1 leading-relaxed">Gestisci profilo, richieste e contatti dalle sezioni dedicate.</p>
+              <p className="font-semibold text-white">Come funziona</p>
+              <p className="mt-1 text-xs leading-relaxed text-white/80">
+                Pubblicare e candidarsi è gratis. Dopo la scelta pagano entrambi il 2% + IVA e si scambiano i contatti.
+              </p>
             </div>
 
             <div className="mt-auto flex items-center justify-between text-sm text-white">
@@ -92,8 +87,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
                 <p className="text-base font-semibold text-textStrong">{pageLabel}</p>
               </div>
               <div className="flex items-center gap-3 text-sm text-neutral-600">
-                <SubscriptionBadge active={subscriptionActive} role={user.role as any} />
-                <LogoutButton variant="light" />
+                <LogoutButton />
               </div>
             </div>
             {children}
@@ -110,7 +104,6 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
             <div className="mb-4 space-y-1">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-600">Navigazione</p>
               <p className="text-sm font-semibold text-textStrong">{user.email}</p>
-              <SubscriptionBadge active={subscriptionActive} role={user.role as any} />
             </div>
             <SidebarNav
               role={user.role}
@@ -134,7 +127,7 @@ function MobileBottomNav({
   items,
   activePath,
 }: {
-  items: { href: string; label: string }[];
+  items: { href: string; label: string; short?: string }[];
   activePath: string;
 }) {
   const visibleItems = items.slice(0, 5);
@@ -143,7 +136,8 @@ function MobileBottomNav({
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-neutral-200 bg-card/95 backdrop-blur shadow-lg md:hidden">
       <div className="flex items-center justify-around px-2 py-3 text-xs font-semibold text-neutral-600">
         {visibleItems.map((item) => {
-          const active = activePath === item.href || activePath.startsWith(`${item.href}/`);
+          const isRoot = /^\/dashboard\/(company|transporter|supplier|admin)$/.test(item.href);
+          const active = activePath === item.href || (!isRoot && activePath.startsWith(`${item.href}/`));
 
           return (
             <Link
@@ -153,7 +147,7 @@ function MobileBottomNav({
                 active ? "text-textStrong" : "text-neutral-500 hover:text-textStrong"
               }`}
             >
-              <span className="text-[13px] font-semibold leading-tight">{item.label}</span>
+              <span className="text-[13px] font-semibold leading-tight">{item.short ?? item.label}</span>
               <span
                 className={`h-1 w-6 rounded-full transition-all duration-200 ${
                   active ? "bg-accent-500" : "bg-transparent"

@@ -1,199 +1,113 @@
 import { NextResponse } from "next/server";
 
 import { getSessionUser } from "@/lib/auth";
+import { MAX_PRICE_EUR, MIN_PRICE_EUR, estimateRoadKm, formatPlace, parseEuroToCents, priceOutOfRange } from "@/lib/catalog";
+import { findPlace } from "@/lib/places";
 import { prisma } from "@/lib/prisma";
-import {
-  buildRequestsListPayload,
-  requestsWhereClauseForRole,
-} from "@/lib/request-privacy";
-import { type Role } from "@/lib/roles";
-import { getUnlockStatesForRequests } from "@/lib/unlocks";
+import { isPickupPast, maskContacts } from "@/lib/request-flow";
 
-type RequestPayload = {
-  pickup?: string;
-  delivery?: string;
-  cargo?: string;
-  cargoType?: string;
-  description?: string;
-  price?: number | string;
-  budget?: number | string;
-  priceString?: string;
-  pickupDate?: string;
-  deliveryDate?: string;
-  weight?: number | string;
-  volume?: string;
-  palletCount?: number | string;
-  vehicleType?: string;
-  isAdr?: boolean;
-  paymentTerms?: string;
-  pickupContact?: string;
-  pickupPhone?: string;
-  distanceKm?: number | string;
-};
+function toNumberOrNull(val: unknown): number | null {
+  if (val === null || val === undefined || val === "") return null;
+  const n = Number(String(val).replace(",", "."));
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
 
-export async function GET() {
-  const user = await getSessionUser();
-  const pathname = "/api/requests";
+function toDateOrNull(val: unknown): Date | null {
+  if (typeof val !== "string" || !val) return null;
+  const d = new Date(val);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
 
-  if (!user) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
+function str(val: unknown, max = 500): string | null {
+  return typeof val === "string" && val.trim() ? val.trim().slice(0, max) : null;
+}
 
-  try {
-    const whereClause = requestsWhereClauseForRole(user.role, user.id);
-
-    const requests = await prisma.request.findMany({
-      where: whereClause,
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        pickup: true,
-        delivery: true,
-        cargo: true,
-        cargoType: true,
-        price: true,
-        createdAt: true,
-        pickupDate: true,
-        deliveryDate: true,
-        vehicleType: true,
-        weight: true,
-        palletCount: true,
-        isAdr: true,
-        distanceKm: true,
-        transporterId: true,
-        unlockedByCompany: true,
-        unlockedByTransporter: true,
-        companyId: true,
-        contactsUnlocked: true,
-        company: { select: { email: true, phone: true, companyName: true } },
-      },
-    });
-
-    const unlockStates = await getUnlockStatesForRequests(
-      requests.map((r) => r.id),
-      user.id,
-      user.role as Role,
-    );
-
-    // I contatti azienda escono dal select solo per chi ha sbloccato la
-    // richiesta (o ne e' il proprietario): la redazione vive nel payload
-    // builder per non poter essere dimenticata qui.
-    const enriched = buildRequestsListPayload(requests, unlockStates, {
-      id: user.id,
-      role: user.role,
-    });
-
-    return NextResponse.json(enriched);
-  } catch (error) {
-    console.error("[Requests API] load failed", {
-      pathname,
-      userId: user.id,
-      role: user.role,
-      error,
-    });
-
-    if (error instanceof Error) {
-      console.error(error.message, error.stack);
-    }
-
-    return NextResponse.json(
-      { error: "Impossibile caricare le richieste" },
-      { status: 500 },
-    );
-  }
+// Testi visibili a tutti i trasportatori: niente telefoni o email, che
+// saltano lo scambio contatti dopo la conferma (vanno nei campi referente).
+function publicText(val: unknown, max: number): string | null {
+  const v = str(val, max);
+  return v ? maskContacts(v).text : null;
 }
 
 export async function POST(request: Request) {
   const user = await getSessionUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
-
-  if (user.role === "ADMIN") {
-    return NextResponse.json(
-      { error: "Gli admin possono solo consultare le richieste" },
-      { status: 403 },
-    );
-  }
-
+  if (!user) return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
   if (user.role !== "COMPANY") {
+    return NextResponse.json({ error: "Solo le aziende possono pubblicare carichi." }, { status: 403 });
+  }
+
+  const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
+  if (!body) return NextResponse.json({ error: "Dati mancanti" }, { status: 400 });
+
+  const placeArg = (v: unknown) => (v && typeof v === "object" ? (v as { city?: unknown; province?: unknown }) : null);
+  const pp = placeArg(body.pickupPlace);
+  const dp = placeArg(body.deliveryPlace);
+  const pickupPlace = pp && typeof pp.city === "string" ? findPlace(pp.city, typeof pp.province === "string" ? pp.province : null) : null;
+  const deliveryPlace = dp && typeof dp.city === "string" ? findPlace(dp.city, typeof dp.province === "string" ? dp.province : null) : null;
+  if (!pickupPlace || !deliveryPlace) {
+    return NextResponse.json({ error: "Scegli i comuni di ritiro e consegna dall'elenco." }, { status: 400 });
+  }
+
+  const priceCents = parseEuroToCents(body.price);
+  if (priceCents === null || priceOutOfRange(priceCents)) {
     return NextResponse.json(
-      { error: "Solo le aziende possono pubblicare richieste" },
-      { status: 403 },
-    );
-  }
-
-  const body: RequestPayload = await request.json();
-
-  const rawPrice = body.price ?? body.budget ?? body.priceString;
-
-  if (!rawPrice) {
-    return NextResponse.json({ error: "Prezzo obbligatorio" }, { status: 400 });
-  }
-
-  const priceNumber = Number(rawPrice);
-
-  if (Number.isNaN(priceNumber) || priceNumber <= 0) {
-    return NextResponse.json({ error: "Prezzo non valido" }, { status: 400 });
-  }
-
-  const priceInCents = Math.round(priceNumber * 100);
-
-  const pickup = body.pickup?.trim() ?? "";
-  const delivery = body.delivery?.trim() ?? "";
-  const cargo = body.cargo?.trim() ?? body.cargoType?.trim() ?? null;
-  const description = body.description?.trim() || null;
-
-  if (!pickup || !delivery) {
-    return NextResponse.json(
-      { error: "Ritiro e consegna obbligatori." },
+      { error: `Prezzo non valido: indica un importo fra ${MIN_PRICE_EUR} e ${MAX_PRICE_EUR.toLocaleString("it-IT")} €.` },
       { status: 400 },
     );
   }
 
-  const toDateOrNull = (val: string | undefined | null): Date | null => {
-    if (!val) return null;
-    const d = new Date(val);
-    return isNaN(d.getTime()) ? null : d;
-  };
+  const pickupDate = toDateOrNull(body.pickupDate);
+  if (!pickupDate) return NextResponse.json({ error: "Indica la data di ritiro." }, { status: 400 });
+  // Stessa regola della bacheca: un ritiro gia' passato non lo vedrebbe nessuno.
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  if (pickupDate < startOfToday || isPickupPast(pickupDate)) {
+    return NextResponse.json({ error: "La data di ritiro non può essere nel passato." }, { status: 400 });
+  }
 
-  const toNumberOrNull = (val: unknown): number | null => {
-    if (val === null || val === undefined || val === "") return null;
-    const n = Number(val);
-    return isNaN(n) ? null : n;
-  };
+  const weight = toNumberOrNull(body.weight);
+  const palletCount = toNumberOrNull(body.palletCount);
+  const cargoType = str(body.cargoType, 40);
 
   try {
-    const newRequest = await prisma.request.create({
+    const created = await prisma.request.create({
       data: {
-        pickup,
-        delivery,
-        cargo,
-        description,
-        price: priceInCents,
         companyId: user.id,
-        cargoType: body.cargoType?.trim() || null,
-        pickupDate: toDateOrNull(body.pickupDate),
+        pickup: formatPlace(pickupPlace.city, pickupPlace.province, pickupPlace.city),
+        delivery: formatPlace(deliveryPlace.city, deliveryPlace.province, deliveryPlace.city),
+        pickupCity: pickupPlace.city,
+        pickupProvince: pickupPlace.province,
+        pickupRegion: pickupPlace.region,
+        pickupLat: pickupPlace.lat,
+        pickupLng: pickupPlace.lng,
+        deliveryCity: deliveryPlace.city,
+        deliveryProvince: deliveryPlace.province,
+        deliveryRegion: deliveryPlace.region,
+        deliveryLat: deliveryPlace.lat,
+        deliveryLng: deliveryPlace.lng,
+        pickupAddress: str(body.pickupAddress, 200),
+        deliveryAddress: str(body.deliveryAddress, 200),
+        distanceKm: estimateRoadKm(pickupPlace, deliveryPlace),
+        price: priceCents,
+        pickupDate,
         deliveryDate: toDateOrNull(body.deliveryDate),
-        weight: toNumberOrNull(body.weight),
-        volume: body.volume?.trim() || null,
-        palletCount: toNumberOrNull(body.palletCount) ? Math.round(Number(body.palletCount)) : null,
-        vehicleType: body.vehicleType?.trim() || null,
-        isAdr: body.isAdr ?? false,
-        paymentTerms: body.paymentTerms?.trim() || null,
-        pickupContact: body.pickupContact?.trim() || null,
-        pickupPhone: body.pickupPhone?.trim() || null,
-        distanceKm: toNumberOrNull(body.distanceKm),
+        vehicleType: str(body.vehicleType, 40),
+        cargoType,
+        cargo: cargoType,
+        weight,
+        palletCount: palletCount !== null ? Math.round(palletCount) : null,
+        volume: publicText(body.volume, 100),
+        isAdr: body.isAdr === true,
+        paymentTerms: str(body.paymentTerms, 40),
+        description: publicText(body.description, 2000),
+        pickupContact: str(body.pickupContact, 100),
+        pickupPhone: str(body.pickupPhone, 40),
       },
+      select: { id: true },
     });
-
-    return NextResponse.json(newRequest, { status: 201 });
+    return NextResponse.json(created, { status: 201 });
   } catch (error) {
     console.error("CREATE REQUEST ERROR:", error);
-    return NextResponse.json(
-      { error: "Impossibile creare la richiesta", details: String(error) },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Impossibile pubblicare il carico." }, { status: 500 });
   }
 }

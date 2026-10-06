@@ -1,175 +1,77 @@
 import { NextResponse } from "next/server";
 
 import { getSessionUser } from "@/lib/auth";
+import { notifyCancelled } from "@/lib/load-notifications";
 import { prisma } from "@/lib/prisma";
-import { type Role } from "@/lib/roles";
-import { getUnlockState } from "@/lib/unlocks";
+import { APPLICATION_STATUS, REQUEST_STATUS } from "@/lib/request-flow";
 
-type RequestPayload = {
-  pickup?: string;
-  delivery?: string;
-  cargo?: string;
-  description?: string;
-  price?: number | string;
-  priceCents?: number;
-  budget?: string;
-};
-
-function parsePriceToCents(value?: number | string | null) {
-  if (value === null || value === undefined) return null;
-  if (typeof value === "number") return Number.isFinite(value) ? Math.round(value * 100) : null;
-  const normalized = value.replace(/[^\d,.-]/g, "");
-  if (!normalized) return null;
-  const withDecimal = normalized.includes(",")
-    ? normalized.replace(/\./g, "").replace(",", ".")
-    : normalized;
-  const parsed = Number.parseFloat(withDecimal);
-  return Number.isFinite(parsed) ? Math.round(parsed * 100) : null;
-}
-
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+/**
+ * Azioni sul ciclo di vita del carico:
+ * - deliver: azienda o trasportatore assegnato, dopo la conferma.
+ * - cancel: azienda, finche' il carico e' aperto.
+ */
+export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const user = await getSessionUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
+  if (!user) return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
 
   const requestId = Number(params.id);
-  if (!Number.isFinite(requestId)) {
-    return NextResponse.json({ error: "Richiesta non valida" }, { status: 400 });
-  }
+  if (!Number.isInteger(requestId)) return NextResponse.json({ error: "Richiesta non valida" }, { status: 400 });
 
-  const requestRecord = await prisma.request.findUnique({
+  const body = (await req.json().catch(() => null)) as { action?: string } | null;
+  const action = body?.action;
+
+  const load = await prisma.request.findUnique({
     where: { id: requestId },
-    include: { company: true, transporter: true },
+    select: { id: true, status: true, companyId: true, transporterId: true },
   });
+  if (!load) return NextResponse.json({ error: "Carico non trovato" }, { status: 404 });
 
-  if (!requestRecord) {
-    return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
+  const isOwner = user.role === "COMPANY" && load.companyId === user.id;
+  const isAssigned = user.role === "TRANSPORTER" && load.transporterId === user.id;
+
+  if (action === "deliver") {
+    if (!isOwner && !isAssigned) return NextResponse.json({ error: "Non autorizzato" }, { status: 403 });
+    if (load.status !== REQUEST_STATUS.CONFIRMED) {
+      return NextResponse.json({ error: "Il carico non è ancora confermato da entrambi." }, { status: 409 });
+    }
+    await prisma.request.update({
+      where: { id: requestId },
+      data: { status: REQUEST_STATUS.DELIVERED, deliveredAt: new Date() },
+    });
+    return NextResponse.json({ ok: true });
   }
 
-  const canAccess =
-    user.role === "ADMIN" ||
-    (user.role === "COMPANY" && requestRecord.companyId === user.id) ||
-    (user.role === "TRANSPORTER" &&
-      (requestRecord.transporterId === null || requestRecord.transporterId === user.id));
-
-  if (!canAccess) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 403 });
+  if (action === "cancel") {
+    if (!isOwner) return NextResponse.json({ error: "Non autorizzato" }, { status: 403 });
+    if (load.status !== REQUEST_STATUS.OPEN) {
+      return NextResponse.json(
+        { error: "Puoi annullare solo un carico ancora aperto (senza trasportatore scelto)." },
+        { status: 409 },
+      );
+    }
+    const pending = await prisma.application.findMany({
+      where: { requestId, status: APPLICATION_STATUS.PENDING },
+      select: { transporter: { select: { email: true, firstName: true, companyName: true } } },
+    });
+    const cancelled = await prisma.$transaction(async (tx) => {
+      const r = await tx.request.updateMany({
+        where: { id: requestId, status: REQUEST_STATUS.OPEN },
+        data: { status: REQUEST_STATUS.CANCELLED, cancelledAt: new Date() },
+      });
+      if (r.count === 0) return false;
+      await tx.application.updateMany({
+        where: { requestId, status: APPLICATION_STATUS.PENDING },
+        data: { status: APPLICATION_STATUS.REJECTED },
+      });
+      return true;
+    });
+    if (!cancelled) {
+      return NextResponse.json({ error: "Il carico è appena cambiato di stato: ricarica la pagina." }, { status: 409 });
+    }
+    const info = await prisma.request.findUnique({ where: { id: requestId }, select: { id: true, pickup: true, delivery: true } });
+    if (info) await Promise.all(pending.map((p) => notifyCancelled(p.transporter, info)));
+    return NextResponse.json({ ok: true });
   }
 
-  const unlockState = await getUnlockState(requestId, user.id, user.role as Role);
-  const showContacts = unlockState.bothUnlocked && unlockState.unlockedByMe;
-
-  const counterpartEmail =
-    user.role === "TRANSPORTER"
-      ? requestRecord.company.email
-      : user.role === "COMPANY"
-        ? requestRecord.transporter?.email ?? null
-        : requestRecord.company.email;
-  const counterpartPhone =
-    user.role === "TRANSPORTER"
-      ? requestRecord.company.phone ?? null
-      : user.role === "COMPANY"
-        ? requestRecord.transporter?.phone ?? null
-        : requestRecord.company.phone ?? null;
-
-  return NextResponse.json({
-    id: requestRecord.id,
-    pickup: requestRecord.pickup,
-    delivery: requestRecord.delivery,
-    cargo: requestRecord.cargo,
-    description: requestRecord.description,
-    price: requestRecord.price,
-    companyId: requestRecord.companyId,
-    transporterId: requestRecord.transporterId,
-    createdAt: requestRecord.createdAt,
-    unlockedForCurrentUser: unlockState.unlockedByMe,
-    unlockedByOtherParty: unlockState.unlockedByOther,
-    bothPartiesUnlocked: unlockState.bothUnlocked,
-    contactEmail: showContacts ? counterpartEmail : null,
-    contactPhone: showContacts ? counterpartPhone : null,
-  });
-}
-
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  const user = await getSessionUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
-
-  const existing = await prisma.request.findUnique({
-    where: { id: Number(params.id) },
-    select: { id: true, companyId: true },
-  });
-
-  if (!existing) {
-    return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
-  }
-
-  if (user.role === "ADMIN") {
-    return NextResponse.json({ error: "Gli admin possono solo consultare le richieste" }, { status: 403 });
-  }
-
-  if (user.role !== "COMPANY" || existing.companyId !== user.id) {
-    return NextResponse.json({ error: "Non autorizzato a modificare questa richiesta" }, { status: 403 });
-  }
-
-  const data: RequestPayload = await request.json();
-  const priceCents = data.priceCents ?? parsePriceToCents(data.price ?? data.budget);
-  const pickup = data.pickup?.trim();
-  const delivery = data.delivery?.trim();
-  const cargo = data.cargo?.trim() || null;
-  const description = data.description?.trim() || null;
-
-  if (!priceCents || priceCents <= 0) {
-    return NextResponse.json({ error: "Importo non valido o mancante." }, { status: 400 });
-  }
-
-  if (!pickup || !delivery) {
-    return NextResponse.json({ error: "Ritiro e consegna obbligatori." }, { status: 400 });
-  }
-
-  const updated = await prisma.request.update({
-    where: { id: existing.id },
-    data: {
-      pickup,
-      delivery,
-      cargo,
-      description,
-      price: priceCents,
-    },
-  });
-
-  return NextResponse.json(updated);
-}
-
-export async function DELETE(_: Request, { params }: { params: { id: string } }) {
-  const user = await getSessionUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  }
-
-  const existing = await prisma.request.findUnique({
-    where: { id: Number(params.id) },
-    select: { id: true, companyId: true },
-  });
-
-  if (!existing) {
-    return NextResponse.json({ error: "Richiesta non trovata" }, { status: 404 });
-  }
-
-  if (user.role === "ADMIN") {
-    return NextResponse.json({ error: "Gli admin possono solo consultare le richieste" }, { status: 403 });
-  }
-
-  if (user.role !== "COMPANY" || existing.companyId !== user.id) {
-    return NextResponse.json({ error: "Non autorizzato a eliminare questa richiesta" }, { status: 403 });
-  }
-
-  await prisma.request.delete({ where: { id: existing.id } });
-
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ error: "Azione non valida" }, { status: 400 });
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
+import { applyLoadCheckout } from "@/lib/load-flow";
 import { prisma } from "@/lib/prisma";
 
 const stripeSecret = process.env.STRIPE_SECRET_KEY;
@@ -39,10 +40,6 @@ export async function POST(req: NextRequest) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const requestId = session.metadata?.requestId;
-    const role = session.metadata?.role;
-    const userId = session.metadata?.userId;
-
     if (session.payment_status !== "paid") {
       return NextResponse.json({ received: true });
     }
@@ -57,105 +54,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
-    const parsedRequestId = Number(requestId);
-    const parsedUserId = Number(userId);
-    if (!Number.isFinite(parsedRequestId) || !role || !Number.isFinite(parsedUserId)) {
-      return NextResponse.json({ received: true });
+    const result = await applyLoadCheckout(session);
+    if (!result.ok) {
+      console.error("[WEBHOOK] pagamento carico non applicato", { sessionId: session.id, reason: result.reason });
+      // Un rimborso dovuto ma non riuscito: rispondere con errore fa
+      // ritentare il webhook a Stripe (il rimborso e' idempotente).
+      if (result.refunded === false) {
+        return NextResponse.json({ error: "rimborso in sospeso" }, { status: 500 });
+      }
     }
-
-    const normalizedRole = role.toUpperCase();
-    if (normalizedRole !== "COMPANY" && normalizedRole !== "TRANSPORTER") {
-      return NextResponse.json({ received: true });
-    }
-
-    const request = await prisma.request.findUnique({
-      where: { id: parsedRequestId },
-      select: {
-        unlockedByCompany: true,
-        unlockedByTransporter: true,
-        transporterId: true,
-      },
-    });
-
-    if (!request) {
-      return NextResponse.json({ received: true });
-    }
-
-    const stripeSessionId = session.id;
-    const stripePaymentIntentId =
-      typeof session.payment_intent === "string"
-        ? session.payment_intent
-        : session.payment_intent?.id ?? null;
-    const amountCents = session.amount_total ?? null;
-
-    // Guardia sblocco: senza un importo effettivamente incassato non si
-    // segnano i contatti come pagati.
-    if (amountCents === null || amountCents <= 0) {
-      console.error("[WEBHOOK] importo sblocco non valido", {
-        sessionId: session.id,
-        amountCents,
-      });
-      return NextResponse.json({ received: true });
-    }
-
-    await prisma.requestUnlock.upsert({
-      where: {
-        requestId_userId: {
-          requestId: parsedRequestId,
-          userId: parsedUserId,
-        },
-      },
-      create: {
-        requestId: parsedRequestId,
-        userId: parsedUserId,
-        userRole: normalizedRole,
-        amountCents,
-        stripeSessionId,
-        stripePaymentIntentId,
-      },
-      update: {
-        userRole: normalizedRole,
-        amountCents,
-        stripeSessionId,
-        stripePaymentIntentId,
-        paidAt: new Date(),
-      },
-    });
-
-    const nextCompanyUnlocked =
-      request.unlockedByCompany || normalizedRole === "COMPANY";
-    const nextTransporterUnlocked =
-      request.unlockedByTransporter || normalizedRole === "TRANSPORTER";
-    const nextContactsUnlocked = nextCompanyUnlocked && nextTransporterUnlocked;
-
-    const nextStatus =
-      nextCompanyUnlocked && nextTransporterUnlocked
-        ? "COMPLETED"
-        : nextTransporterUnlocked
-          ? "TRANSPORTER_PAID"
-          : nextCompanyUnlocked
-            ? "COMPANY_PAID"
-            : "OPEN";
-
-    // Legacy global flags kept in sync for backward-compat during migration.
-    const updateData: Record<string, unknown> = {
-      unlockedByCompany: nextCompanyUnlocked,
-      unlockedByTransporter: nextTransporterUnlocked,
-      contactsUnlocked: nextContactsUnlocked,
-      status: nextStatus,
-    };
-
-    if (normalizedRole === "TRANSPORTER" && !request.transporterId) {
-      updateData.transporterId = parsedUserId;
-      updateData.acceptedAt = new Date();
-    }
-
-    await prisma.request.update({
-      where: { id: parsedRequestId },
-      data: updateData,
-    });
-
-    console.log("[WEBHOOK] stato pagamento aggiornato", { requestId: parsedRequestId, role: normalizedRole, userId: parsedUserId });
   }
 
   return NextResponse.json({ received: true });

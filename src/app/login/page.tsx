@@ -7,7 +7,7 @@ import { useState, useTransition } from "react";
 
 const highlights = [
   "Avviso WhatsApp appena esce un carico",
-  "Iscrizione gratuita, nessun abbonamento: il 2% solo a contatto sbloccato",
+  "Candidarsi è gratis: il 2% solo se l'azienda ti sceglie e confermi",
   "Contatto diretto con chi spedisce, senza intermediari",
   "Officine e fornitori per il mezzo nella Borsa Servizi",
 ];
@@ -40,7 +40,10 @@ export default function LoginPage() {
         }
 
         setResult("Accesso eseguito.");
-        router.replace(data?.redirectTo ?? "/dashboard");
+        // Dopo il login si torna alla pagina richiesta (es. link da WhatsApp/email).
+        const next = new URLSearchParams(window.location.search).get("next");
+        const safeNext = next && next.startsWith("/dashboard") && !next.startsWith("//") ? next : null;
+        router.replace(safeNext ?? data?.redirectTo ?? "/dashboard");
       } catch (err) {
         console.error("Errore durante il login", err);
         setError("Accesso non riuscito. Riprova tra qualche istante.");
