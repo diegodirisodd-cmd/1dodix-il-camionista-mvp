@@ -1,4 +1,4 @@
--- DA APPLICARE A MANO in produzione (Supabase jluadyrdvitmunfzfpjt) dopo la migration
+-- Applicata in produzione (Supabase jluadyrdvitmunfzfpjt) il 2026-10-08, dopo la migration Prisma 20261008160000_offerte_fornitori. Ad ogni nuova offerta chiama la Edge
 -- Prisma 20261008160000_offerte_fornitori. Ad ogni nuova offerta chiama la Edge
 -- Function whatsapp-offer-notify, che manda i WhatsApp ai trasportatori con consenso.
 create or replace function public.notify_offer_created()

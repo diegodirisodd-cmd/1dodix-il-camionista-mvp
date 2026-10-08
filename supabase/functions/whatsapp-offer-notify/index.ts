@@ -72,9 +72,10 @@ Deno.serve(async (req: Request) => {
   if (!WA_TOKEN) return json({ error: "WHATSAPP_TOKEN not configured" }, 500);
   if (!TEMPLATE_NAME) return json({ skipped: "WHATSAPP_OFFER_TEMPLATE non impostato: offerta lasciata in attesa" });
 
+  let offerId = 0;
   try {
     const payload = await req.json().catch(() => ({}));
-    const offerId = Number(payload?.offerId);
+    offerId = Number(payload?.offerId);
     // force: rilancio a mano di un'offerta rimasta "sending" (timeout); i destinatari già raggiunti non ricevono doppioni.
     const force = payload?.force === true;
     if (!Number.isInteger(offerId) || offerId <= 0) return json({ error: "payload non valido" }, 400);
@@ -153,12 +154,11 @@ Deno.serve(async (req: Request) => {
     return json({ offerId, sandboxOnly: SANDBOX_ONLY, sent, failed, skipped });
   } catch (e) {
     console.error("handler error:", e);
-    try {
-      const id = Number((await req.clone().json().catch(() => ({})))?.offerId);
-      if (Number.isInteger(id) && id > 0) {
-        await rest(`Offer?id=eq.${id}&waStatus=eq.sending`, { method: "PATCH", body: JSON.stringify({ waStatus: "pending" }) });
-      }
-    } catch { /* niente */ }
+    if (Number.isInteger(offerId) && offerId > 0) {
+      try {
+        await rest(`Offer?id=eq.${offerId}&waStatus=eq.sending`, { method: "PATCH", body: JSON.stringify({ waStatus: "pending" }) });
+      } catch { /* niente */ }
+    }
     return json({ error: String(e) }, 500);
   }
 });
