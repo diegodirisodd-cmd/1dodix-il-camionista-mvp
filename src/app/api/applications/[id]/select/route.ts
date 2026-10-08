@@ -3,7 +3,7 @@ import Stripe from "stripe";
 
 import { getSessionUser } from "@/lib/auth";
 import { calculateCommission } from "@/lib/commission";
-import { selectWithExistingPayment } from "@/lib/load-flow";
+import { selectWithExistingPayment, selectWithFreeUnlock } from "@/lib/load-flow";
 import { prisma } from "@/lib/prisma";
 import { APPLICATION_STATUS, REQUEST_STATUS, effectivePriceCents } from "@/lib/request-flow";
 
@@ -54,6 +54,13 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
       return ok
         ? NextResponse.json({ selected: true })
         : NextResponse.json({ error: "Non è stato possibile assegnare il carico." }, { status: 409 });
+    }
+
+    // Primo sblocco gratuito (per P.IVA): niente Stripe.
+    const free = await selectWithFreeUnlock(user.id, app.id);
+    if (free === "applied") return NextResponse.json({ selected: true, free: true });
+    if (free === "unavailable") {
+      return NextResponse.json({ error: "Non è stato possibile assegnare il carico. Riprova." }, { status: 409 });
     }
 
     if (!process.env.STRIPE_SECRET_KEY) {

@@ -3,6 +3,7 @@ import "server-only";
 import type Stripe from "stripe";
 import { Prisma } from "@prisma/client";
 
+import { claimFreeUnlock } from "./free-unlock";
 import { prisma } from "./prisma";
 import { APPLICATION_STATUS, REQUEST_STATUS, effectivePriceCents } from "./request-flow";
 import { notifyConfirmedToCompany, notifyNotSelected, notifyReleased, notifySelected } from "./load-notifications";
@@ -93,6 +94,32 @@ async function afterAssign(applicationId: number) {
   await notifySelected(app.transporter, app.request, app.request.agreedPrice ?? app.request.price);
 }
 
+/** Avvisi dopo la conferma del trasportatore (pagata o gratuita): contatti all'azienda, "non scelto" agli altri. */
+async function afterConfirm(requestId: number) {
+  const load = await prisma.request.findUnique({
+    where: { id: requestId },
+    select: {
+      id: true,
+      pickup: true,
+      delivery: true,
+      company: { select: personSelect },
+      transporter: { select: { ...personSelect, lastName: true, phone: true } },
+    },
+  });
+  const losers = await prisma.application.findMany({
+    where: { requestId, status: APPLICATION_STATUS.REJECTED },
+    include: { transporter: { select: personSelect } },
+  });
+  if (load) {
+    await Promise.all([
+      load.transporter
+        ? notifyConfirmedToCompany(load.company, load, displayName(load.transporter), load.transporter.phone, load.transporter.email)
+        : Promise.resolve(),
+      ...losers.map((a) => notifyNotSelected(a.transporter, load)),
+    ]);
+  }
+}
+
 /** Selezione senza pagamento: l'azienda ha gia' pagato la commissione per questo carico. */
 export async function selectWithExistingPayment(applicationId: number) {
   const ok = await prisma.$transaction((tx) => assignInTx(tx, applicationId));
@@ -171,6 +198,95 @@ async function refundOutcome(session: Stripe.Checkout.Session, internalReason: s
  */
 async function lockRequest(tx: Tx, requestId: number) {
   await tx.$queryRaw`SELECT "id" FROM "Request" WHERE "id" = ${requestId} FOR UPDATE`;
+}
+
+class FreeUnlockAborted extends Error {}
+
+/**
+ * Primo sblocco gratuito dell'azienda: sceglie il candidato senza passare da
+ * Stripe. "not_eligible": il gratuito e' gia' stato usato (si procede col
+ * pagamento). "unavailable": il candidato non e' piu' scegliibile; la
+ * transazione viene annullata e il gratuito non viene consumato.
+ */
+export async function selectWithFreeUnlock(
+  userId: number,
+  applicationId: number,
+): Promise<"applied" | "not_eligible" | "unavailable"> {
+  let result: "applied" | "not_eligible" | "unavailable";
+  try {
+    result = await prisma.$transaction(async (tx) => {
+      const app = await tx.application.findUnique({ where: { id: applicationId }, select: { requestId: true } });
+      if (!app) return "unavailable" as const;
+
+      const eligible = await claimFreeUnlock(tx, userId);
+      await lockRequest(tx, app.requestId);
+
+      const req = await tx.request.findUnique({ where: { id: app.requestId }, select: { companyId: true } });
+      if (!req || req.companyId !== userId) return "unavailable" as const;
+      const already = await tx.requestUnlock.findUnique({
+        where: { requestId_userId: { requestId: app.requestId, userId } },
+        select: { id: true },
+      });
+      if (already) return "unavailable" as const;
+      if (!eligible) return "not_eligible" as const;
+
+      await tx.requestUnlock.create({
+        data: { requestId: app.requestId, userId, userRole: "COMPANY", amountCents: 0 },
+      });
+      if (!(await assignInTx(tx, applicationId))) throw new FreeUnlockAborted();
+      return "applied" as const;
+    });
+  } catch (e) {
+    if (e instanceof FreeUnlockAborted) return "unavailable";
+    throw e;
+  }
+  if (result === "applied") await afterAssign(applicationId);
+  return result;
+}
+
+/**
+ * Primo sblocco gratuito del trasportatore scelto: conferma il carico e vede i
+ * contatti senza pagare. Esiti: "confirmed"; "not_eligible" (gratuito gia'
+ * usato: si procede col pagamento); "already" (aveva gia' confermato); "stale"
+ * (il carico non e' piu' assegnato a lui).
+ */
+export async function confirmWithFreeUnlock(
+  userId: number,
+  requestId: number,
+): Promise<"confirmed" | "not_eligible" | "already" | "stale"> {
+  const result = await prisma.$transaction(async (tx) => {
+    const eligible = await claimFreeUnlock(tx, userId);
+    await lockRequest(tx, requestId);
+
+    const existing = await tx.requestUnlock.findUnique({
+      where: { requestId_userId: { requestId, userId } },
+      select: { id: true },
+    });
+    if (existing) return "already" as const;
+    if (!eligible) return "not_eligible" as const;
+
+    const updated = await tx.request.updateMany({
+      where: { id: requestId, status: REQUEST_STATUS.ASSIGNED, transporterId: userId },
+      data: {
+        status: REQUEST_STATUS.CONFIRMED,
+        confirmedAt: new Date(),
+        contactsUnlocked: true,
+        unlockedByCompany: true,
+        unlockedByTransporter: true,
+      },
+    });
+    if (updated.count === 0) return "stale" as const;
+
+    await tx.requestUnlock.create({ data: { requestId, userId, userRole: "TRANSPORTER", amountCents: 0 } });
+    await tx.application.updateMany({
+      where: { requestId, status: APPLICATION_STATUS.PENDING },
+      data: { status: APPLICATION_STATUS.REJECTED },
+    });
+    return "confirmed" as const;
+  });
+
+  if (result === "confirmed") await afterConfirm(requestId);
+  return result;
 }
 
 export type CheckoutOutcome = { ok: boolean; applied: boolean; refunded?: boolean; reason?: string };
@@ -268,30 +384,7 @@ export async function applyLoadCheckout(session: Stripe.Checkout.Session): Promi
       );
     }
 
-    if (result === "confirmed") {
-      const load = await prisma.request.findUnique({
-        where: { id: requestId },
-        select: {
-          id: true,
-          pickup: true,
-          delivery: true,
-          company: { select: personSelect },
-          transporter: { select: { ...personSelect, lastName: true, phone: true } },
-        },
-      });
-      const losers = await prisma.application.findMany({
-        where: { requestId, status: APPLICATION_STATUS.REJECTED },
-        include: { transporter: { select: personSelect } },
-      });
-      if (load) {
-        await Promise.all([
-          load.transporter
-            ? notifyConfirmedToCompany(load.company, load, displayName(load.transporter), load.transporter.phone, load.transporter.email)
-            : Promise.resolve(),
-          ...losers.map((a) => notifyNotSelected(a.transporter, load)),
-        ]);
-      }
-    }
+    if (result === "confirmed") await afterConfirm(requestId);
     return { ok: true, applied: true };
   }
 

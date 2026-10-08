@@ -89,6 +89,10 @@ export type LoadDetailData = {
   } | null;
   iAmAssigned: boolean;
   myCommissionCents: number;
+  /** Il primo sblocco di questa partita IVA e' ancora gratuito. */
+  freeUnlock: boolean;
+  /** Il primo sblocco sarebbe gratis, ma serve la P.IVA verificata nel profilo. */
+  freeUnlockNeedsVat: boolean;
   reviewedByMe: number | null;
 };
 
@@ -325,6 +329,16 @@ function ApplyForm({ data, editing, onCancel }: { data: LoadDetailData; editing?
       {!editing && (
         <p className="text-xs text-neutral-500">
           Candidarsi è gratis. Paghi la commissione DodiX (2% + IVA) solo se l&apos;azienda sceglie te e tu confermi.
+          {data.freeUnlock && " Il tuo primo sblocco è gratis."}
+          {data.freeUnlockNeedsVat && (
+            <>
+              {" "}
+              <a href="/dashboard/profile" className="underline">
+                Verifica la P.IVA nel profilo
+              </a>
+              : il tuo primo sblocco è gratis.
+            </>
+          )}
         </p>
       )}
     </form>
@@ -364,10 +378,29 @@ function TransporterPanel({ data }: { data: LoadDetailData }) {
           <span className="badge-urgent w-fit">L&apos;azienda ha scelto te</span>
           <h2 className="text-xl">Conferma il carico e ricevi i contatti</h2>
           <p className="text-sm text-neutral-600">
-            Prezzo concordato <b className="stat-mono">{formatEuro(data.agreedPriceCents, { round: true })}</b>. L&apos;azienda ha
-            già pagato la sua parte: confermando paghi la commissione DodiX di{" "}
-            <b className="stat-mono">{formatEuro(data.myCommissionCents)}</b> (2% + IVA) e vedi subito telefono ed email.
+            Prezzo concordato <b className="stat-mono">{formatEuro(data.agreedPriceCents, { round: true })}</b>.{" "}
+            {data.freeUnlock ? (
+              <>
+                È il tuo primo sblocco: la commissione DodiX di{" "}
+                <b className="stat-mono">{formatEuro(data.myCommissionCents)}</b> (2% + IVA) per te è{" "}
+                <b>gratis</b>. Confermi e vedi subito telefono ed email.
+              </>
+            ) : (
+              <>
+                L&apos;azienda ha già fatto la sua parte: confermando paghi la commissione DodiX di{" "}
+                <b className="stat-mono">{formatEuro(data.myCommissionCents)}</b> (2% + IVA) e vedi subito telefono ed email.
+              </>
+            )}
           </p>
+          {data.freeUnlockNeedsVat && (
+            <p className="rounded-lg bg-warning/10 p-3 text-sm text-textStrong">
+              Il tuo primo sblocco sarebbe gratis, ma serve la P.IVA verificata.{" "}
+              <a href="/dashboard/profile" className="underline">
+                Verificala nel profilo
+              </a>{" "}
+              e poi torna qui a confermare.
+            </p>
+          )}
           {deadline && (
             <p className="text-xs text-neutral-500">
               Hai tempo fino a {deadline.toLocaleString("it-IT", { weekday: "short", hour: "2-digit", minute: "2-digit" })}, poi l&apos;azienda
@@ -375,7 +408,7 @@ function TransporterPanel({ data }: { data: LoadDetailData }) {
             </p>
           )}
           <ActionButton
-            label={`Conferma e paga ${formatEuro(data.myCommissionCents)}`}
+            label={data.freeUnlock ? "Conferma gratis" : `Conferma e paga ${formatEuro(data.myCommissionCents)}`}
             url="/api/stripe/unlock"
             body={{ requestId: data.id }}
             className="w-full"
@@ -545,17 +578,35 @@ function CandidateCard({ c, data, open }: { c: CandidateSummary; data: LoadDetai
         </p>
       )}
 
+      {canChoose && data.freeUnlockNeedsVat && (
+        <p className="rounded-lg bg-warning/10 p-3 text-sm text-textStrong">
+          Il tuo primo sblocco è gratis se la P.IVA è verificata.{" "}
+          <a href="/dashboard/profile" className="underline">
+            Verificala nel profilo
+          </a>{" "}
+          prima di scegliere.
+        </p>
+      )}
+
       <div className="flex flex-wrap gap-2">
         {canChoose && (
           <ActionButton
-            label={data.companyPaid ? "Scegli questo trasportatore" : `Scegli · paghi ${formatEuro(c.commissionCents)}`}
+            label={
+              data.companyPaid
+                ? "Scegli questo trasportatore"
+                : data.freeUnlock
+                  ? "Scegli · primo sblocco gratis"
+                  : `Scegli · paghi ${formatEuro(c.commissionCents)}`
+            }
             url={`/api/applications/${c.applicationId}/select`}
             confirm={
               data.companyPaid
                 ? `Assegni il carico a ${c.name}? Hai già pagato la commissione per questo carico.`
-                : `Assegni il carico a ${c.name} a ${formatEuro(c.priceCents, { round: true })}. Paghi ora la commissione DodiX di ${formatEuro(c.commissionCents)} (2% + IVA); il trasportatore conferma pagando la sua parte e vi scambiate i contatti.`
+                : data.freeUnlock
+                  ? `Assegni il carico a ${c.name} a ${formatEuro(c.priceCents, { round: true })}. È il tuo primo sblocco: la commissione DodiX di ${formatEuro(c.commissionCents)} (2% + IVA) per te è gratis. Il trasportatore conferma la sua parte e vi scambiate i contatti.`
+                  : `Assegni il carico a ${c.name} a ${formatEuro(c.priceCents, { round: true })}. Paghi ora la commissione DodiX di ${formatEuro(c.commissionCents)} (2% + IVA); il trasportatore conferma pagando la sua parte e vi scambiate i contatti.`
             }
-            confirmLabel={data.companyPaid ? "Assegna" : "Vai al pagamento"}
+            confirmLabel={data.companyPaid || data.freeUnlock ? "Assegna" : "Vai al pagamento"}
           />
         )}
         {releasable && (
