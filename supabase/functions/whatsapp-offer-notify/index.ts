@@ -75,6 +75,8 @@ Deno.serve(async (req: Request) => {
   try {
     const payload = await req.json().catch(() => ({}));
     const offerId = Number(payload?.offerId);
+    // force: rilancio a mano di un'offerta rimasta "sending" (timeout); i destinatari già raggiunti non ricevono doppioni.
+    const force = payload?.force === true;
     if (!Number.isInteger(offerId) || offerId <= 0) return json({ error: "payload non valido" }, 400);
 
     const offer = (await rest<Offer>(`Offer?id=eq.${offerId}&select=id,title,body,linkUrl,createdAt`)).data[0];
@@ -83,15 +85,30 @@ Deno.serve(async (req: Request) => {
     if (!Number.isFinite(createdMs) || Date.now() - createdMs > MAX_AGE_MS) return json({ skipped: "offerta non recente" });
 
     // Prenota l'invio: solo chi trova la riga ancora "pending" prosegue.
-    const claim = await rest<{ id: number }>(`Offer?id=eq.${offerId}&waStatus=eq.pending&select=id`, {
+    const claimFilter = force ? "waStatus=in.(pending,sending)" : "waStatus=eq.pending";
+    const claim = await rest<{ id: number }>(`Offer?id=eq.${offerId}&${claimFilter}&select=id`, {
       method: "PATCH", headers: { Prefer: "return=representation" }, body: JSON.stringify({ waStatus: "sending" }),
     });
     if (!claim.ok) return json({ error: "impossibile prenotare l'invio" }, 500);
     if (claim.data.length === 0) return json({ skipped: "offerta già inviata o in corso" });
 
-    const carriers = (await rest<Carrier>(
-      `User?role=eq.TRANSPORTER&whatsappOptIn=eq.true&phone=not.is.null&select=id,phone&order=id.asc&limit=1000`,
-    )).data;
+    // Se qualcosa va storto prima di finire, l'offerta torna "pending" e si può rilanciare.
+    const release = () => rest(`Offer?id=eq.${offerId}&waStatus=eq.sending`, { method: "PATCH", body: JSON.stringify({ waStatus: "pending" }) });
+
+    // Tutti i destinatari, a pagine di 1000 (keyset su id). Un errore non vale "zero destinatari".
+    const carriers: Carrier[] = [];
+    for (let lastId = 0; ;) {
+      const page = await rest<Carrier>(
+        `User?role=eq.TRANSPORTER&whatsappOptIn=eq.true&phone=not.is.null&id=gt.${lastId}&select=id,phone&order=id.asc&limit=1000`,
+      );
+      if (!page.ok) {
+        await release();
+        return json({ error: "lettura destinatari fallita, offerta lasciata in attesa" }, 500);
+      }
+      carriers.push(...page.data);
+      if (page.data.length < 1000) break;
+      lastId = page.data[page.data.length - 1].id;
+    }
 
     const text = clean(offer.body, 700) + (offer.linkUrl ? ` ${offer.linkUrl}` : "");
     const params = [clean(offer.title, 100), text.substring(0, 900)];
@@ -136,6 +153,12 @@ Deno.serve(async (req: Request) => {
     return json({ offerId, sandboxOnly: SANDBOX_ONLY, sent, failed, skipped });
   } catch (e) {
     console.error("handler error:", e);
+    try {
+      const id = Number((await req.clone().json().catch(() => ({})))?.offerId);
+      if (Number.isInteger(id) && id > 0) {
+        await rest(`Offer?id=eq.${id}&waStatus=eq.sending`, { method: "PATCH", body: JSON.stringify({ waStatus: "pending" }) });
+      }
+    } catch { /* niente */ }
     return json({ error: String(e) }, 500);
   }
 });

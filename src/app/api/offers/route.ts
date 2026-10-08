@@ -34,16 +34,18 @@ export async function POST(req: Request) {
     }
     if (link === "invalid") return NextResponse.json({ error: "Link non valido." }, { status: 400 });
 
-    const last = await prisma.offer.findFirst({ orderBy: { createdAt: "desc" }, select: { createdAt: true } });
-    if (last && Date.now() - last.createdAt.getTime() < OFFER_COOLDOWN_MS) {
+    // Controllo e inserimento nella stessa transazione, serializzati da un lock:
+    // due invii simultanei non passano entrambi il limite.
+    const offer = await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('offer:send'))`;
+      const last = await tx.offer.findFirst({ orderBy: { createdAt: "desc" }, select: { createdAt: true } });
+      if (last && Date.now() - last.createdAt.getTime() < OFFER_COOLDOWN_MS) return null;
+      // L'inserimento fa partire il trigger che manda i WhatsApp.
+      return tx.offer.create({ data: { senderId: user.id, title, body, linkUrl: link }, select: { id: true } });
+    });
+    if (!offer) {
       return NextResponse.json({ error: "Hai appena inviato un'offerta. Riprova tra qualche minuto." }, { status: 429 });
     }
-
-    // L'inserimento fa partire il trigger che manda i WhatsApp.
-    const offer = await prisma.offer.create({
-      data: { senderId: user.id, title, body, linkUrl: link },
-      select: { id: true },
-    });
     return NextResponse.json({ sent: true, id: offer.id });
   } catch (error) {
     console.error("[offers]", error);

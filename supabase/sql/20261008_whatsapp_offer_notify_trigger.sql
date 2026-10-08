@@ -31,3 +31,8 @@ alter table public."Offer" enable row level security;
 alter table public."OfferDelivery" enable row level security;
 revoke all on public."Offer" from anon, authenticated;
 revoke all on public."OfferDelivery" from anon, authenticated;
+
+-- La service_role (Edge Function via REST) non ha accesso alle tabelle create da Prisma.
+grant select, update on public."Offer" to service_role;
+grant select, insert, update on public."OfferDelivery" to service_role;
+grant usage, select on sequence public."OfferDelivery_id_seq" to service_role;
