@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { LoadDetail, type LoadDetailData, type CandidateSummary } from "@/components/loads/load-detail";
 import { getSessionUser } from "@/lib/auth";
 import { calculateCommission } from "@/lib/commission";
+import { freeUnlockAvailable } from "@/lib/free-unlock";
 import { displayName } from "@/lib/load-flow";
 import { routeForUser } from "@/lib/navigation";
 import { prisma } from "@/lib/prisma";
@@ -117,6 +118,10 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
         }),
       )
     : false;
+
+  // Primo sblocco gratuito: lo mostriamo solo a chi puo' usarlo su questa pagina.
+  const freeUnlock =
+    (isOwner && !companyPaid) || user.role === "TRANSPORTER" ? await freeUnlockAvailable(user.id) : false;
 
   let candidates: CandidateSummary[] = [];
   if (isOwner || user.role === "ADMIN") {
@@ -254,6 +259,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
       : null,
     iAmAssigned,
     myCommissionCents: calculateCommission(load.agreedPrice ?? load.price).total,
+    freeUnlock,
     reviewedByMe: reviewByMe?.rating ?? null,
   };
 

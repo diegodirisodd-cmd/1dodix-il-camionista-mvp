@@ -4,6 +4,7 @@ import Stripe from "stripe";
 
 import { getSessionUser } from "@/lib/auth";
 import { calculateCommission } from "@/lib/commission";
+import { confirmWithFreeUnlock } from "@/lib/load-flow";
 import { prisma } from "@/lib/prisma";
 import { REQUEST_STATUS } from "@/lib/request-flow";
 
@@ -66,6 +67,12 @@ export async function POST(req: Request) {
     if (already) {
       return NextResponse.json({ error: "Hai già confermato questo carico." }, { status: 409 });
     }
+
+    // Primo sblocco gratuito (per P.IVA): conferma senza passare da Stripe.
+    const free = await confirmWithFreeUnlock(user.id, requestId);
+    if (free === "confirmed") return NextResponse.json({ confirmed: true, free: true });
+    if (free === "already") return NextResponse.json({ error: "Hai già confermato questo carico." }, { status: 409 });
+    if (free === "stale") return NextResponse.json({ error: "Questo carico non è assegnato a te." }, { status: 409 });
 
     const { total } = calculateCommission(request.agreedPrice ?? request.price);
 
