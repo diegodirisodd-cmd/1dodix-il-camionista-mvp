@@ -20,11 +20,6 @@ const baseUrl =
  */
 export async function POST(req: Request) {
   try {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      console.error("STRIPE_SECRET_KEY mancante");
-      return NextResponse.json({ error: "Pagamenti non configurati." }, { status: 500 });
-    }
-
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
@@ -73,6 +68,12 @@ export async function POST(req: Request) {
     if (free === "confirmed") return NextResponse.json({ confirmed: true, free: true });
     if (free === "already") return NextResponse.json({ error: "Hai già confermato questo carico." }, { status: 409 });
     if (free === "stale") return NextResponse.json({ error: "Questo carico non è assegnato a te." }, { status: 409 });
+
+    // Da qui in poi serve Stripe: la chiave si controlla solo per il pagamento.
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error("STRIPE_SECRET_KEY mancante");
+      return NextResponse.json({ error: "Pagamenti non configurati." }, { status: 500 });
+    }
 
     const { total } = calculateCommission(request.agreedPrice ?? request.price);
 
