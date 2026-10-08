@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { getSessionUser } from "@/lib/auth";
+import { canSendOffers } from "@/lib/offers";
 import { prisma } from "@/lib/prisma";
 import {
   SERVICE_CATEGORY_LABELS,
@@ -56,6 +57,16 @@ export default async function SupplierDashboardPage() {
 
   return (
     <section className="space-y-6">
+      {canSendOffers(user.email) && (
+        <Link href="/dashboard/supplier/offers" className="card card-hover flex flex-col gap-2 border-2 border-accent-500 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-semibold text-textStrong">Invia un&apos;offerta ai trasportatori</p>
+            <p className="text-sm text-neutral-600">Bacheca in piattaforma + WhatsApp a tutti.</p>
+          </div>
+          <span className="btn-primary min-h-[44px] shrink-0">Nuova offerta</span>
+        </Link>
+      )}
+
       <div className="card-contrast bg-road animate-fadeUp space-y-3">
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-300">Borsa Servizi</p>
         <h1 className="text-white">

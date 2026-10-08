@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS "Offer" (
+  "id" SERIAL PRIMARY KEY,
+  "senderId" INTEGER NOT NULL REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "title" TEXT NOT NULL,
+  "body" TEXT NOT NULL,
+  "linkUrl" TEXT,
+  "waStatus" TEXT NOT NULL DEFAULT 'pending',
+  "waSent" INTEGER NOT NULL DEFAULT 0,
+  "waFailed" INTEGER NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS "Offer_createdAt_idx" ON "Offer"("createdAt");
+
+CREATE TABLE IF NOT EXISTS "OfferDelivery" (
+  "id" SERIAL PRIMARY KEY,
+  "offerId" INTEGER NOT NULL REFERENCES "Offer"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "userId" INTEGER NOT NULL,
+  "status" TEXT NOT NULL,
+  "error" TEXT,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "OfferDelivery_offerId_userId_key" ON "OfferDelivery"("offerId","userId");
