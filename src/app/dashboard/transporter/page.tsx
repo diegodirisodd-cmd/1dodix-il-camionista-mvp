@@ -24,6 +24,12 @@ export default async function TransporterDashboardPage() {
   yesterday.setDate(yesterday.getDate() - 1);
   yesterday.setHours(0, 0, 0, 0);
 
+  const offers = await prisma.offer.findMany({
+    where: { createdAt: { gte: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) } },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+
   const [toConfirm, pending, confirmed, forYou] = await Promise.all([
     prisma.request.findMany({
       where: { transporterId: user.id, status: REQUEST_STATUS.ASSIGNED },
@@ -74,6 +80,20 @@ export default async function TransporterDashboardPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">Panoramica</p>
         <h1>{me?.firstName ? `Ciao ${me.firstName}` : "Ciao"}</h1>
       </div>
+
+      {offers.map((o) => (
+        <div key={o.id} className="card space-y-2 border-2 border-brand-200">
+          <span className="badge-urgent">Offerta Di Riso Teloni</span>
+          <p className="font-semibold text-textStrong">{o.title}</p>
+          <p className="whitespace-pre-line text-sm text-neutral-700">{o.body}</p>
+          <p className="text-xs text-neutral-500">{o.createdAt.toLocaleDateString("it-IT", { timeZone: "Europe/Rome" })}</p>
+          {o.linkUrl && (
+            <a href={o.linkUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary min-h-[44px] w-fit">
+              Apri l&apos;offerta
+            </a>
+          )}
+        </div>
+      ))}
 
       {toConfirm.map((r) => (
         <Link

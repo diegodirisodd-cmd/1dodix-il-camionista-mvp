@@ -58,6 +58,7 @@ model User {
 
   supplierProfile      SupplierProfile?
   serviceRequestsMade  ServiceRequest[]
+  offersSent           Offer[]
 }
 
 model Request {
@@ -291,4 +292,36 @@ model ServiceContactUnlock {
   supplier SupplierProfile @relation(fields: [supplierId], references: [id])
 
   @@unique([requestId, supplierId])
+}
+
+// Offerte che un account autorizzato (vedi OFFER_SENDER_EMAILS) manda a tutti i
+// trasportatori: bacheca in piattaforma + avviso WhatsApp a chi ha il consenso.
+model Offer {
+  id        Int      @id @default(autoincrement())
+  senderId  Int
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  linkUrl   String?
+  // pending -> sending -> done (compilato dalla Edge Function whatsapp-offer-notify)
+  waStatus  String   @default("pending")
+  waSent    Int      @default(0)
+  waFailed  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  deliveries OfferDelivery[]
+
+  @@index([createdAt])
+}
+
+model OfferDelivery {
+  id        Int      @id @default(autoincrement())
+  offerId   Int
+  offer     Offer    @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  userId    Int
+  status    String
+  error     String?
+  createdAt DateTime @default(now())
+
+  @@unique([offerId, userId])
 }
