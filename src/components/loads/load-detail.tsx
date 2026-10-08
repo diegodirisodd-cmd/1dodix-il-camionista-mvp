@@ -91,6 +91,8 @@ export type LoadDetailData = {
   myCommissionCents: number;
   /** Il primo sblocco di questa partita IVA e' ancora gratuito. */
   freeUnlock: boolean;
+  /** Il primo sblocco sarebbe gratis, ma serve la P.IVA verificata nel profilo. */
+  freeUnlockNeedsVat: boolean;
   reviewedByMe: number | null;
 };
 
@@ -328,6 +330,15 @@ function ApplyForm({ data, editing, onCancel }: { data: LoadDetailData; editing?
         <p className="text-xs text-neutral-500">
           Candidarsi è gratis. Paghi la commissione DodiX (2% + IVA) solo se l&apos;azienda sceglie te e tu confermi.
           {data.freeUnlock && " Il tuo primo sblocco è gratis."}
+          {data.freeUnlockNeedsVat && (
+            <>
+              {" "}
+              <a href="/dashboard/profile" className="underline">
+                Verifica la P.IVA nel profilo
+              </a>
+              : il tuo primo sblocco è gratis.
+            </>
+          )}
         </p>
       )}
     </form>
@@ -381,6 +392,15 @@ function TransporterPanel({ data }: { data: LoadDetailData }) {
               </>
             )}
           </p>
+          {data.freeUnlockNeedsVat && (
+            <p className="rounded-lg bg-warning/10 p-3 text-sm text-textStrong">
+              Il tuo primo sblocco sarebbe gratis, ma serve la P.IVA verificata.{" "}
+              <a href="/dashboard/profile" className="underline">
+                Verificala nel profilo
+              </a>{" "}
+              e poi torna qui a confermare.
+            </p>
+          )}
           {deadline && (
             <p className="text-xs text-neutral-500">
               Hai tempo fino a {deadline.toLocaleString("it-IT", { weekday: "short", hour: "2-digit", minute: "2-digit" })}, poi l&apos;azienda
@@ -555,6 +575,16 @@ function CandidateCard({ c, data, open }: { c: CandidateSummary; data: LoadDetai
         <p className="rounded-lg bg-warning/10 p-3 text-sm text-textStrong">
           Hai scelto questo trasportatore. Ora deve confermare pagando la sua parte: appena lo fa vedete entrambi i contatti.
           {c.selectedAt && !releasable && " Se non conferma entro 24 ore potrai scegliere un altro candidato senza pagare di nuovo."}
+        </p>
+      )}
+
+      {canChoose && data.freeUnlockNeedsVat && (
+        <p className="rounded-lg bg-warning/10 p-3 text-sm text-textStrong">
+          Il tuo primo sblocco è gratis se la P.IVA è verificata.{" "}
+          <a href="/dashboard/profile" className="underline">
+            Verificala nel profilo
+          </a>{" "}
+          prima di scegliere.
         </p>
       )}
 
