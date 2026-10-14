@@ -263,8 +263,8 @@ export function RequestForm({ onSuccessRedirect }: { onSuccessRedirect?: string 
               <input className="input-field" type="tel" value={form.pickupPhone} onChange={(e) => set("pickupPhone", e.target.value)} />
             </label>
             <label className="form-field">
-              <span className="label">Misure / volume</span>
-              <input className="input-field" value={form.volume} onChange={(e) => set("volume", e.target.value)} placeholder="Es. 13,6 m, 80 m³" />
+              <span className="label">Misure (cm) o volume (m³)</span>
+              <input className="input-field" value={form.volume} onChange={(e) => set("volume", e.target.value)} placeholder="Es. 120x80x150 oppure 80" />
             </label>
             <label className="form-field sm:col-span-2">
               <span className="label">Note e istruzioni</span>

@@ -14,6 +14,11 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 // Con qualsiasi altro template (default "nuovo_carico") il comportamento e'
 // identico a v36 (5 variabili). NON vengono mai inviati telefoni, nomi di
 // contatto e indirizzi precisi: restano dietro la conferma a pagamento.
+//
+// v39 (14 ott 2026): il campo "Misure / volume" e' testo libero. Solo un
+// numero nudo diventa "N m³"; misure tipo "120X80X150" escono come
+// "120x80x150 cm"; qualsiasi altro testo ("8 metri", "5 pallet 80x120 170h")
+// esce cosi' com'e', senza unita' aggiunte.
 
 const WA_TOKEN = Deno.env.get("WHATSAPP_TOKEN") ?? "";
 const PHONE_ID = Deno.env.get("WHATSAPP_PHONE_ID") ?? "1223790424131412";
@@ -186,12 +191,26 @@ function placeLabel(city: unknown, prov: unknown, region: unknown, fallback: unk
   return clean(fallback, 80);
 }
 
+const NUM = String.raw`\d+(?:[.,]\d+)?`;
+const DIMS_ONLY = new RegExp(String.raw`^${NUM}(?:\s*[x×]\s*${NUM}){1,2}\s*(cm|mm|m)?$`, "i");
+
+export function formatVolume(raw: unknown): string | null {
+  const s = String(raw ?? "").replace(/\s+/g, " ").trim();
+  if (!s) return null;
+  if (new RegExp(`^${NUM}$`).test(s)) return `${s} m³`;
+  // "120X80X150" -> "120x80x150", anche dentro un testo piu' lungo.
+  const v = s.replace(/(\d)\s*[x×]\s*(?=\d)/gi, "$1x");
+  const dims = v.match(DIMS_ONLY);
+  if (dims) return dims[1] ? v.replace(/\s*(cm|mm|m)$/i, ` ${dims[1].toLowerCase()}`) : `${v} cm`;
+  return v;
+}
+
 // deno-lint-ignore no-explicit-any
 function buildLoadParamsV2(record: any): string[] {
   const cargo = CARGO_LABELS[record.cargoType] ?? record.cargo ?? "Merce varia";
   const pallets = record.palletCount ? `${record.palletCount} pallet` : null;
   const weight = record.weight ? `${Math.round(Number(record.weight)).toLocaleString("it-IT")} kg` : null;
-  const volume = record.volume ? `${record.volume} m³` : null;
+  const volume = formatVolume(record.volume);
   const adr = record.isAdr ? "ADR" : null;
 
   const km = Number(record.distanceKm);
@@ -242,7 +261,7 @@ Deno.serve(async (req: Request) => {
             "Brescia (BS), Lombardia",
             "Angri (SA), Campania",
             "812 km (1,54 €/km)",
-            "Pallet · 33 pallet · 24.000 kg · 80 m³",
+            `Pallet · 33 pallet · 24.000 kg · ${formatVolume("120X80X150")}`,
             "Bilico",
             "15/05/2026",
             "17/05/2026",
