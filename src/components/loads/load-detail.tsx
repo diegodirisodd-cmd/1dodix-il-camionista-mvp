@@ -161,7 +161,7 @@ export function LoadDetail({ data }: { data: LoadDetailData }) {
               <Info label="Tipo merce" value={data.cargoType ? CARGO_LABELS[data.cargoType] ?? data.cargoType : null} />
               <Info label="Peso" value={data.weight ? `${data.weight.toLocaleString("it-IT")} kg` : null} mono />
               <Info label="Pallet / colli" value={data.palletCount ? String(data.palletCount) : null} mono />
-              <Info label="Volume / misure" value={data.volume} />
+              <Info label="Misure / volume" value={data.volume} />
               <Info label="Pagamento" value={data.paymentTerms ? PAYMENT_LABELS[data.paymentTerms] ?? data.paymentTerms : null} />
             </div>
             {data.cargo && data.cargo !== data.cargoType && <Info label="Note carico" value={data.cargo} />}
