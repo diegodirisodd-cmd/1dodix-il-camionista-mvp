@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { formatVolume } from "./format-volume.ts";
 
 // Avviso "nuovo carico" ai trasportatori, chiamato dal trigger
 // on_new_request_notify all'inserimento in Request.
@@ -19,6 +20,9 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 // numero nudo diventa "N m³"; misure tipo "120X80X150" escono come
 // "120x80x150 cm"; qualsiasi altro testo ("8 metri", "5 pallet 80x120 170h")
 // esce cosi' com'e', senza unita' aggiunte.
+//
+// v40 (14 ott 2026): " cm" solo se le misure sono tutte intere; misure miste
+// come "120X80X1.40" escono senza unita'. Logica in format-volume.ts.
 
 const WA_TOKEN = Deno.env.get("WHATSAPP_TOKEN") ?? "";
 const PHONE_ID = Deno.env.get("WHATSAPP_PHONE_ID") ?? "1223790424131412";
@@ -189,20 +193,6 @@ function placeLabel(city: unknown, prov: unknown, region: unknown, fallback: unk
     return clean(`${c}${p ? ` (${p})` : ""}${r ? `, ${r}` : ""}`, 80);
   }
   return clean(fallback, 80);
-}
-
-const NUM = String.raw`\d+(?:[.,]\d+)?`;
-const DIMS_ONLY = new RegExp(String.raw`^${NUM}(?:\s*[x×]\s*${NUM}){1,2}\s*(cm|mm|m)?$`, "i");
-
-export function formatVolume(raw: unknown): string | null {
-  const s = String(raw ?? "").replace(/\s+/g, " ").trim();
-  if (!s) return null;
-  if (new RegExp(`^${NUM}$`).test(s)) return `${s} m³`;
-  // "120X80X150" -> "120x80x150", anche dentro un testo piu' lungo.
-  const v = s.replace(/(\d)\s*[x×]\s*(?=\d)/gi, "$1x");
-  const dims = v.match(DIMS_ONLY);
-  if (dims) return dims[1] ? v.replace(/\s*(cm|mm|m)$/i, ` ${dims[1].toLowerCase()}`) : `${v} cm`;
-  return v;
 }
 
 // deno-lint-ignore no-explicit-any

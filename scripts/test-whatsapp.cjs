@@ -15,7 +15,16 @@ try {
   if (compile.error) throw compile.error;
   code = compile.status ?? 1;
   if (code === 0) {
-    const test = spawnSync(process.execPath, ["--test", "tests/whatsapp-webhook.test.cjs"], {
+    const compileNotify = spawnSync(process.execPath, [
+      require.resolve("typescript/bin/tsc"), "supabase/functions/whatsapp-notify/format-volume.ts",
+      "--outDir", output, "--module", "commonjs", "--target", "ES2020",
+      "--lib", "ES2020", "--strict", "--skipLibCheck", "--types", "node",
+    ], { cwd: root, stdio: "inherit" });
+    if (compileNotify.error) throw compileNotify.error;
+    code = compileNotify.status ?? 1;
+  }
+  if (code === 0) {
+    const test = spawnSync(process.execPath, ["--test", "tests/whatsapp-webhook.test.cjs", "tests/whatsapp-notify-format.test.cjs"], {
       cwd: root, stdio: "inherit",
       env: { ...process.env, WHATSAPP_TEST_BUILD: output },
     });
