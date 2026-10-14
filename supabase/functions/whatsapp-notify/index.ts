@@ -7,12 +7,20 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 // mezzi nel profilo riceve solo i carichi che partono o arrivano in una delle
 // sue regioni e compatibili con i suoi mezzi. Chi non ha ancora compilato il
 // profilo continua a ricevere tutto, come prima.
+//
+// v37 (8 ott 2026): messaggio completo. Se WHATSAPP_TEMPLATE e' "nuovo_carico_v2*"
+// vengono inviate 10 variabili con tutte le info del carico (numero, partenza,
+// arrivo, km e euro/km, merce, mezzo, date, prezzo, pagamento e note).
+// Con qualsiasi altro template (default "nuovo_carico") il comportamento e'
+// identico a v36 (5 variabili). NON vengono mai inviati telefoni, nomi di
+// contatto e indirizzi precisi: restano dietro la conferma a pagamento.
 
 const WA_TOKEN = Deno.env.get("WHATSAPP_TOKEN") ?? "";
 const PHONE_ID = Deno.env.get("WHATSAPP_PHONE_ID") ?? "1223790424131412";
 const TEMPLATE_NAME = Deno.env.get("WHATSAPP_TEMPLATE") ?? "nuovo_carico";
 const CONFIGURED_LANG = Deno.env.get("WHATSAPP_TEMPLATE_LANG") ?? "it";
 const TEMPLATE_LANG = TEMPLATE_NAME === "hello_world" ? "en_US" : CONFIGURED_LANG;
+const USE_V2 = TEMPLATE_NAME.startsWith("nuovo_carico_v2");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SB_SERVICE_ROLE_KEY") ?? "";
 const SANDBOX_ONLY = (Deno.env.get("SANDBOX_ONLY") ?? "true") === "true";
@@ -146,6 +154,7 @@ export function matches(t: Transporter, record: any): boolean {
   return true;
 }
 
+// --- Template v1 (5 variabili) ---
 // deno-lint-ignore no-explicit-any
 function buildLoadParams(record: any): string[] {
   const cargo = CARGO_LABELS[record.cargoType] ?? record.cargo ?? "Merce varia";
@@ -160,6 +169,64 @@ function buildLoadParams(record: any): string[] {
   ];
 }
 
+// --- Template v2 (10 variabili, messaggio completo) ---
+// Meta non accetta variabili vuote, a capo, tab o piu' di 4 spazi di fila.
+function clean(v: unknown, max: number, fallback = "Non indicato"): string {
+  const s = String(v ?? "").replace(/[\r\n\t]+/g, " ").replace(/ {2,}/g, " ").trim();
+  return (s || fallback).substring(0, max);
+}
+
+function placeLabel(city: unknown, prov: unknown, region: unknown, fallback: unknown): string {
+  const c = String(city ?? "").trim();
+  if (c) {
+    const p = String(prov ?? "").trim();
+    const r = String(region ?? "").trim();
+    return clean(`${c}${p ? ` (${p})` : ""}${r ? `, ${r}` : ""}`, 80);
+  }
+  return clean(fallback, 80);
+}
+
+// deno-lint-ignore no-explicit-any
+function buildLoadParamsV2(record: any): string[] {
+  const cargo = CARGO_LABELS[record.cargoType] ?? record.cargo ?? "Merce varia";
+  const pallets = record.palletCount ? `${record.palletCount} pallet` : null;
+  const weight = record.weight ? `${Math.round(Number(record.weight)).toLocaleString("it-IT")} kg` : null;
+  const volume = record.volume ? `${record.volume} m³` : null;
+  const adr = record.isAdr ? "ADR" : null;
+
+  const km = Number(record.distanceKm);
+  const price = Number(record.price);
+  let distance = "Non indicata";
+  if (km > 0) {
+    distance = `${Math.round(km).toLocaleString("it-IT")} km`;
+    if (price > 0) {
+      const perKm = new Intl.NumberFormat("it-IT", {
+        style: "currency",
+        currency: "EUR",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(price / 100 / km);
+      distance += ` (${perKm}/km)`;
+    }
+  }
+
+  const payment = clean(record.paymentTerms, 80);
+  const notes = String(record.description ?? "").replace(/[\r\n\t]+/g, " ").replace(/ {2,}/g, " ").trim();
+
+  return [
+    String(record.id ?? "-"),
+    placeLabel(record.pickupCity, record.pickupProvince, record.pickupRegion, record.pickup),
+    placeLabel(record.deliveryCity, record.deliveryProvince, record.deliveryRegion, record.delivery),
+    distance,
+    clean([cargo, pallets, weight, volume, adr].filter(Boolean).join(" · "), 120),
+    clean(VEHICLE_LABELS[record.vehicleType], 40),
+    formatDate(record.pickupDate),
+    formatDate(record.deliveryDate),
+    formatPrice(record.price),
+    clean(notes ? `${payment}. Note: ${notes}` : payment, 250),
+  ];
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
   if (!WA_TOKEN) return new Response(JSON.stringify({ error: "WHATSAPP_TOKEN not configured" }), { status: 500 });
@@ -169,7 +236,20 @@ Deno.serve(async (req: Request) => {
     const record = payload?.record;
 
     if (!record) {
-      const fakeParams = ["Brescia (BS)", "Angri (SA)", "Pallet · Bilico · 12.000 kg", "15/05/2026", "1.200 €"];
+      const fakeParams = USE_V2
+        ? [
+            "0",
+            "Brescia (BS), Lombardia",
+            "Angri (SA), Campania",
+            "812 km (1,54 €/km)",
+            "Pallet · 33 pallet · 24.000 kg · 80 m³",
+            "Bilico",
+            "15/05/2026",
+            "17/05/2026",
+            "1250 €",
+            "60 giorni FM. Note: messaggio di prova",
+          ]
+        : ["Brescia (BS)", "Angri (SA)", "Pallet · Bilico · 12.000 kg", "15/05/2026", "1.200 €"];
       const test = await sendWhatsApp(SANDBOX_TEST_NUMBER, fakeParams);
       await logNotification(null, null, SANDBOX_TEST_NUMBER, test.ok ? "sent" : "failed", test.data?.messages?.[0]?.id ?? null, test.ok ? null : JSON.stringify(test.data));
       return new Response(JSON.stringify({ mode: "ping", template: TEMPLATE_NAME, lang: TEMPLATE_LANG, result: test }), { status: 200 });
@@ -194,7 +274,7 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    const params = buildLoadParams(record);
+    const params = USE_V2 ? buildLoadParamsV2(record) : buildLoadParams(record);
     const results = [];
     for (const r of recipients) {
       const send = await sendWhatsApp(r.phone, params);
@@ -205,11 +285,12 @@ Deno.serve(async (req: Request) => {
       results.push({ phone: r.phone, status, messageId, error: errorMsg });
     }
 
-    console.log(`load ${record.id}: ${results.filter((x) => x.status === "sent").length} sent, ${skipped} fuori zona/mezzo`);
+    console.log(`load ${record.id}: ${results.filter((x) => x.status === "sent").length} sent, ${skipped} fuori zona/mezzo (template ${TEMPLATE_NAME})`);
     return new Response(
       JSON.stringify({
         requestId: record.id,
         sandboxOnly: SANDBOX_ONLY,
+        template: TEMPLATE_NAME,
         sent: results.filter((x) => x.status === "sent").length,
         failed: results.filter((x) => x.status === "failed").length,
         skippedNotMatching: skipped,
