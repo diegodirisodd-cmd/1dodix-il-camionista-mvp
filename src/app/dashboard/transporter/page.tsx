@@ -16,7 +16,7 @@ export default async function TransporterDashboardPage() {
 
   const me = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { firstName: true, vehicleTypes: true, serviceRegions: true, phone: true },
+    select: { firstName: true, vehicleTypes: true, serviceRegions: true, phone: true, province: true },
   });
   const hasProfile = Boolean(me && me.serviceRegions.length > 0);
 
@@ -25,7 +25,14 @@ export default async function TransporterDashboardPage() {
   yesterday.setHours(0, 0, 0, 0);
 
   const offers = await prisma.offer.findMany({
-    where: { createdAt: { gte: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) } },
+    where: {
+      createdAt: { gte: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) },
+      // Offerte per tutti, o per la provincia della sede del trasportatore.
+      OR: [
+        { targetProvinces: { isEmpty: true } },
+        ...(me?.province ? [{ targetProvinces: { has: me.province.trim().toUpperCase() } }] : []),
+      ],
+    },
     orderBy: { createdAt: "desc" },
     take: 3,
   });

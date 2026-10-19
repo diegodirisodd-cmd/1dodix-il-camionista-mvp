@@ -24,6 +24,30 @@ export const REGIONS = [
   "Veneto",
 ] as const;
 
+/** Sigle di provincia per regione: servono a mandare un'offerta solo a chi ha sede in una regione. */
+export const REGION_PROVINCES: Record<(typeof REGIONS)[number], readonly string[]> = {
+  Abruzzo: ["AQ", "CH", "PE", "TE"],
+  Basilicata: ["MT", "PZ"],
+  Calabria: ["CS", "CZ", "KR", "RC", "VV"],
+  Campania: ["AV", "BN", "CE", "NA", "SA"],
+  "Emilia-Romagna": ["BO", "FC", "FE", "MO", "PC", "PR", "RA", "RE", "RN"],
+  "Friuli-Venezia Giulia": ["GO", "PN", "TS", "UD"],
+  Lazio: ["FR", "LT", "RI", "RM", "VT"],
+  Liguria: ["GE", "IM", "SP", "SV"],
+  Lombardia: ["BG", "BS", "CO", "CR", "LC", "LO", "MB", "MI", "MN", "PV", "SO", "VA"],
+  Marche: ["AN", "AP", "FM", "MC", "PU"],
+  Molise: ["CB", "IS"],
+  Piemonte: ["AL", "AT", "BI", "CN", "NO", "TO", "VB", "VC"],
+  Puglia: ["BA", "BR", "BT", "FG", "LE", "TA"],
+  Sardegna: ["CA", "NU", "OR", "SS", "SU"],
+  Sicilia: ["AG", "CL", "CT", "EN", "ME", "PA", "RG", "SR", "TP"],
+  Toscana: ["AR", "FI", "GR", "LI", "LU", "MS", "PI", "PO", "PT", "SI"],
+  "Trentino-Alto Adige": ["BZ", "TN"],
+  Umbria: ["PG", "TR"],
+  "Valle d'Aosta": ["AO"],
+  Veneto: ["BL", "PD", "RO", "TV", "VE", "VI", "VR"],
+};
+
 /** I nomi ISTAT bilingui vengono ricondotti al nome italiano. */
 export function normalizeRegion(name: string | null | undefined): string | null {
   if (!name) return null;

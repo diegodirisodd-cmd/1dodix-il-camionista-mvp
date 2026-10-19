@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getSessionUser } from "@/lib/auth";
+import { REGION_PROVINCES, REGIONS } from "@/lib/catalog";
 import { OFFER_COOLDOWN_MS, OFFER_LIMITS, canSendOffers } from "@/lib/offers";
 import { prisma } from "@/lib/prisma";
 
@@ -15,7 +16,7 @@ function cleanLink(raw: unknown): string | null | "invalid" {
   }
 }
 
-/** Invia un'offerta a tutti i trasportatori: solo account autorizzati. */
+/** Invia un'offerta ai trasportatori (tutti o di una regione): solo account autorizzati. */
 export async function POST(req: Request) {
   try {
     const user = await getSessionUser();
@@ -24,7 +25,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Non puoi inviare offerte." }, { status: 403 });
     }
 
-    const b = (await req.json().catch(() => null)) as { title?: unknown; body?: unknown; linkUrl?: unknown } | null;
+    const b = (await req.json().catch(() => null)) as
+      | { title?: unknown; body?: unknown; linkUrl?: unknown; region?: unknown }
+      | null;
+    // Regione della sede dei destinatari: vuota = tutti i trasportatori.
+    const region = String(b?.region ?? "").trim();
+    if (region && !(REGIONS as readonly string[]).includes(region)) {
+      return NextResponse.json({ error: "Regione non valida." }, { status: 400 });
+    }
+    const targetProvinces = region ? [...REGION_PROVINCES[region as (typeof REGIONS)[number]]] : [];
     const title = String(b?.title ?? "").replace(/\s+/g, " ").trim();
     const body = String(b?.body ?? "").replace(/\r/g, "").trim();
     const link = cleanLink(b?.linkUrl);
@@ -41,7 +50,7 @@ export async function POST(req: Request) {
       const last = await tx.offer.findFirst({ orderBy: { createdAt: "desc" }, select: { createdAt: true } });
       if (last && Date.now() - last.createdAt.getTime() < OFFER_COOLDOWN_MS) return null;
       // L'inserimento fa partire il trigger che manda i WhatsApp.
-      return tx.offer.create({ data: { senderId: user.id, title, body, linkUrl: link }, select: { id: true } });
+      return tx.offer.create({ data: { senderId: user.id, title, body, linkUrl: link, targetProvinces }, select: { id: true } });
     });
     if (!offer) {
       return NextResponse.json({ error: "Hai appena inviato un'offerta. Riprova tra qualche minuto." }, { status: 429 });

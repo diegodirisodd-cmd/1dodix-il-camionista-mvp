@@ -3,10 +3,18 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-type Props = { recipients: number; whatsappRecipients: number; maxTitle: number; maxBody: number };
+type Props = {
+  audience: Record<string, { all: number; whatsapp: number }>;
+  regions: string[];
+  maxTitle: number;
+  maxBody: number;
+};
 
-export function OfferForm({ recipients, whatsappRecipients, maxTitle, maxBody }: Props) {
+export function OfferForm({ audience, regions, maxTitle, maxBody }: Props) {
   const router = useRouter();
+  const [region, setRegion] = useState("");
+  const recipients = audience[region]?.all ?? 0;
+  const whatsappRecipients = audience[region]?.whatsapp ?? 0;
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
@@ -24,7 +32,7 @@ export function OfferForm({ recipients, whatsappRecipients, maxTitle, maxBody }:
       const res = await fetch("/api/offers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, body, linkUrl }),
+        body: JSON.stringify({ title, body, linkUrl, region }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
@@ -55,6 +63,22 @@ export function OfferForm({ recipients, whatsappRecipients, maxTitle, maxBody }:
       }}
     >
       <div className="space-y-1">
+        <label className="text-sm font-semibold text-textStrong" htmlFor="offer-region">Destinatari</label>
+        <select
+          id="offer-region"
+          className="input min-h-[44px]"
+          value={region}
+          onChange={(e) => { setRegion(e.target.value); setDone(false); setConfirming(false); }}
+        >
+          <option value="">Tutti i trasportatori ({audience[""]?.all ?? 0})</option>
+          {regions.map((r) => (
+            <option key={r} value={r}>
+              Sede in {r} ({audience[r]?.all ?? 0})
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="space-y-1">
         <label className="text-sm font-semibold text-textStrong" htmlFor="offer-title">Titolo</label>
         <input id="offer-title" className="input" value={title} maxLength={maxTitle} onChange={(e) => { setTitle(e.target.value); setDone(false); setConfirming(false); }} placeholder="Es. Teloni nuovi -15% fino a venerdì" />
       </div>
@@ -72,8 +96,8 @@ export function OfferForm({ recipients, whatsappRecipients, maxTitle, maxBody }:
       {done && <p className="text-sm font-semibold text-green-700">Offerta inviata: è in bacheca e i WhatsApp stanno partendo.</p>}
 
       {!confirming ? (
-        <button type="submit" className="btn-primary min-h-[44px]" disabled={!ready}>
-          Invia a tutti i trasportatori
+        <button type="submit" className="btn-primary min-h-[44px]" disabled={!ready || recipients === 0}>
+          {region ? `Invia ai trasportatori con sede in ${region}` : "Invia a tutti i trasportatori"}
         </button>
       ) : (
         <div className="space-y-3 rounded-xl border-2 border-accent-500 p-4">
