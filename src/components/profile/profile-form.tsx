@@ -220,14 +220,19 @@ function VisuraUpload({ onVerified }: { onVerified: () => void }) {
     setError(null);
     const form = new FormData();
     form.append("file", file);
-    const res = await fetch("/api/profile/vat-document", { method: "POST", body: form });
-    const data = (await res.json().catch(() => ({}))) as { error?: string };
-    setUploading(false);
-    if (!res.ok) {
-      setError(data.error ?? "Caricamento non riuscito, riprova.");
-      return;
+    try {
+      const res = await fetch("/api/profile/vat-document", { method: "POST", body: form });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        setError(data.error ?? "Caricamento non riuscito, riprova.");
+        return;
+      }
+      onVerified();
+    } catch {
+      setError("Connessione persa durante il caricamento, riprova.");
+    } finally {
+      setUploading(false);
     }
-    onVerified();
   }
 
   return (

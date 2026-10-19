@@ -89,8 +89,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Caricamento non riuscito, riprova." }, { status: 500 });
   }
 
-  await prisma.user.update({
-    where: { id: user.id },
+  // La verifica vale solo per la P.IVA letta prima dell'upload: se nel frattempo
+  // il profilo e' stato salvato con un'altra P.IVA, la visura non vale per quella.
+  const { count } = await prisma.user.updateMany({
+    where: { id: user.id, vatNumber: me.vatNumber, vatVerified: false },
     data: {
       vatVerified: true,
       vatVerifiedAt: new Date(),
@@ -98,6 +100,17 @@ export async function POST(request: Request) {
       vatDocumentPath: path,
     },
   });
+
+  if (count === 0) {
+    await getSupabaseAdminClient()
+      .storage.from(VAT_DOCUMENT_BUCKET)
+      .remove([path])
+      .catch(() => undefined);
+    return NextResponse.json(
+      { error: "La partita IVA del profilo è cambiata durante il caricamento: ricarica la pagina e riprova." },
+      { status: 409 },
+    );
+  }
 
   return NextResponse.json({ vatVerified: true, vatVerifiedMethod: "VISURA" }, { status: 201 });
 }
