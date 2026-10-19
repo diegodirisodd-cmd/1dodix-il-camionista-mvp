@@ -4,7 +4,7 @@ import { getSessionUser } from "@/lib/auth";
 import { REGIONS, VEHICLE_TYPES } from "@/lib/catalog";
 import { prisma } from "@/lib/prisma";
 import { maskContacts } from "@/lib/request-flow";
-import { checkItalianVat, normalizeItalianPhone } from "@/lib/vies";
+import { checkItalianVat, isValidItalianVatFormat, normalizeItalianPhone } from "@/lib/vies";
 
 const TEXT_FIELDS = ["firstName", "lastName", "companyName", "address", "city", "province", "zipCode", "contactPerson"] as const;
 
@@ -18,6 +18,7 @@ const PROFILE_SELECT = {
   companyName: true,
   vatNumber: true,
   vatVerified: true,
+  vatVerifiedMethod: true,
   address: true,
   city: true,
   province: true,
@@ -78,23 +79,31 @@ export async function PUT(request: Request) {
   let vatMessage: string | null = null;
   if ("vatNumber" in body) {
     const vat = typeof body.vatNumber === "string" ? body.vatNumber.replace(/\s/g, "").toUpperCase() : "";
+    const unverified = { vatVerified: false, vatVerifiedAt: null, vatVerifiedMethod: null, vatDocumentPath: null };
     data.vatNumber = vat || null;
     if (!vat) {
-      data.vatVerified = false;
-      data.vatVerifiedAt = null;
+      Object.assign(data, unverified);
     } else if (vat !== current?.vatNumber || !current?.vatVerified) {
+      if (!isValidItalianVatFormat(vat)) {
+        return NextResponse.json({ error: "Partita IVA non valida: controlla le 11 cifre." }, { status: 400 });
+      }
       const check = await checkItalianVat(vat);
-      if (check === null) {
-        vatMessage = "Il servizio europeo di verifica P.IVA non risponde: riproveremo al prossimo salvataggio.";
-        data.vatVerified = false;
-      } else if (!check.valid) {
-        return NextResponse.json({ error: "Partita IVA non trovata nel registro europeo (VIES)." }, { status: 400 });
-      } else {
+      if (check?.valid) {
         data.vatVerified = true;
         data.vatVerifiedAt = new Date();
+        data.vatVerifiedMethod = "VIES";
+        data.vatDocumentPath = null;
         if (!("companyName" in body) || !data.companyName) {
           if (check.name) data.companyName = check.name;
         }
+      } else {
+        // Non su VIES (molti padroncini non sono iscritti agli scambi UE) o VIES
+        // giu': la P.IVA si salva lo stesso e si verifica con la visura camerale.
+        Object.assign(data, unverified);
+        vatMessage =
+          check === null
+            ? "Profilo salvato. Il registro europeo non risponde: carica la visura camerale qui sotto per verificare la P.IVA."
+            : "Profilo salvato. La P.IVA non risulta sul registro europeo VIES (succede a molte ditte individuali): carica la visura camerale qui sotto per verificarla.";
       }
     }
   }

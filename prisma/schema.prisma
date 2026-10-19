@@ -44,9 +44,14 @@ model User {
   // lavora. Servono per la bacheca "Per te" e per gli avvisi WhatsApp mirati.
   vehicleTypes   String[] @default([])
   serviceRegions String[] @default([])
-  // P.IVA verificata sul servizio VIES dell'Unione europea.
-  vatVerified    Boolean  @default(false)
-  vatVerifiedAt  DateTime?
+  // P.IVA verificata: su VIES (Unione europea) oppure, per chi non risulta su
+  // VIES, con la visura camerale caricata dal profilo (approvata in automatico).
+  vatVerified       Boolean  @default(false)
+  vatVerifiedAt     DateTime?
+  // "VIES" | "VISURA"
+  vatVerifiedMethod String?
+  // Path dell'oggetto nel bucket privato "vat-documents".
+  vatDocumentPath   String?
 
   companyRequests     Request[] @relation("CompanyRequests")
   transporterRequests Request[] @relation("TransporterJobs")

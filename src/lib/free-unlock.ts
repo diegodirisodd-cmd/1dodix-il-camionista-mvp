@@ -8,7 +8,7 @@ import { prisma } from "./prisma";
 // (azienda che sceglie, trasportatore che conferma) non passa da Stripe. Viene
 // registrato in RequestUnlock con amountCents = 0 e senza sessione Stripe.
 //
-// - Serve una P.IVA verificata su VIES (User.vatVerified): senza, si paga.
+// - Serve una P.IVA verificata, su VIES o con visura (User.vatVerified): senza, si paga.
 // - "Il primo" si conta per P.IVA: tutti gli sblocchi, gratuiti o pagati, di
 //   qualsiasi account con la stessa P.IVA consumano il gratuito.
 

@@ -72,6 +72,47 @@ export async function ensureServicePhotoBucket() {
   return ensureBucketPromise;
 }
 
+// Bucket privato per le visure camerali: le carica chi ha una P.IVA che non
+// risulta su VIES (molti padroncini non sono iscritti agli scambi UE). Il file
+// resta disponibile solo lato server, per eventuali controlli successivi.
+export const VAT_DOCUMENT_BUCKET = "vat-documents";
+
+export const VAT_DOCUMENT_MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+
+export const VAT_DOCUMENT_ALLOWED_TYPES = [
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+] as const;
+
+let ensureVatBucketPromise: Promise<void> | null = null;
+
+export async function ensureVatDocumentBucket() {
+  if (!ensureVatBucketPromise) {
+    ensureVatBucketPromise = (async () => {
+      const supabase = getSupabaseAdminClient();
+      const { data, error } = await supabase.storage.getBucket(VAT_DOCUMENT_BUCKET);
+
+      if (data && !error) return;
+
+      const { error: createError } = await supabase.storage.createBucket(VAT_DOCUMENT_BUCKET, {
+        public: false,
+        fileSizeLimit: VAT_DOCUMENT_MAX_BYTES,
+        allowedMimeTypes: [...VAT_DOCUMENT_ALLOWED_TYPES],
+      });
+
+      if (createError && !/already exists/i.test(createError.message)) {
+        ensureVatBucketPromise = null;
+        throw createError;
+      }
+    })();
+  }
+
+  return ensureVatBucketPromise;
+}
+
 function isAbsoluteUrl(value: string) {
   return /^https?:\/\//i.test(value);
 }

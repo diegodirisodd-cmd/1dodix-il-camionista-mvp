@@ -14,6 +14,7 @@ export type ProfileData = {
   companyName: string | null;
   vatNumber: string | null;
   vatVerified: boolean;
+  vatVerifiedMethod?: string | null;
   city: string | null;
   province: string | null;
   vehicleTypes: string[];
@@ -42,6 +43,8 @@ export function ProfileForm({ initial, welcome }: { initial: ProfileData; welcom
   const [p, setP] = useState(initial);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  // P.IVA come salvata sul server: la visura si carica solo per quella.
+  const [savedVat, setSavedVat] = useState(initial.vatNumber ?? "");
   const isTransporter = p.role === "TRANSPORTER";
 
   function toggle(key: "vehicleTypes" | "serviceRegions", value: string) {
@@ -77,9 +80,11 @@ export function ProfileForm({ initial, welcome }: { initial: ProfileData; welcom
       return;
     }
     setP((prev) => ({ ...prev, ...data }));
+    setSavedVat(data.vatNumber ?? "");
     setMsg({ ok: true, text: data.vatMessage ?? "Profilo salvato." });
     router.refresh();
-    if (welcome && isTransporter) router.push("/dashboard/transporter/jobs");
+    // Se manca solo la visura, resta qui per caricarla.
+    if (welcome && isTransporter && !data.vatMessage) router.push("/dashboard/transporter/jobs");
   }
 
   const field = (key: keyof ProfileData, label: string, props: React.InputHTMLAttributes<HTMLInputElement> = {}) => (
@@ -149,7 +154,12 @@ export function ProfileForm({ initial, welcome }: { initial: ProfileData; welcom
           {field("companyName", isTransporter ? "Nome / ragione sociale" : "Ragione sociale", { autoComplete: "organization" })}
           <label className="form-field">
             <span className="label">
-              Partita IVA {p.vatVerified && <span className="badge-verified ml-1 normal-case">Verificata</span>}
+              Partita IVA{" "}
+              {p.vatVerified && (
+                <span className="badge-verified ml-1 normal-case">
+                  {p.vatVerifiedMethod === "VISURA" ? "Verificata con visura" : "Verificata"}
+                </span>
+              )}
             </span>
             <input
               className="input-field stat-mono"
@@ -157,7 +167,9 @@ export function ProfileForm({ initial, welcome }: { initial: ProfileData; welcom
               onChange={(e) => setP((prev) => ({ ...prev, vatNumber: e.target.value, vatVerified: false }))}
               placeholder="IT12345678901"
             />
-            <span className="text-xs text-neutral-500">La verifichiamo sul registro europeo VIES: chi ha la P.IVA verificata ottiene il badge.</span>
+            <span className="text-xs text-neutral-500">
+              La verifichiamo sul registro europeo VIES. Se non risulta, basta caricare la visura camerale. Con la P.IVA verificata hai il badge e il primo sblocco gratis.
+            </span>
           </label>
           {field("city", "Città", { autoComplete: "address-level2" })}
           {field("province", "Provincia (sigla)", { maxLength: 2, placeholder: "SA" })}
@@ -178,10 +190,66 @@ export function ProfileForm({ initial, welcome }: { initial: ProfileData; welcom
         </label>
       </div>
 
+      {savedVat && !p.vatVerified && (p.vatNumber ?? "") === savedVat && (
+        <VisuraUpload
+          onVerified={() => {
+            setP((prev) => ({ ...prev, vatVerified: true, vatVerifiedMethod: "VISURA" }));
+            setMsg({ ok: true, text: "Visura caricata: la tua P.IVA ora è verificata." });
+            router.refresh();
+          }}
+        />
+      )}
+
       {msg && <p className={msg.ok ? "alert-success" : "alert-danger"}>{msg.text}</p>}
       <button type="submit" className="btn-primary min-h-[48px] w-full sm:w-auto" disabled={saving}>
         {saving ? "Salvataggio..." : welcome ? "Salva e vai ai carichi" : "Salva profilo"}
       </button>
     </form>
+  );
+}
+
+function VisuraUpload({ onVerified }: { onVerified: () => void }) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function upload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploading(true);
+    setError(null);
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch("/api/profile/vat-document", { method: "POST", body: form });
+    const data = (await res.json().catch(() => ({}))) as { error?: string };
+    setUploading(false);
+    if (!res.ok) {
+      setError(data.error ?? "Caricamento non riuscito, riprova.");
+      return;
+    }
+    onVerified();
+  }
+
+  return (
+    <div className="card space-y-3">
+      <div className="space-y-1">
+        <h2 className="text-lg">Verifica la P.IVA con la visura</h2>
+        <p className="text-sm text-neutral-600">
+          La tua P.IVA non risulta sul registro europeo VIES, cosa normale per molte ditte individuali. Carica la visura
+          camerale (PDF o foto, massimo 10 MB) e la verifica è immediata.
+        </p>
+      </div>
+      <label className={`btn-secondary min-h-[48px] w-full cursor-pointer sm:w-auto ${uploading ? "pointer-events-none opacity-60" : ""}`}>
+        {uploading ? "Caricamento..." : "Carica la visura camerale"}
+        <input
+          type="file"
+          className="sr-only"
+          accept="application/pdf,image/jpeg,image/png,image/webp,image/heic"
+          onChange={upload}
+          disabled={uploading}
+        />
+      </label>
+      {error && <p className="alert-danger">{error}</p>}
+    </div>
   );
 }

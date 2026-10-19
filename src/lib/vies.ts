@@ -1,6 +1,26 @@
 import "server-only";
 
 /**
+ * Controllo formale di una partita IVA italiana: 11 cifre e cifra di controllo
+ * giusta. Non dice se la ditta esiste, ma scarta errori di battitura e numeri
+ * inventati ("12345678901") prima di VIES o della visura.
+ */
+export function isValidItalianVatFormat(raw: string | null | undefined): boolean {
+  const number = String(raw ?? "")
+    .toUpperCase()
+    .replace(/[^0-9A-Z]/g, "")
+    .replace(/^IT/, "");
+  if (!/^\d{11}$/.test(number) || /^0{11}$/.test(number)) return false;
+  let sum = 0;
+  for (let i = 0; i < 10; i++) {
+    const d = Number(number[i]);
+    if (i % 2 === 0) sum += d;
+    else sum += d * 2 > 9 ? d * 2 - 9 : d * 2;
+  }
+  return (10 - (sum % 10)) % 10 === Number(number[10]);
+}
+
+/**
  * Verifica una partita IVA italiana sul servizio VIES della Commissione
  * europea. Ritorna null se il servizio non risponde (non e' un "no").
  */
