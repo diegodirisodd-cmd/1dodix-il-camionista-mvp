@@ -24,6 +24,7 @@ export default async function ProfilePage({ searchParams }: { searchParams?: { b
       companyName: true,
       vatNumber: true,
       vatVerified: true,
+      vatVerifiedMethod: true,
       city: true,
       province: true,
       vehicleTypes: true,
