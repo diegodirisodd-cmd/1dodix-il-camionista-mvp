@@ -4,7 +4,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 // quelli con sede nelle province di Offer.targetProvinces, se non vuoto).
 // Chiamata dal trigger AFTER INSERT su "Offer" (payload: { offerId }), oppure a mano
 // con lo stesso payload per rilanciare un'offerta rimasta "pending".
-// - Resta dormiente finché WHATSAPP_OFFER_TEMPLATE non e' impostato (template Meta approvato).
+// - Template: WHATSAPP_OFFER_TEMPLATE, altrimenti offerta_fornitore (approvato da Meta).
 // - Una sola esecuzione per offerta: claim atomico pending -> sending.
 // - Un solo messaggio per trasportatore: riga unica in "OfferDelivery" prima dell'invio.
 // - SANDBOX_ONLY (default true): invia solo al numero di test, a tutti i destinatari "simulati".
@@ -12,7 +12,8 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const WA_TOKEN = Deno.env.get("WHATSAPP_TOKEN") ?? "";
 const PHONE_ID = Deno.env.get("WHATSAPP_PHONE_ID") ?? "1223790424131412";
-const TEMPLATE_NAME = Deno.env.get("WHATSAPP_OFFER_TEMPLATE") ?? "";
+// Template Meta approvato il 19 ott 2026 (Marketing, italiano, 2 parametri); il secret lo sovrascrive.
+const TEMPLATE_NAME = Deno.env.get("WHATSAPP_OFFER_TEMPLATE") || "offerta_fornitore";
 const TEMPLATE_LANG = Deno.env.get("WHATSAPP_TEMPLATE_LANG") ?? "it";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SB_SERVICE_ROLE_KEY") ?? "";
