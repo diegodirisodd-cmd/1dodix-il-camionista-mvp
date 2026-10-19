@@ -308,6 +308,8 @@ model Offer {
   title     String
   body      String
   linkUrl   String?
+  // Sigle di provincia della sede dei destinatari; vuoto = tutti i trasportatori.
+  targetProvinces String[] @default([])
   // pending -> sending -> done (compilato dalla Edge Function whatsapp-offer-notify)
   waStatus  String   @default("pending")
   waSent    Int      @default(0)

@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-// Offerte di Di Riso Teloni: avviso WhatsApp a tutti i trasportatori con consenso.
+// Offerte di Di Riso Teloni: avviso WhatsApp ai trasportatori con consenso (tutti, o solo
+// quelli con sede nelle province di Offer.targetProvinces, se non vuoto).
 // Chiamata dal trigger AFTER INSERT su "Offer" (payload: { offerId }), oppure a mano
 // con lo stesso payload per rilanciare un'offerta rimasta "pending".
 // - Resta dormiente finché WHATSAPP_OFFER_TEMPLATE non e' impostato (template Meta approvato).
@@ -20,8 +21,8 @@ const SANDBOX_TEST_NUMBER = "393921489852";
 const MAX_AGE_MS = 24 * 60 * 60 * 1000;
 const CONCURRENCY = 5;
 
-type Offer = { id: number; title: string; body: string; linkUrl: string | null; createdAt: string };
-type Carrier = { id: number; phone: string | null };
+type Offer = { id: number; title: string; body: string; linkUrl: string | null; createdAt: string; targetProvinces: string[] | null };
+type Carrier = { id: number; phone: string | null; province: string | null };
 
 const H = { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json" };
 
@@ -80,7 +81,7 @@ Deno.serve(async (req: Request) => {
     const force = payload?.force === true;
     if (!Number.isInteger(offerId) || offerId <= 0) return json({ error: "payload non valido" }, 400);
 
-    const offer = (await rest<Offer>(`Offer?id=eq.${offerId}&select=id,title,body,linkUrl,createdAt`)).data[0];
+    const offer = (await rest<Offer>(`Offer?id=eq.${offerId}&select=id,title,body,linkUrl,createdAt,targetProvinces`)).data[0];
     if (!offer) return json({ skipped: "offerta non trovata" });
     const createdMs = new Date(offer.createdAt + (offer.createdAt.endsWith("Z") ? "" : "Z")).getTime();
     if (!Number.isFinite(createdMs) || Date.now() - createdMs > MAX_AGE_MS) return json({ skipped: "offerta non recente" });
@@ -100,7 +101,7 @@ Deno.serve(async (req: Request) => {
     const carriers: Carrier[] = [];
     for (let lastId = 0; ;) {
       const page = await rest<Carrier>(
-        `User?role=eq.TRANSPORTER&whatsappOptIn=eq.true&phone=not.is.null&id=gt.${lastId}&select=id,phone&order=id.asc&limit=1000`,
+        `User?role=eq.TRANSPORTER&whatsappOptIn=eq.true&phone=not.is.null&id=gt.${lastId}&select=id,phone,province&order=id.asc&limit=1000`,
       );
       if (!page.ok) {
         await release();
@@ -109,6 +110,14 @@ Deno.serve(async (req: Request) => {
       carriers.push(...page.data);
       if (page.data.length < 1000) break;
       lastId = page.data[page.data.length - 1].id;
+    }
+
+    // Offerta per regione: solo chi ha la sede (sigla di provincia) tra quelle scelte.
+    const targets = new Set((offer.targetProvinces ?? []).map((p) => p.trim().toUpperCase()));
+    if (targets.size > 0) {
+      const inArea = carriers.filter((c) => targets.has((c.province ?? "").trim().toUpperCase()));
+      carriers.length = 0;
+      carriers.push(...inArea);
     }
 
     const text = clean(offer.body, 700) + (offer.linkUrl ? ` ${offer.linkUrl}` : "");
