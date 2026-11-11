@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Archivo, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const inter = Inter({
@@ -38,6 +39,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="it" className={`${inter.variable} ${archivo.variable} ${jbMono.variable}`}>
       <body className="font-sans bg-appBg text-textStrong">
         <div className="min-h-screen">{children}</div>
+        {/* Vercel Web Analytics: visite, provenienza (referrer) e parametri UTM.
+            Senza cookie. Va attivato anche dal pannello Vercel → Analytics. */}
+        <Analytics />
       </body>
     </html>
   );
