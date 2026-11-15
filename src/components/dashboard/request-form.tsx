@@ -40,8 +40,22 @@ function todayIso() {
   return d.toISOString().slice(0, 10);
 }
 
-export function RequestForm({ onSuccessRedirect }: { onSuccessRedirect?: string }) {
+type RequestFormProps = {
+  onSuccessRedirect?: string;
+  // Dove si apre il carico appena pubblicato (cambia fra azienda e trasportatore).
+  detailBasePath?: string;
+  // Trasportatore che pubblica un carico preso da un suo committente: deve
+  // dichiarare di poterlo affidare a un altro vettore (sub-vezione).
+  requireSubcontractDeclaration?: boolean;
+};
+
+export function RequestForm({
+  onSuccessRedirect,
+  detailBasePath = "/dashboard/company/requests",
+  requireSubcontractDeclaration = false,
+}: RequestFormProps) {
   const router = useRouter();
+  const [declared, setDeclared] = useState(false);
   const [pickup, setPickup] = useState<PlaceValue | null>(null);
   const [delivery, setDelivery] = useState<PlaceValue | null>(null);
   const [form, setForm] = useState(INITIAL);
@@ -68,6 +82,10 @@ export function RequestForm({ onSuccessRedirect }: { onSuccessRedirect?: string 
       setError(`Indica un prezzo fra ${MIN_PRICE_EUR} e ${MAX_PRICE_EUR.toLocaleString("it-IT")} €.`);
       return;
     }
+    if (requireSubcontractDeclaration && !declared) {
+      setError("Per pubblicare devi confermare la dichiarazione sul committente.");
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/requests", {
@@ -91,6 +109,7 @@ export function RequestForm({ onSuccessRedirect }: { onSuccessRedirect?: string 
           description: form.description || null,
           pickupContact: form.pickupContact || null,
           pickupPhone: form.pickupPhone || null,
+          ...(requireSubcontractDeclaration ? { subcontractDeclaration: declared } : {}),
         }),
       });
       const data = (await res.json().catch(() => ({}))) as { id?: number; error?: string };
@@ -99,7 +118,7 @@ export function RequestForm({ onSuccessRedirect }: { onSuccessRedirect?: string 
         setLoading(false);
         return;
       }
-      router.push(data.id ? `/dashboard/company/requests/${data.id}?created=1` : onSuccessRedirect ?? "/dashboard/company/requests");
+      router.push(data.id ? `${detailBasePath}/${data.id}?created=1` : onSuccessRedirect ?? detailBasePath);
     } catch {
       setError("Connessione non riuscita. Riprova.");
       setLoading(false);
@@ -281,6 +300,23 @@ export function RequestForm({ onSuccessRedirect }: { onSuccessRedirect?: string 
           </div>
         )}
       </div>
+
+      {requireSubcontractDeclaration && (
+        <label className="card-muted flex items-start gap-3 text-sm text-textStrong">
+          <input
+            type="checkbox"
+            className="mt-0.5 h-5 w-5 shrink-0"
+            checked={declared}
+            onChange={(e) => setDeclared(e.target.checked)}
+            required
+          />
+          <span>
+            Dichiaro che questo carico mi è stato affidato da un committente che ha accettato per iscritto che il
+            trasporto sia eseguito da un altro vettore (sub-vezione, art. 6-ter D.Lgs. 286/2005), oppure che sono io il
+            proprietario della merce. Il trasportatore che sceglierò non potrà affidarlo a sua volta ad altri.
+          </span>
+        </label>
+      )}
 
       {error && (
         <p className="alert-danger" role="alert">

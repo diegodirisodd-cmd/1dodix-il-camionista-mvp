@@ -119,6 +119,11 @@ model Request {
   // Ciclo di vita: OPEN -> ASSIGNED (azienda ha scelto e pagato) ->
   // CONFIRMED (ha pagato anche il trasportatore, contatti visibili) ->
   // DELIVERED. In ogni momento prima di CONFIRMED: CANCELLED.
+  // Carico pubblicato da un trasportatore (carico di un suo committente da
+  // affidare a un altro vettore): momento in cui ha dichiarato di avere il
+  // consenso scritto del committente alla sub-vezione. Null per le aziende.
+  subcontractDeclaredAt DateTime?
+
   selectedApplicationId Int?
   agreedPrice           Int?
   assignedAt            DateTime?

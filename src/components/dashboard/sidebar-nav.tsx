@@ -20,6 +20,7 @@ export const navByRole: Record<Role, { href: string; label: string; short?: stri
     { href: "/dashboard/transporter/accepted", label: "I miei carichi", short: "Miei" },
     { href: "/dashboard/services", label: "Borsa Servizi", short: "Servizi" },
     { href: "/dashboard/transporter/profile", label: "Profilo", short: "Profilo" },
+    { href: "/dashboard/transporter/my-loads", label: "Affida un carico", short: "Affida" },
   ],
   SUPPLIER: [
     { href: "/dashboard/supplier", label: "Panoramica", short: "Home" },

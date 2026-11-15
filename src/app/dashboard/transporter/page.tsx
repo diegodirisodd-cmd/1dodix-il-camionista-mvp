@@ -59,6 +59,8 @@ export default async function TransporterDashboardPage() {
             }
           : {}),
         applications: { none: { transporterId: user.id } },
+        // I carichi che ha pubblicato lui stesso non li vede in bacheca.
+        companyId: { not: user.id },
       },
       orderBy: [{ pickupDate: "asc" }, { createdAt: "desc" }],
       take: 6,
@@ -130,6 +132,19 @@ export default async function TransporterDashboardPage() {
           </Link>
         </div>
       )}
+
+      <Link
+        href="/dashboard/transporter/my-loads/new"
+        className="card card-hover flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div>
+          <p className="font-semibold text-textStrong">Hai un carico che non riesci a coprire?</p>
+          <p className="text-sm text-neutral-600">
+            Affidalo a un altro trasportatore: lo pubblichi gratis e arriva su WhatsApp ai colleghi della zona.
+          </p>
+        </div>
+        <span className="btn-secondary min-h-[44px] shrink-0">Affida un carico</span>
+      </Link>
 
       <div className="grid grid-cols-3 gap-3">
         <Link href="/dashboard/transporter/accepted" className="card card-hover space-y-1">

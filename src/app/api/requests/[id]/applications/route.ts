@@ -22,6 +22,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     where: { id: requestId },
     select: {
       id: true,
+      companyId: true,
       status: true,
       pickupDate: true,
       pickup: true,
@@ -30,6 +31,9 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     },
   });
   if (!load) return NextResponse.json({ error: "Carico non trovato" }, { status: 404 });
+  if (load.companyId === user.id) {
+    return NextResponse.json({ error: "Non puoi candidarti a un carico che hai pubblicato tu." }, { status: 403 });
+  }
   if (!canApply(load)) {
     return NextResponse.json({ error: "Questo carico non accetta più candidature." }, { status: 409 });
   }

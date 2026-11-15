@@ -32,7 +32,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   if (!app) return NextResponse.json({ error: "Candidatura non trovata" }, { status: 404 });
 
   const isCandidate = user.role === "TRANSPORTER" && app.transporterId === user.id;
-  const isOwner = user.role === "COMPANY" && app.request.companyId === user.id;
+  const isOwner = app.request.companyId === user.id;
 
   switch (body?.action) {
     case "withdraw": {

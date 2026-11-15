@@ -86,18 +86,22 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
     return <NotAvailable title="Carico non trovato" text="Il carico non esiste o è stato rimosso." backHref={backHref} />;
   }
 
-  const isOwner = user.role === "COMPANY" && load.companyId === user.id;
+  // Proprietario = chi ha pubblicato il carico: un'azienda oppure un
+  // trasportatore che affida a un altro vettore il carico di un suo committente.
+  const isOwner = load.companyId === user.id;
   if (user.role === "COMPANY" && !isOwner) redirect("/dashboard/company/requests");
+  // Trasportatore che guarda il carico di un altro: parte che si candida.
+  const isCandidateSide = user.role === "TRANSPORTER" && !isOwner;
 
   const myApplication =
-    user.role === "TRANSPORTER"
+    isCandidateSide
       ? await prisma.application.findUnique({
           where: { requestId_transporterId: { requestId, transporterId: user.id } },
         })
       : null;
 
   // Un trasportatore vede i carichi aperti e quelli a cui ha partecipato.
-  if (user.role === "TRANSPORTER" && load.status !== REQUEST_STATUS.OPEN && !myApplication) {
+  if (isCandidateSide && load.status !== REQUEST_STATUS.OPEN && !myApplication) {
     return (
       <NotAvailable
         title="Carico non più disponibile"
@@ -108,7 +112,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
   }
 
   const contactsOpen = load.status === REQUEST_STATUS.CONFIRMED || load.status === REQUEST_STATUS.DELIVERED;
-  const iAmAssigned = user.role === "TRANSPORTER" && load.transporterId === user.id;
+  const iAmAssigned = isCandidateSide && load.transporterId === user.id;
 
   const companyPaid = isOwner
     ? Boolean(
@@ -121,7 +125,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
 
   // Primo sblocco gratuito: lo mostriamo solo a chi puo' usarlo su questa pagina.
   const freeUnlockState =
-    (isOwner && !companyPaid) || user.role === "TRANSPORTER" ? await freeUnlockStatus(user.id) : "used";
+    (isOwner && !companyPaid) || isCandidateSide ? await freeUnlockStatus(user.id) : "used";
 
   let candidates: CandidateSummary[] = [];
   if (isOwner || user.role === "ADMIN") {
@@ -193,7 +197,9 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
 
   const data: LoadDetailData = {
     id: load.id,
-    role: user.role as LoadDetailData["role"],
+    // Ruolo nella pagina: chi ha pubblicato vede il lato "azienda" (candidati,
+    // scelta, pagamento) anche se e' un trasportatore.
+    role: (isOwner ? "COMPANY" : user.role) as LoadDetailData["role"],
     backHref,
     status: load.status,
     pickup: load.pickup,
@@ -224,6 +230,7 @@ export async function RequestDetailPage({ requestId, backHref }: RequestDetailPa
         : null,
       vatVerified: load.company.vatVerified,
       memberSince: load.company.createdAt.toISOString(),
+      isSubcontract: load.subcontractDeclaredAt !== null,
       contacts: companyContactsVisible
         ? {
             email: load.company.email,
