@@ -61,6 +61,8 @@ export type LoadDetailData = {
     place: string | null;
     vatVerified: boolean;
     memberSince: string;
+    // Pubblicato da un trasportatore per conto di un suo committente (sub-vezione).
+    isSubcontract: boolean;
     contacts: {
       email: string;
       phone: string | null;
@@ -191,7 +193,9 @@ export function LoadDetail({ data }: { data: LoadDetailData }) {
 
           {data.role !== "COMPANY" && (
             <div className="card space-y-3">
-              <h2 className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">Azienda</h2>
+              <h2 className="text-xs font-semibold uppercase tracking-[0.3em] text-accent-600">
+                {data.company.isSubcontract ? "Pubblicato da un trasportatore" : "Azienda"}
+              </h2>
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-lg font-semibold text-textStrong">{data.company.name}</p>
                 {data.company.vatVerified && <span className="badge-verified">P.IVA verificata</span>}
@@ -199,6 +203,12 @@ export function LoadDetail({ data }: { data: LoadDetailData }) {
               <p className="text-sm text-neutral-600">
                 {data.company.place ? `${data.company.place} · ` : ""}su DodiX da {memberSince(data.company.memberSince)}
               </p>
+              {data.company.isSubcontract && (
+                <p className="rounded-xl border border-warning/30 bg-warning/10 p-3 text-xs text-textStrong">
+                  Carico di un suo committente, affidato in sub-vezione: chi pubblica ha dichiarato di avere il consenso
+                  scritto del committente. Se vieni scelto devi eseguirlo tu, senza affidarlo ad altri vettori.
+                </p>
+              )}
               {data.company.contacts ? (
                 <div className="space-y-1 rounded-xl border border-success/30 bg-success/10 p-3 text-sm text-textStrong">
                   <p className="font-semibold">Contatti</p>

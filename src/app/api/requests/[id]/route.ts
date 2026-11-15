@@ -26,7 +26,8 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   });
   if (!load) return NextResponse.json({ error: "Carico non trovato" }, { status: 404 });
 
-  const isOwner = user.role === "COMPANY" && load.companyId === user.id;
+  // Proprietario = chi ha pubblicato il carico (azienda o trasportatore).
+  const isOwner = load.companyId === user.id;
   const isAssigned = user.role === "TRANSPORTER" && load.transporterId === user.id;
 
   if (action === "deliver") {

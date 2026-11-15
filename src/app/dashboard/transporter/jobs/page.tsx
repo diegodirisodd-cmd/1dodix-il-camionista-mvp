@@ -35,6 +35,8 @@ export default async function TransporterJobsPage({ searchParams }: { searchPara
 
   const and: Prisma.RequestWhereInput[] = [
     { status: REQUEST_STATUS.OPEN, transporterId: null },
+    // I carichi che ha pubblicato lui stesso li gestisce da "Affida un carico".
+    { companyId: { not: user.id } },
     { OR: [{ pickupDate: null }, { pickupDate: { gte: yesterday } }] },
   ];
   if (from) and.push({ pickupRegion: from });

@@ -5,6 +5,7 @@ import { getSessionUser } from "@/lib/auth";
 import { calculateCommission } from "@/lib/commission";
 import { selectWithExistingPayment, selectWithFreeUnlock } from "@/lib/load-flow";
 import { prisma } from "@/lib/prisma";
+import { canPublishLoads, ownLoadPath } from "@/lib/roles";
 import { APPLICATION_STATUS, REQUEST_STATUS, effectivePriceCents } from "@/lib/request-flow";
 
 const baseUrl =
@@ -21,7 +22,8 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
   try {
     const user = await getSessionUser();
     if (!user) return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-    if (user.role !== "COMPANY") return NextResponse.json({ error: "Solo l'azienda sceglie." }, { status: 403 });
+    // Sceglie chi ha pubblicato il carico (azienda o trasportatore).
+    if (!canPublishLoads(user.role)) return NextResponse.json({ error: "Solo chi ha pubblicato il carico sceglie." }, { status: 403 });
 
     const applicationId = Number(params.id);
     if (!Number.isInteger(applicationId)) return NextResponse.json({ error: "Candidatura non valida" }, { status: 400 });
@@ -72,7 +74,7 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
     if (total < 50) return NextResponse.json({ error: "Importo della commissione non valido." }, { status: 400 });
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
-    const detailUrl = `${baseUrl}/dashboard/company/requests/${app.request.id}`;
+    const detailUrl = `${baseUrl}${ownLoadPath(user.role, app.request.id)}`;
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],

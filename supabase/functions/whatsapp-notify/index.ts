@@ -272,6 +272,8 @@ Deno.serve(async (req: Request) => {
       const transporters = await getTransporters();
       const seen = new Set<string>();
       for (const t of transporters) {
+        // Un trasportatore che pubblica un carico non riceve l'avviso del suo carico.
+        if (record.companyId != null && Number(t.id) === Number(record.companyId)) continue;
         if (!matches(t, record)) {
           skipped++;
           continue;

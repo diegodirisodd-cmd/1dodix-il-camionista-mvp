@@ -4,6 +4,7 @@ import { getSessionUser } from "@/lib/auth";
 import { MAX_PRICE_EUR, MIN_PRICE_EUR, estimateRoadKm, formatPlace, parseEuroToCents, priceOutOfRange } from "@/lib/catalog";
 import { findPlace } from "@/lib/places";
 import { prisma } from "@/lib/prisma";
+import { canPublishLoads } from "@/lib/roles";
 import { isPickupPast, maskContacts } from "@/lib/request-flow";
 
 function toNumberOrNull(val: unknown): number | null {
@@ -32,12 +33,23 @@ function publicText(val: unknown, max: number): string | null {
 export async function POST(request: Request) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-  if (user.role !== "COMPANY") {
-    return NextResponse.json({ error: "Solo le aziende possono pubblicare carichi." }, { status: 403 });
+  if (!canPublishLoads(user.role)) {
+    return NextResponse.json({ error: "Solo aziende e trasportatori possono pubblicare carichi." }, { status: 403 });
   }
 
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body) return NextResponse.json({ error: "Dati mancanti" }, { status: 400 });
+
+  // Un trasportatore che pubblica affida a un altro vettore il carico di un
+  // suo committente: la sub-vezione richiede il consenso scritto del
+  // committente (art. 6-ter D.Lgs. 286/2005), che deve dichiarare.
+  const isTransporter = user.role === "TRANSPORTER";
+  if (isTransporter && body.subcontractDeclaration !== true) {
+    return NextResponse.json(
+      { error: "Per pubblicare devi confermare la dichiarazione sul committente." },
+      { status: 400 },
+    );
+  }
 
   const placeArg = (v: unknown) => (v && typeof v === "object" ? (v as { city?: unknown; province?: unknown }) : null);
   const pp = placeArg(body.pickupPlace);
@@ -102,6 +114,7 @@ export async function POST(request: Request) {
         description: publicText(body.description, 2000),
         pickupContact: str(body.pickupContact, 100),
         pickupPhone: str(body.pickupPhone, 40),
+        subcontractDeclaredAt: isTransporter ? new Date() : null,
       },
       select: { id: true },
     });
